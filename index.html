@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Make.pics — Instant Passport Photo Maker</title>
+<meta name="description" content="Create compliant passport & visa photos in seconds. AI background removal runs fully in your browser: private, fast, and better." />
+<meta property="og:title" content="Make.pics — Instant Passport Photo Maker" />
+<meta property="og:description" content="AI passport photos in your browser. Private, instant, high-quality." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="topbar">
+      <img id="logo" src="logo.png" alt="Make.pics" />
+      <div class="topright">
+        <span id="backendBadge" class="badge hidden"></span>
+        <div class="btnGroup">
+          <button id="profileBtn" class="iconBtn brand" aria-label="Your profile" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          </button>
+          <button id="menuBtn" class="iconBtn ghost" aria-label="Open menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          </button>
+          <div id="profileMenu" class="dropdown hidden">
+            <div class="ddHead"><div class="ddName">Guest user</div><div class="ddSub">Not signed in</div></div>
+            <button class="ddItem">Sign in</button>
+            <button class="ddItem">My photos</button>
+            <button class="ddItem">Settings</button>
+          </div>
+          <div id="menuMenu" class="dropdown hidden">
+            <button class="ddItem" data-action="new">New photo</button>
+            <button class="ddItem">Passport sizes</button>
+            <button class="ddItem">How it works</button>
+            <button class="ddItem">Privacy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="uploadView" class="view">
+    <div class="crystalWrap" aria-hidden="true">
+      <div class="crystalGlow"></div>
+      <div id="crystalBox"><canvas id="crystalCanvas"></canvas></div>
+    </div>
+    <div class="hero">
+      <h1>Passport photos<br /><span class="grad">in seconds</span></h1>
+      <p class="lead">AI background removal runs fully in your browser. Private, fast, better.</p>
+      <div class="features">
+        <div class="feat">
+          <div class="featI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div>
+          <div><div class="featT">Instant result</div><div class="featS">On-device AI</div></div>
+        </div>
+        <div class="feat">
+          <div class="featI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10v4M10 10v4M7 12h3" stroke-linecap="round"/><path d="M13.5 10v4M13.5 10h1.6a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-1.6" stroke-linecap="round"/></svg></div>
+          <div><div class="featT">High quality</div><div class="featS">Precision matting</div></div>
+        </div>
+        <div class="feat">
+          <div class="featI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <div><div class="featT">Private &amp; secure</div><div class="featS">No uploads ever</div></div>
+        </div>
+      </div>
+      <div id="drop" class="drop">
+        <input id="fileInput" type="file" accept="image/*" hidden />
+        <div class="dropInner">
+          <div class="dropIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div class="dropTitle">Drop a photo or tap to choose</div>
+          <div class="dropSub">JPG or PNG · Your image never leaves this device</div>
+          <button id="pickBtn" class="btn primary">Choose photo</button>
+        </div>
+      </div>
+      <div id="uploadError" class="err hidden"></div>
+    </div>
+  </section>
+
+  <section id="processingView" class="view hidden">
+    <div class="loader">
+      <div class="loaderRing outer"></div>
+      <div class="loaderRing inner"></div>
+    </div>
+    <div id="procTitle" class="procTitle">Warming up the AI…</div>
+    <div id="procSub" class="procSub">Preparing your photo studio.</div>
+  </section>
+
+  <section id="resultView" class="view hidden">
+    <div class="resultHead">
+      <div>
+        <h1>Your passport photo is ready</h1>
+        <p class="muted">Fine-tune framing, pick a background, then download.</p>
+      </div>
+      <button id="newBtn" class="btn ghost">↺ New photo</button>
+    </div>
+    <div class="resultGrid">
+      <div class="panel">
+        <div class="previewBox"><canvas id="previewCanvas"></canvas></div>
+        <label class="enhanceToggle" for="enhanceChk">
+          <span class="enhanceLabel"><span class="enhanceStar">✨</span> Auto Enhance</span>
+          <span class="enhanceSwitch">
+            <input id="enhanceChk" type="checkbox" checked />
+            <span class="enhanceTrack"><span class="enhanceThumb"></span></span>
+          </span>
+        </label>
+        <div class="framing">
+          <div class="frameHead">
+            <h3>Adjust framing</h3>
+            <label class="chk"><input id="guidesChk" type="checkbox" checked /> Guides</label>
+          </div>
+          <label class="slider">Zoom <input id="zoom" type="range" min="0.6" max="1.8" step="0.01" value="1"/></label>
+          <label class="slider">Vertical <input id="offY" type="range" min="-0.35" max="0.35" step="0.005" value="0"/></label>
+          <label class="slider">Horizontal <input id="offX" type="range" min="-0.35" max="0.35" step="0.005" value="0"/></label>
+          <button id="resetFrame" class="linkBtn">Reset framing</button>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="panel small">
+          <div class="pTitle">Photo size</div>
+          <select id="specSelect"></select>
+          <div id="specMeta" class="muted small"></div>
+        </div>
+        <div class="panel small">
+          <div class="pTitle">Background</div>
+          <div id="bgSwatches" class="swatches"></div>
+        </div>
+        <div class="panel small">
+          <div class="pTitle">Format</div>
+          <div class="fmt">
+            <button data-fmt="jpeg" class="fmtBtn active">JPEG</button>
+            <button data-fmt="png" class="fmtBtn">PNG</button>
+          </div>
+        </div>
+        <button id="dlSingle" class="btn primary big">↓ Download photo</button>
+        <button id="dlSheet" class="btn ghost big">Download 4×6″ print sheet</button>
+        <div id="timings" class="muted small center"></div>
+        <div id="resultError" class="err hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="siteFooter">
+    <div class="aboutCard">
+      <div class="aboutHead">
+        <div class="aboutBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+        </div>
+        <div>
+          <div class="aboutKicker">About</div>
+          <h2 class="aboutTitle">About <span class="grad">Make.pics</span></h2>
+        </div>
+      </div>
+      <p class="aboutText">
+        Make.pics creates compliant passport and visa photos in seconds. AI background
+        removal runs entirely on-device in your browser, so your photo is processed
+        locally and never uploaded to a server. Adjust framing, zoom, and rotation,
+        then export in the size and format you need.
+      </p>
+      <ul class="aboutList">
+        <li>
+          <span class="aboutIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+          </span>
+          <div>
+            <div class="aboutItemT">On-device AI background removal</div>
+            <div class="aboutItemS">Private by design — your image never leaves this device.</div>
+          </div>
+        </li>
+        <li>
+          <span class="aboutIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4z"/><path d="M14 14h6v6h-6z"/><path d="M14 4h6v6h-6z" opacity=".6"/><path d="M4 14h6v6H4z" opacity=".6"/></svg>
+          </span>
+          <div>
+            <div class="aboutItemT">Adjustable framing, zoom & rotation</div>
+            <div class="aboutItemS">Dial in the perfect crop with live guides.</div>
+          </div>
+        </li>
+        <li>
+          <span class="aboutIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+          </span>
+          <div>
+            <div class="aboutItemT">Multiple passport & visa presets</div>
+            <div class="aboutItemS">US, Schengen, UK, India, Canada, China, Australia and more.</div>
+          </div>
+        </li>
+        <li>
+          <span class="aboutIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
+          </span>
+          <div>
+            <div class="aboutItemT">Download as JPEG or PNG</div>
+            <div class="aboutItemS">High-resolution files ready for online applications.</div>
+          </div>
+        </li>
+        <li>
+          <span class="aboutIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="9" width="12" height="9" rx="1"/><path d="M8 9V5h8v4"/><path d="M6 14H4v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3h-2"/></svg>
+          </span>
+          <div>
+            <div class="aboutItemT">4×6″ print sheet option</div>
+            <div class="aboutItemS">Auto-tiled layout for one-click home or kiosk printing.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="footNote">© <span id="year"></span> Make.pics · Made for private, on-device photo editing.</div>
+  </footer>
+</div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "onnxruntime-web/webgpu": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.27.0/dist/ort.webgpu.bundle.min.mjs"
+  }
+}
+</script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
