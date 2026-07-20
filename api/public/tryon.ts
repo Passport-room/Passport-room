@@ -7,12 +7,12 @@
 import { Client } from "@gradio/client";
 import { Image, decode, encode } from "image-js";
 
-export const config = { runtime: "nodejs20.x", maxDuration: 300 };
+export const config = { runtime: "nodejs20.x", maxDuration: 60 };
 
 const SPACE_ID = "yisol/IDM-VTON";
 const MAX_BYTES = 8 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const TIMEOUT_MS = 170_000;
+const TIMEOUT_MS = 55_000;
 
 const MODEL_W = 768;
 const MODEL_H = 1024;
@@ -102,7 +102,7 @@ async function callSpaceOnce(
   garment: Blob,
   description: string,
 ): Promise<ArrayBuffer> {
-  const client = await Client.connect(SPACE_ID);
+  const client = await Client.connect(SPACE_ID, process.env.HF_TOKEN ? { hf_token: `hf_${process.env.HF_TOKEN.replace(/^hf_/, "")}` as `hf_${string}` } : undefined);
   const result = await client.predict("/tryon", {
     dict: { background: personPadded, layers: [], composite: null },
     garm_img: garment,

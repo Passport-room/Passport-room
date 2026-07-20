@@ -4,12 +4,12 @@
 
 import { Client } from "@gradio/client";
 
-export const config = { runtime: "nodejs20.x", maxDuration: 300 };
+export const config = { runtime: "nodejs20.x", maxDuration: 60 };
 
 const SPACE_ID = "sczhou/CodeFormer";
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-const TIMEOUT_MS = 220_000;
+const TIMEOUT_MS = 55_000;
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -48,7 +48,7 @@ function extractUrl(data: unknown): string | undefined {
 }
 
 async function callSpaceOnce(image: Blob, upscale: number) {
-  const client = await Client.connect(SPACE_ID);
+  const client = await Client.connect(SPACE_ID, process.env.HF_TOKEN ? { hf_token: `hf_${process.env.HF_TOKEN.replace(/^hf_/, "")}` as `hf_${string}` } : undefined);
   // sczhou/CodeFormer /inference — positional:
   // [image, pre_face_align, background_enhance, face_upsample, rescaling_factor, codeformer_fidelity]
   const result = await client.predict("/inference", [
