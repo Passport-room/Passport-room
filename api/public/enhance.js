@@ -7,7 +7,7 @@ import { Client } from "@gradio/client";
 const SPACE_ID = "sczhou/CodeFormer";
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-const TIMEOUT_MS = 220_000;
+const TIMEOUT_MS = 90_000;
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -71,7 +71,7 @@ const isTransient = (msg) =>
   /429|rate|queue|loading|starting|busy|502|503|504/i.test(msg);
 
 async function callSpaceWithRetry(image, upscale) {
-  const delays = [0, 3000, 8000];
+  const delays = [0, 5000];
   let lastErr = null;
   for (const d of delays) {
     if (d) await sleep(d);
@@ -101,7 +101,7 @@ export default async function handler(request) {
     return json({ error: "Expected multipart/form-data" }, 400);
   }
   const image = form.get("image");
-  const upscale = Math.min(4, Math.max(1, Number(form.get("upscale") ?? 2) || 2));
+  const upscale = Math.min(2, Math.max(1, Number(form.get("upscale") ?? 2) || 2));
   if (!(image instanceof File)) return json({ error: "image file required" }, 400);
   if (image.size === 0) return json({ error: "image is empty" }, 400);
   if (image.size > MAX_BYTES) return json({ error: "image exceeds 12 MB" }, 413);
@@ -131,6 +131,8 @@ export default async function handler(request) {
     if (msg === "timeout") return json({ error: "AI took too long. Try again." }, 504);
     if (/429|rate|too many/i.test(msg))
       return json({ error: "Space is busy. Retry shortly." }, 429);
+    if (/connect|loading|starting/i.test(msg))
+      return json({ error: "The enhancer Space is starting up. Please retry in ~30 seconds." }, 503);
     return json({ error: `Space error: ${msg}` }, 502);
   } finally {
     clearTimeout(timer);

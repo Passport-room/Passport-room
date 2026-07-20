@@ -1,7 +1,7 @@
 {
   "outputDirectory": "public",
   "functions": {
-    "api/public/enhance.js": { "maxDuration": 220 },
-    "api/public/tryon.js": { "maxDuration": 170 }
+    "api/public/enhance.js": { "maxDuration": 100 },
+    "api/public/tryon.js": { "maxDuration": 160 }
   }
 }

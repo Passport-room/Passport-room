@@ -10,7 +10,7 @@ import { Image, decode, encode } from "image-js";
 const SPACE_ID = "yisol/IDM-VTON";
 const MAX_BYTES = 8 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const TIMEOUT_MS = 170_000;
+const TIMEOUT_MS = 150_000;
 
 const MODEL_W = 768;
 const MODEL_H = 1024;
@@ -43,7 +43,6 @@ async function letterboxTo3x4(src) {
   const x = Math.floor((MODEL_W - w) / 2);
   const y = Math.floor((MODEL_H - h) / 2);
 
-  // Normalize to RGBA so source and target share the same color model for copyTo.
   const rgbaSrc = img.colorModel === "RGBA" ? img : img.convertColor("RGBA");
   const resized = rgbaSrc.resize({ width: w, height: h });
   let canvas = new Image(MODEL_W, MODEL_H, { colorModel: "RGBA" });
@@ -63,7 +62,6 @@ async function letterboxTo3x4(src) {
 async function cropBackToOriginal(modelOut, inset, origW, origH) {
   const img = decode(new Uint8Array(modelOut));
 
-  // If the space returned a different resolution, scale the inset.
   const sx = img.width / MODEL_W;
   const sy = img.height / MODEL_H;
   const cx = Math.max(0, Math.round(inset.x * sx));
@@ -87,15 +85,17 @@ async function cropBackToOriginal(modelOut, inset, origW, origH) {
 
 async function callSpaceOnce(personPadded, garment, description) {
   const client = await Client.connect(SPACE_ID);
-  const result = await client.predict("/tryon", {
-    dict: { background: personPadded, layers: [], composite: null },
-    garm_img: garment,
-    garment_des: description || "a garment",
-    is_checked: true,
-    is_checked_crop: false,
-    denoise_steps: 30,
-    seed: 42,
-  });
+  // yisol/IDM-VTON /tryon — positional array in the order the Space exposes:
+  // [dict, garm_img, garment_des, is_checked, is_checked_crop, denoise_steps, seed]
+  const result = await client.predict("/tryon", [
+    { background: personPadded, layers: [], composite: null },
+    garment,
+    description || "a garment",
+    true,
+    false,
+    30,
+    42,
+  ]);
 
   const data = result?.data;
   if (!Array.isArray(data) || data.length === 0) {
@@ -122,7 +122,7 @@ const isTransient = (msg) =>
   /429|rate|queue|loading|starting|busy|502|503|504/i.test(msg);
 
 async function callSpaceWithRetry(personPadded, garment, description) {
-  const delays = [0, 3000, 8000];
+  const delays = [0, 2000, 6000];
   let lastErr = null;
   for (const d of delays) {
     if (d) await sleep(d);
@@ -203,7 +203,9 @@ export default async function handler(request) {
     if (/rate|429|too many/i.test(msg)) {
       return json({ error: "The Hugging Face Space is busy. Please retry shortly." }, 429);
     }
-    return json({ error: `Hugging Face Space error: ${msg}` }, 502);
+    return json({
+      error: "The AI Space rejected the request; it may be sleeping or overloaded — try again in a minute.",
+    }, 502);
   } finally {
     clearTimeout(timer);
   }

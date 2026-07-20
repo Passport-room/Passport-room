@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@gradio/client": "^2.3.1",
+    "@gradio/client": "^1.15.6",
     "image-js": "^1.7.0"
   }
 }
