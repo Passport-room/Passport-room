@@ -2,7 +2,7 @@
 // which calls the finegrain-image-enhancer Space via @gradio/client.
 
 const ENDPOINT = "/api/public/enhance";
-const TIMEOUT_MS = 100_000;
+const TIMEOUT_MS = 230_000;
 
 let scale = 2;
 let busy = false;

@@ -3,7 +3,7 @@
 // Keeps the window.__tryOn contract, all DOM ids, and UX identical.
 
 const ENDPOINT = "/api/public/tryon";
-const TIMEOUT_MS = 160_000;
+const TIMEOUT_MS = 180_000;
 
 const GARMENTS = [
   { id: "formal",       label: "Formal",         img: "assets/formal.png",       description: "a formal shirt" },
