@@ -1,9 +1,14 @@
 {
-  "name": "make-pics",
+  "name": "tryon-site",
   "private": true,
-  "type": "module",
+  "version": "1.0.0",
+  "description": "Make.pics — passport photo maker + AI virtual try-on + HD enhance. Static frontend served from /public, two Vercel serverless functions under /api/public.",
   "dependencies": {
     "@gradio/client": "^2.3.1",
     "image-js": "^1.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "typescript": "^5.8.3"
   }
 }

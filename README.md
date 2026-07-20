@@ -1,44 +1,39 @@
-# Make.pics
+# Make.pics — Vercel deployment
 
-Static passport-photo / virtual try-on site, deployed on Vercel as static
-assets + two serverless functions.
+Static passport-photo / virtual-try-on / HD-enhance app.
 
 ## Structure
 
 ```
-public/                  static site (served as-is, unchanged)
-  index.html
-  style.css
-  app.js
-  crystal.js
-  photo-editor.js
-  passport-render.js
-  background-removal.js
-  enhance.js
-  dress-tryon.js
-  passport-specs.js
-  favicon.ico
-  robots.txt
-  manifest.webmanifest
-  assets/                clothing overlay images
-api/public/
-  enhance.js             POST /api/public/enhance  (face-restoration proxy)
-  tryon.js                POST /api/public/tryon    (virtual try-on proxy)
-vercel.json
-package.json
+public/          Static site (served at /)
+api/public/      Vercel serverless functions
+  tryon.ts       POST /api/public/tryon    (proxies yisol/IDM-VTON)
+  enhance.ts     POST /api/public/enhance  (proxies sczhou/CodeFormer)
+vercel.json      Function runtime + timeout config
 ```
+
+No build step. Vercel serves `public/` as-is and compiles the two TypeScript
+functions on deploy.
 
 ## Deploy
 
-```
-npm install
-vercel deploy
+```bash
+npm install       # or bun install
+npx vercel        # first time
+npx vercel --prod # production
 ```
 
-No environment variables are required; the two API routes proxy to public
-Hugging Face Spaces (`sczhou/CodeFormer` and `yisol/IDM-VTON`).
+## Plan requirement
 
-Note: `enhance` and `tryon` can take up to ~220s / ~170s on a cold Space.
-`vercel.json` sets `maxDuration` accordingly — this requires a Vercel plan
-that supports function durations beyond the default 10s (Pro or Fluid
-Compute on Hobby).
+`vercel.json` sets `maxDuration: 300` (5 min) to accommodate slow cold-start
+responses from Hugging Face Spaces (matches the original 170s / 220s
+internal timeouts).
+
+- **Vercel Pro / Enterprise** — works out of the box.
+- **Vercel Hobby** — hard cap is 60s per function. Change both entries in
+  `vercel.json` to `"maxDuration": 60`. Cold-Space calls may occasionally
+  timeout; the client will show the standard "AI took too long" message.
+
+## Environment
+
+No environment variables required — Gradio Spaces are called anonymously.

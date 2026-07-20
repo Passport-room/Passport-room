@@ -1,7 +1,7 @@
 {
-  "outputDirectory": "public",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/public/enhance.js": { "maxDuration": 220 },
-    "api/public/tryon.js": { "maxDuration": 170 }
+    "api/public/tryon.ts": { "memory": 1024, "maxDuration": 300 },
+    "api/public/enhance.ts": { "memory": 1024, "maxDuration": 300 }
   }
 }
