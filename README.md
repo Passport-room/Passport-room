@@ -1,68 +1,78 @@
-# Make.pics — Vercel deployment
+# AI Photo Studio
 
-Static passport-photo / virtual-try-on / HD-enhance app.
+Virtual try-on and HD face-enhance for portrait photos, running on free public Hugging Face Spaces. Built on **TanStack Start** (React 19 + Vite 7) and deployed to Cloudflare Workers.
 
-## Structure
+## Features
 
+- **AI Dress Try-On** — powered by [`yisol/IDM-VTON`](https://huggingface.co/spaces/yisol/IDM-VTON). The server proxy letterboxes the person image to 3:4 before sending and crops the model output back to the original aspect ratio, so photos are never squashed.
+- **AI Enhance** — face-safe super-resolution via [`sczhou/CodeFormer`](https://huggingface.co/spaces/sczhou/CodeFormer) with 2× / 4× upscale.
+- **In-browser photo editor** — brightness, contrast, saturation, sharpness, clarity, and more; runs entirely on-device.
+- **Background removal** — WebGPU via `onnxruntime-web`; no upload, no server.
+- **Passport / visa photos** — country-specific specs with print-sheet composition.
+
+No paid APIs, no signup, no personal data leaves your machine except the two AI calls to the public Spaces.
+
+## Getting started
+
+```bash
+bun install
+bun run dev
 ```
-public/          Static site (served at /)
-api/public/      Vercel serverless functions
-  tryon.ts       POST /api/public/tryon    (proxies yisol/IDM-VTON)
-  enhance.ts     POST /api/public/enhance  (proxies sczhou/CodeFormer)
-vercel.json      Function runtime + timeout config
+
+The dev server runs on <http://localhost:8080>. It serves the client at `/index.html`; `/` redirects there.
+
+## Build
+
+```bash
+bun run build
 ```
 
-No build step. Vercel serves `public/` as-is and compiles the two TypeScript
-functions on deploy.
+`prebuild` bundles the client-side JS (`src/client/main.js`) into a single minified file at `public/assets/app.min.js`, then Vite builds the TanStack Start server + SSR shell.
+
+## Project structure
+
+```text
+├── public/                    Static assets served as-is
+│   ├── index.html             Main UI (loads one bundled script)
+│   ├── style.css
+│   ├── manifest.webmanifest
+│   ├── robots.txt
+│   └── favicon.ico
+├── scripts/
+│   └── build-client.mjs       esbuild bundler for the client
+├── src/
+│   ├── client/                Client-side source (bundled → public/assets/app.min.js)
+│   │   ├── main.js            Bundle entry
+│   │   ├── app.js             UI wiring
+│   │   ├── dress-tryon.js     Try-On flow
+│   │   ├── enhance.js         CodeFormer enhance flow
+│   │   ├── photo-editor.js    In-browser adjustments
+│   │   ├── background-removal.js
+│   │   ├── crystal.js         Decorative WebGL
+│   │   ├── passport-render.js
+│   │   └── passport-specs.js
+│   ├── routes/
+│   │   ├── __root.tsx         Root layout / metadata
+│   │   ├── index.tsx          Redirect to /index.html
+│   │   └── api/public/
+│   │       ├── tryon.ts       IDM-VTON proxy (letterbox + crop-back)
+│   │       └── enhance.ts     CodeFormer proxy
+│   ├── lib/                   Error reporting + utils
+│   ├── hooks/
+│   ├── router.tsx
+│   ├── server.ts
+│   ├── start.ts
+│   └── styles.css
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── README.md
+```
 
 ## Deploy
 
-```bash
-npm install       # or bun install
-npx vercel        # first time
-npx vercel --prod # production
-```
+The project targets Cloudflare Workers via TanStack Start's Nitro Cloudflare preset. Any push to your connected host will run `bun run build`, which bundles the client and builds the server. No environment variables are required — both Hugging Face Spaces are public.
 
-## Plan config
+## License
 
-Defaults are tuned for the **free Hobby plan**:
-
-- `vercel.json` → `maxDuration: 60` (Hobby cap)
-- handler internal `TIMEOUT_MS` = 55 000 ms (returns a clean 504 JSON before
-  Vercel kills the function)
-
-If you upgrade to **Vercel Pro** you can raise both:
-
-1. `vercel.json` → `"maxDuration": 300`
-2. `api/public/tryon.ts` → `const TIMEOUT_MS = 170_000;`
-3. `api/public/enhance.ts` → `const TIMEOUT_MS = 220_000;`
-
-That gives cold Hugging Face Spaces the full time they need to warm up.
-
-## Environment (optional but recommended)
-
-Cold Hugging Face Spaces can take 60–180 s to boot. Adding a free HF token
-puts your requests in the authenticated queue (much faster, avoids public
-throttling and reduces the 504s you see on the free plan):
-
-1. Create a **read** token at https://huggingface.co/settings/tokens
-2. In Vercel → **Project → Settings → Environment Variables** add:
-
-   ```
-   HF_TOKEN = hf_xxxxxxxxxxxxxxxxxxxx
-   ```
-
-3. Redeploy.
-
-The handlers automatically pick it up (`process.env.HF_TOKEN`). Without it
-they still work anonymously — just slower on cold starts.
-
-## Troubleshooting
-
-- **504 “AI took too long”** — Space is cold-booting. Retry in ~30 s, or
-  add `HF_TOKEN`, or upgrade to Pro and raise the timeouts as above.
-- **502 “Space error”** — the Hugging Face Space itself returned an error
-  (upstream). The error message is passed through in the response body.
-- **413 “image exceeds …”** — resize to under 8 MB (try-on) / 12 MB
-  (enhance). Vercel’s own request-body limit is 4.5 MB by default; if the
-  browser can’t POST, resize client-side first.
+MIT
