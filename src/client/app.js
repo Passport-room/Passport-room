@@ -210,18 +210,31 @@ if (fileInput)
   });
 
 async function fileToSourceCanvas(file) {
-  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const MAX = 2000;
-  const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
-  const w = Math.max(1, Math.round(bitmap.width * scale));
-  const h = Math.max(1, Math.round(bitmap.height * scale));
+  let img;
+  try {
+    img = await createImageBitmap(file, { imageOrientation: "from-image" });
+  } catch {
+    img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("Could not read image file"));
+      i.src = URL.createObjectURL(file);
+    });
+  }
+  const MAX = 1800;
+  const nw = img.naturalWidth || img.width;
+  const nh = img.naturalHeight || img.height;
+  const scale = Math.min(1, MAX / Math.max(nw, nh));
+  const w = Math.max(1, Math.round(nw * scale));
+  const h = Math.max(1, Math.round(nh * scale));
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(bitmap, 0, 0, w, h);
-  bitmap.close();
+  ctx.drawImage(img, 0, 0, w, h);
+  if (img.close) img.close();
+  if (img.src && img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
   return canvas;
 }
 
@@ -259,12 +272,19 @@ async function handleFile(file) {
     timings = { inference: mask.inferenceMs, total: performance.now() - t0 };
     renderBackendBadge();
 
-    // Record activity and save thumbnail to history
+    // Record activity and save tiny thumbnail to history
     recordActivity("photo_processed");
     hasCreatedImageInSession = true;
     const currentSpec = PASSPORT_SPECS.find((s) => s.id === specId) || PASSPORT_SPECS[0];
     try {
-      const thumbDataUrl = cutout.canvas.toDataURL("image/png");
+      const tc = document.createElement("canvas");
+      tc.width = 120;
+      tc.height = 150;
+      const tctx = tc.getContext("2d");
+      tctx.imageSmoothingEnabled = true;
+      tctx.imageSmoothingQuality = "high";
+      tctx.drawImage(cutout.canvas, 0, 0, 120, 150);
+      const thumbDataUrl = tc.toDataURL("image/jpeg", 0.7);
       addHistoryItem({
         specLabel: currentSpec.label,
         specId: currentSpec.id,
@@ -454,7 +474,12 @@ if ($("retryBtn"))
       const mask = await computeMask(lastSourceCanvas, (p) =>
         updateProc(p.stage, p.total ? Math.round((p.loaded / p.total) * 100) : null),
       );
-      cutout = composeCutout(lastSourceCanvas, mask.maskCanvas, lastSourceCanvas.width, lastSourceCanvas.height);
+      cutout = composeCutout(
+        lastSourceCanvas,
+        mask.maskCanvas,
+        lastSourceCanvas.width,
+        lastSourceCanvas.height,
+      );
       originalCutoutCanvas = cutout.canvas;
       backend = mask.backend;
       timings = { inference: mask.inferenceMs, total: performance.now() - t0 };

@@ -5,12 +5,18 @@ export function initCrystal(canvas, box) {
   if (!canvas || !box) return () => {};
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: false,
-    alpha: true,
-    powerPreference: "high-performance",
-  });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: false,
+      alpha: true,
+      powerPreference: "low-power",
+    });
+  } catch (err) {
+    console.warn("WebGL initialization failed:", err);
+    return () => {};
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 

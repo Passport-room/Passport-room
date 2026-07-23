@@ -63,14 +63,17 @@ async function callEnhance(personBlob, upscale) {
     if (ct.includes("json")) {
       try {
         const j = await res.json();
-        if (j?.error) msg = typeof j.error === "string" ? j.error : (j.error.message || JSON.stringify(j.error));
+        if (j?.error)
+          msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
       } catch {}
     }
     throw new Error(msg);
   }
   if (!ct.includes("image/")) {
     let text = "";
-    try { text = await res.text(); } catch {}
+    try {
+      text = await res.text();
+    } catch {}
     console.error("Enhance unexpected non-image response:", ct, text);
     throw new Error("Enhancer service did not return an image. Please try again.");
   }
@@ -97,7 +100,7 @@ async function enhance() {
     "Enhancing facial features & detail…",
     "Restoring photo clarity & resolution…",
     "Giving final touches…",
-    "Polishing enhanced portrait…"
+    "Polishing enhanced portrait…",
   ];
   let msgIdx = 0;
   setStatus(progressMsgs[0]);

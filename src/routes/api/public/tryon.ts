@@ -210,4 +210,3 @@ export const Route = createFileRoute("/api/public/tryon")({
     },
   },
 });
-

@@ -2,7 +2,7 @@
 import { specPixels } from "./passport-specs.js";
 import { detectFaceInCanvas } from "./face-detector.js";
 
-export const DEFAULT_ADJUST = { zoom: 0.80, offsetX: 0, offsetY: 0 };
+export const DEFAULT_ADJUST = { zoom: 0.8, offsetX: 0, offsetY: 0 };
 
 export function composeCutout(source, maskCanvas, natWidth, natHeight) {
   const canvas = document.createElement("canvas");
@@ -60,6 +60,66 @@ export function composeCutout(source, maskCanvas, natWidth, natHeight) {
   return { canvas, width: natWidth, height: natHeight, bbox, face };
 }
 
+export function drawCropToCanvas(
+  ctx,
+  srcCanvas,
+  cropX,
+  cropY,
+  cropW,
+  cropH,
+  dstX,
+  dstY,
+  dstW,
+  dstH,
+  bgColor,
+) {
+  if (bgColor) {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(dstX, dstY, dstW, dstH);
+  }
+
+  if (!srcCanvas || !srcCanvas.width || !srcCanvas.height || cropW <= 0 || cropH <= 0) {
+    return;
+  }
+
+  // Uniform scale factors in X and Y
+  const scaleX = dstW / cropW;
+  const scaleY = dstH / cropH;
+
+  // Intersect crop bounds with source canvas to get valid source pixels
+  const validSrcX = Math.max(0, Math.min(srcCanvas.width, cropX));
+  const validSrcY = Math.max(0, Math.min(srcCanvas.height, cropY));
+  const validSrcRight = Math.max(0, Math.min(srcCanvas.width, cropX + cropW));
+  const validSrcBottom = Math.max(0, Math.min(srcCanvas.height, cropY + cropH));
+
+  const validSrcW = validSrcRight - validSrcX;
+  const validSrcH = validSrcBottom - validSrcY;
+
+  if (validSrcW <= 0 || validSrcH <= 0) {
+    return;
+  }
+
+  // Map valid source sub-rectangle proportionally to destination coordinates
+  const subDstX = dstX + (validSrcX - cropX) * scaleX;
+  const subDstY = dstY + (validSrcY - cropY) * scaleY;
+  const subDstW = validSrcW * scaleX;
+  const subDstH = validSrcH * scaleY;
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(
+    srcCanvas,
+    validSrcX,
+    validSrcY,
+    validSrcW,
+    validSrcH,
+    subDstX,
+    subDstY,
+    subDstW,
+    subDstH,
+  );
+}
+
 export function renderPassport(cutout, spec, bgColor, adjust) {
   const { width: outW, height: outH } = specPixels(spec);
   const aspect = outW / outH;
@@ -99,19 +159,31 @@ export function renderPassport(cutout, spec, bgColor, adjust) {
   canvas.width = outW;
   canvas.height = outH;
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, outW, outH);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
   if (adjust.rotate) {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, outW, outH);
     ctx.save();
     ctx.translate(outW / 2, outH / 2);
     ctx.rotate((adjust.rotate * Math.PI) / 180);
-    ctx.drawImage(cutout.canvas, cropX, cropY, cropW, cropH, -outW / 2, -outH / 2, outW, outH);
+    drawCropToCanvas(
+      ctx,
+      cutout.canvas,
+      cropX,
+      cropY,
+      cropW,
+      cropH,
+      -outW / 2,
+      -outH / 2,
+      outW,
+      outH,
+      null,
+    );
     ctx.restore();
   } else {
-    ctx.drawImage(cutout.canvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+    drawCropToCanvas(ctx, cutout.canvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH, bgColor);
   }
   return canvas;
 }

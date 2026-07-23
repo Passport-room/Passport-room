@@ -190,4 +190,3 @@ export const Route = createFileRoute("/api/public/enhance")({
     },
   },
 });
-

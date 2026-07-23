@@ -115,6 +115,100 @@ async function blobToDataUrl(blob) {
   });
 }
 
+async function preparePersonBlobForTryOn(dataUrl) {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  await new Promise((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Could not load person image"));
+    img.src = dataUrl;
+  });
+
+  const origW = img.naturalWidth || img.width;
+  const origH = img.naturalHeight || img.height;
+  const origAR = origW / origH;
+
+  const targetW = 768;
+  const targetH = 1024;
+  const targetAR = targetW / targetH;
+
+  let drawW, drawH, drawX, drawY;
+
+  if (origAR >= targetAR) {
+    drawW = targetW;
+    drawH = Math.round(targetW / origAR);
+    drawX = 0;
+    drawY = Math.round((targetH - drawH) / 2);
+  } else {
+    drawH = targetH;
+    drawW = Math.round(targetH * origAR);
+    drawX = Math.round((targetW - drawW) / 2);
+    drawY = 0;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const coverScale = Math.max(targetW / origW, targetH / origH);
+  const coverW = origW * coverScale;
+  const coverH = origH * coverScale;
+  const coverX = (targetW - coverW) / 2;
+  const coverY = (targetH - coverH) / 2;
+
+  ctx.save();
+  ctx.filter = "blur(16px)";
+  ctx.drawImage(img, coverX, coverY, coverW, coverH);
+  ctx.restore();
+
+  ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+  const preparedBlob = await new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b), "image/png"),
+  );
+
+  return {
+    preparedBlob,
+    placement: { origW, origH, drawX, drawY, drawW, drawH, targetW, targetH },
+  };
+}
+
+async function restoreTryOnResultAspect(resultBlob, placement) {
+  const resultDataUrl = await blobToDataUrl(resultBlob);
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  await new Promise((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Could not load result image"));
+    img.src = resultDataUrl;
+  });
+
+  const resW = img.naturalWidth || img.width;
+  const resH = img.naturalHeight || img.height;
+
+  const scaleX = resW / placement.targetW;
+  const scaleY = resH / placement.targetH;
+
+  const srcX = Math.round(placement.drawX * scaleX);
+  const srcY = Math.round(placement.drawY * scaleY);
+  const srcW = Math.round(placement.drawW * scaleX);
+  const srcH = Math.round(placement.drawH * scaleY);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = placement.origW;
+  canvas.height = placement.origH;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, placement.origW, placement.origH);
+
+  return canvas.toDataURL("image/png");
+}
+
 async function callTryOn(personBlob, garmentBlob, description) {
   const form = new FormData();
   form.append("person", personBlob, "person.png");
@@ -141,7 +235,7 @@ async function callTryOn(personBlob, garmentBlob, description) {
       try {
         const j = await res.json();
         if (j?.error) {
-          msg = typeof j.error === "string" ? j.error : (j.error.message || JSON.stringify(j.error));
+          msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
         }
       } catch {}
     }
@@ -149,7 +243,9 @@ async function callTryOn(personBlob, garmentBlob, description) {
   }
   if (!ct.includes("image/")) {
     let text = "";
-    try { text = await res.text(); } catch {}
+    try {
+      text = await res.text();
+    } catch {}
     console.error("TryOn unexpected non-image response:", ct, text);
     throw new Error("AI service did not return an image. Please try again.");
   }
@@ -189,7 +285,8 @@ async function generate() {
       description = selected.description;
     }
   } catch (e) {
-    const errMsg = e instanceof Error ? e.message : (typeof e === "string" ? e : "Could not load garment.");
+    const errMsg =
+      e instanceof Error ? e.message : typeof e === "string" ? e : "Could not load garment.";
     setStatus(errMsg, "err");
     return;
   }
@@ -202,7 +299,7 @@ async function generate() {
     "Processing clothing fit & posture…",
     "Aligning outfit details…",
     "Giving final touches…",
-    "Polishing new look…"
+    "Polishing new look…",
   ];
   let msgIdx = 0;
   setStatus(progressMsgs[0]);
@@ -213,13 +310,14 @@ async function generate() {
 
   try {
     preTryOnSnapshot = personDataUrl;
-    const personBlob = await dataUrlToBlob(personDataUrl);
-    const resultBlob = await callTryOn(personBlob, garmentBlob, description);
-    lastResultBlob = resultBlob;
+    const { preparedBlob, placement } = await preparePersonBlobForTryOn(personDataUrl);
+    const resultBlob = await callTryOn(preparedBlob, garmentBlob, description);
+    const restoredDataUrl = await restoreTryOnResultAspect(resultBlob, placement);
+    const restoredBlob = await dataUrlToBlob(restoredDataUrl);
+    lastResultBlob = restoredBlob;
     clearInterval(progressInterval);
     setStatus("Preparing your new photo…");
-    const dataUrl = await blobToDataUrl(resultBlob);
-    await window.__tryOn.applyResult(dataUrl, (m) => setStatus(m));
+    await window.__tryOn.applyResult(restoredDataUrl, (m) => setStatus(m));
     $("tryOnRevert").classList.remove("hidden");
     const dlBtn = $("tryOnDownload");
     if (dlBtn) dlBtn.classList.remove("hidden");
@@ -227,7 +325,12 @@ async function generate() {
   } catch (e) {
     clearInterval(progressInterval);
     console.error(e);
-    const errMsg = e instanceof Error ? e.message : (typeof e === "string" ? e : (e?.message || "Generation failed. Please try again."));
+    const errMsg =
+      e instanceof Error
+        ? e.message
+        : typeof e === "string"
+          ? e
+          : e?.message || "Generation failed. Please try again.";
     setStatus(errMsg, "err");
   } finally {
     clearInterval(progressInterval);
