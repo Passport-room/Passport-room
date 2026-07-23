@@ -1,33 +1,19 @@
-// Virtual try-on proxy — one model per request. The client drives the
-// retry / model-rotation loop and shows a live countdown when a model is
-// busy. Never returns a local composite; on busy returns 202 JSON; on
-// hard failure returns 502 JSON. On success returns the upstream image
-// bytes unchanged so quality/resolution is preserved.
+// Virtual try-on proxy — authenticated Hugging Face Space calls with a
+// second free Space as a fallback. Never returns a low-quality local
+// composite; on real failure returns a JSON 502 the UI can surface.
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const PER_ATTEMPT_TIMEOUT_MS = 110_000;
+const PER_ATTEMPT_TIMEOUT_MS = 90_000;
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Max-Age": "86400",
-};
-
-// Ordered model pool. First entry is default. Order matters — highest
-// quality first.
-const MODELS = ["idm", "catvton", "kolors", "ootd"] as const;
-type ModelId = (typeof MODELS)[number];
-
-const MODEL_LABELS: Record<ModelId, string> = {
-  idm: "IDM-VTON",
-  catvton: "CatVTON",
-  kolors: "Kolors-VTON",
-  ootd: "OOTDiffusion",
 };
 
 function json(body: unknown, status = 200) {
@@ -75,125 +61,76 @@ function extractUrl(data: unknown, rootHint?: string): string | undefined {
   return visit(data);
 }
 
-function isBusyError(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)) || "";
-  return /429|503|504|queue|busy|loading|gpu|quota|timed out|timeout|unavailable|overloaded|rate.?limit|sleep|starting/i.test(
-    msg,
-  );
-}
-
 async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Fetch generated image failed (${res.status})`);
   const buf = await res.arrayBuffer();
+  // Ensure ArrayBuffer (not SharedArrayBuffer) — copy is cheap and keeps TS happy.
   const out = new ArrayBuffer(buf.byteLength);
   new Uint8Array(out).set(new Uint8Array(buf));
   return out;
 }
 
-async function toFile(b: Blob, name: string): Promise<File> {
-  return new File([await b.arrayBuffer()], name, { type: b.type || "image/png" });
-}
-
-async function callIdm(person: Blob, garment: Blob, description: string, hf?: string) {
+async function callIdmVton(
+  personBlob: Blob,
+  garmentBlob: Blob,
+  description: string,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
   const client = await Client.connect(
     "yisol/IDM-VTON",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
   );
-  const bg = handle_file(await toFile(person, "person.png"));
-  const gm = handle_file(await toFile(garment, "garment.png"));
+  const personFile = new File([await personBlob.arrayBuffer()], "person.png", {
+    type: personBlob.type || "image/png",
+  });
+  const garmentFile = new File([await garmentBlob.arrayBuffer()], "garment.png", {
+    type: garmentBlob.type || "image/png",
+  });
+  const bgData = handle_file(personFile);
+  const garmData = handle_file(garmentFile);
+
   const result = await client.predict("/tryon", {
-    dict: { background: bg, layers: [], composite: bg },
-    garm_img: gm,
+    dict: { background: bgData, layers: [], composite: bgData },
+    garm_img: garmData,
     garment_des: description || "a garment",
     is_checked: true,
-    is_checked_crop: true,
-    denoise_steps: 50,
-    seed: Math.floor(Math.random() * 1_000_000),
+    is_checked_crop: false,
+    denoise_steps: 30,
+    seed: 42,
   });
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
   if (!url) throw new Error("IDM-VTON returned no image URL");
   return fetchImageBuffer(url);
 }
 
-async function callCatVton(person: Blob, garment: Blob, hf?: string) {
-  const client = await Client.connect(
-    "zhengchong/CatVTON",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
-  );
-  const p = handle_file(await toFile(person, "person.png"));
-  const g = handle_file(await toFile(garment, "garment.png"));
-  // CatVTON signature: (person, cloth, cloth_type, num_inference_steps, guidance_scale, seed, show_type)
-  const result = await client.predict("/submit_function", [
-    p,
-    g,
-    "upper",
-    50,
-    2.5,
-    Math.floor(Math.random() * 1_000_000),
-    "result only",
-  ]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
-  if (!url) throw new Error("CatVTON returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-async function callKolors(person: Blob, garment: Blob, hf?: string) {
+async function callKolorsVton(
+  personBlob: Blob,
+  garmentBlob: Blob,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
+  // Kwai-Kolors/Kolors-Virtual-Try-On — free public Space, simpler API.
   const client = await Client.connect(
     "Kwai-Kolors/Kolors-Virtual-Try-On",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
   );
-  const p = handle_file(await toFile(person, "person.png"));
-  const g = handle_file(await toFile(garment, "garment.png"));
-  const result = await client.predict("/tryon", [p, g, 0, true]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  const personFile = new File([await personBlob.arrayBuffer()], "person.png", {
+    type: personBlob.type || "image/png",
+  });
+  const garmentFile = new File([await garmentBlob.arrayBuffer()], "garment.png", {
+    type: garmentBlob.type || "image/png",
+  });
+  const result = await client.predict("/tryon", [
+    handle_file(personFile),
+    handle_file(garmentFile),
+    0, // seed
+    true, // random seed
+  ]);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
   if (!url) throw new Error("Kolors returned no image URL");
   return fetchImageBuffer(url);
-}
-
-async function callOotd(person: Blob, garment: Blob, hf?: string) {
-  const client = await Client.connect(
-    "levihsu/OOTDiffusion",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
-  );
-  const p = handle_file(await toFile(person, "person.png"));
-  const g = handle_file(await toFile(garment, "garment.png"));
-  // Half-body process: (vton_img, garm_img, n_samples, n_steps, image_scale, seed)
-  const result = await client.predict("/process_hd", [
-    p,
-    g,
-    1,
-    30,
-    2.0,
-    Math.floor(Math.random() * 1_000_000),
-  ]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
-  if (!url) throw new Error("OOTDiffusion returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-function nextModel(current: ModelId): ModelId | null {
-  const i = MODELS.indexOf(current);
-  return i >= 0 && i < MODELS.length - 1 ? MODELS[i + 1] : null;
-}
-
-async function runModel(
-  model: ModelId,
-  person: Blob,
-  garment: Blob,
-  description: string,
-  hf?: string,
-) {
-  switch (model) {
-    case "idm":
-      return callIdm(person, garment, description, hf);
-    case "catvton":
-      return callCatVton(person, garment, hf);
-    case "kolors":
-      return callKolors(person, garment, hf);
-    case "ootd":
-      return callOotd(person, garment, hf);
-  }
 }
 
 export const Route = createFileRoute("/api/public/tryon")({
@@ -201,12 +138,6 @@ export const Route = createFileRoute("/api/public/tryon")({
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const requested = (url.searchParams.get("model") || "idm").toLowerCase();
-        const model = (MODELS as readonly string[]).includes(requested)
-          ? (requested as ModelId)
-          : "idm";
-
         let form: FormData;
         try {
           form = await request.formData();
@@ -232,56 +163,51 @@ export const Route = createFileRoute("/api/public/tryon")({
         }
 
         const hfToken = process.env.HF_TOKEN;
+        const errors: string[] = [];
 
-        try {
-          const raw = await withTimeout(
-            runModel(model, person, garment, description, hfToken),
-            PER_ATTEMPT_TIMEOUT_MS,
-            MODEL_LABELS[model],
-          );
-          return new Response(raw, {
-            status: 200,
-            headers: {
-              "Content-Type": "image/png",
-              "Cache-Control": "no-store",
-              "X-Model-Used": MODEL_LABELS[model],
-              ...CORS,
-            },
-          });
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn(`[tryon:${model}] failed:`, msg);
-          const nxt = nextModel(model);
-          if (isBusyError(err) && nxt) {
-            return json(
-              {
-                busy: true,
-                model,
-                modelLabel: MODEL_LABELS[model],
-                nextModel: nxt,
-                nextModelLabel: MODEL_LABELS[nxt],
-                waitMs: 5000,
-                detail: msg,
+        const attempts: Array<{ name: string; run: () => Promise<ArrayBuffer> }> = [
+          {
+            name: "IDM-VTON",
+            run: () => callIdmVton(person, garment, description, hfToken),
+          },
+          {
+            name: "IDM-VTON retry",
+            run: () => callIdmVton(person, garment, description, hfToken),
+          },
+          {
+            name: "Kolors-VTON",
+            run: () => callKolorsVton(person, garment, hfToken),
+          },
+        ];
+
+        for (const attempt of attempts) {
+          try {
+            const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, attempt.name);
+            return new Response(raw, {
+              status: 200,
+              headers: {
+                "Content-Type": "image/png",
+                "Cache-Control": "no-store",
+                ...CORS,
               },
-              202,
-            );
+            });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn(`[tryon] ${attempt.name} failed:`, msg);
+            errors.push(`${attempt.name}: ${msg}`);
           }
-          // No more models — hard failure the UI must surface.
-          return json(
-            {
-              error: nxt
-                ? `AI try-on model ${MODEL_LABELS[model]} failed.`
-                : "All AI try-on models are currently unavailable. Please try again shortly.",
-              model,
-              modelLabel: MODEL_LABELS[model],
-              nextModel: nxt,
-              nextModelLabel: nxt ? MODEL_LABELS[nxt] : null,
-              detail: msg,
-            },
-            nxt ? 502 : 503,
-          );
         }
+
+        return json(
+          {
+            error:
+              "The AI try-on service is busy or unavailable right now. Please try again in a minute.",
+            details: errors,
+          },
+          502,
+        );
       },
     },
   },
 });
+

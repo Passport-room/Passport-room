@@ -10,22 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiPublicTryonRouteImport } from './routes/api/public/tryon'
 import { Route as ApiPublicEnhanceRouteImport } from './routes/api/public/enhance'
+import { Route as ApiPublicTryonRouteImport } from './routes/api/public/tryon'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTryonRoute = ApiPublicTryonRouteImport.update({
-  id: '/api/public/tryon',
-  path: '/api/public/tryon',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicEnhanceRoute = ApiPublicEnhanceRouteImport.update({
   id: '/api/public/enhance',
   path: '/api/public/enhance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTryonRoute = ApiPublicTryonRouteImport.update({
+  id: '/api/public/tryon',
+  path: '/api/public/tryon',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -68,18 +68,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/tryon': {
-      id: '/api/public/tryon'
-      path: '/api/public/tryon'
-      fullPath: '/api/public/tryon'
-      preLoaderRoute: typeof ApiPublicTryonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/enhance': {
       id: '/api/public/enhance'
       path: '/api/public/enhance'
       fullPath: '/api/public/enhance'
       preLoaderRoute: typeof ApiPublicEnhanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon': {
+      id: '/api/public/tryon'
+      path: '/api/public/tryon'
+      fullPath: '/api/public/tryon'
+      preLoaderRoute: typeof ApiPublicTryonRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

@@ -1,4 +1,4 @@
-// Crystal (three.js) is dynamically imported on demand to keep mobile lightweight.
+import { initCrystal } from "./crystal.js";
 import { PASSPORT_SPECS, BACKGROUND_OPTIONS, specPixels } from "./passport-specs.js";
 import { computeMask } from "./background-removal.js";
 import {
@@ -96,7 +96,7 @@ function setPhase(p) {
   document
     .querySelectorAll("[data-home-only]")
     .forEach((el) => el.classList.toggle("hidden", p !== "upload"));
-  if (p === "upload" && !crystalTeardown && !crystalLoading) startCrystal();
+  if (p === "upload" && !crystalTeardown) startCrystal();
   if (p !== "upload" && crystalTeardown) {
     crystalTeardown();
     crystalTeardown = null;
@@ -108,33 +108,10 @@ function setPhase(p) {
   }
 }
 
-// Crystal (only on landing, desktop/tablet only — skipped on small screens to
-// avoid loading three.js and running WebGL on low-end mobile devices.)
+// Crystal (only on landing)
 let crystalTeardown = null;
-let crystalLoading = false;
-const CRYSTAL_MIN_WIDTH = 900;
-function crystalAllowed() {
-  const narrow = window.matchMedia(`(max-width: ${CRYSTAL_MIN_WIDTH - 1}px)`).matches;
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  const lowMem = typeof navigator !== "undefined" && navigator.deviceMemory && navigator.deviceMemory < 4;
-  return !narrow && !coarse && !lowMem;
-}
-async function startCrystal() {
-  if (crystalLoading || crystalTeardown) return;
-  if (!crystalAllowed()) return;
-  const box = $("crystalBox");
-  const canvas = $("crystalCanvas");
-  if (!box || !canvas) return;
-  crystalLoading = true;
-  try {
-    const mod = await import("./crystal.js");
-    if (phase !== "upload") return; // user navigated away while loading
-    crystalTeardown = await mod.initCrystal(canvas, box);
-  } catch (e) {
-    console.warn("Crystal disabled:", e);
-  } finally {
-    crystalLoading = false;
-  }
+function startCrystal() {
+  crystalTeardown = initCrystal($("crystalCanvas"), $("crystalBox"));
 }
 startCrystal();
 
@@ -717,8 +694,6 @@ async function download(kind) {
 }
 
 // ------- AI Dress Try-On integration -------
-let lastPersonDims = null; // { w, h } of the person photo sent to the AI
-
 function canvasFromImage(img) {
   const MAX = 2000;
   const scale = Math.min(1, MAX / Math.max(img.width, img.height));
@@ -733,71 +708,16 @@ function canvasFromImage(img) {
   return c;
 }
 
-// Fit the try-on result to the original person's aspect ratio so the face
-// is never squeezed sideways or clipped when the passport crop is applied.
-// VTON models frequently pad or reshape the output (portrait -> 3:4 / 1:1),
-// so we letterbox it (paint on a matching-aspect canvas at the same scale
-// as the original) instead of stretching or cropping the head.
-function fitResultToPersonAspect(img, target) {
-  if (!target || !target.w || !target.h) return canvasFromImage(img);
-  const targetAR = target.w / target.h;
-  const srcAR = img.width / img.height;
-
-  // Base canvas size uses the original person dimensions (capped).
-  const MAX = 2000;
-  const scale = Math.min(1, MAX / Math.max(target.w, target.h));
-  const cw = Math.max(1, Math.round(target.w * scale));
-  const ch = Math.max(1, Math.round(target.h * scale));
-
-  const c = document.createElement("canvas");
-  c.width = cw;
-  c.height = ch;
-  const ctx = c.getContext("2d");
-  ctx.imageSmoothingQuality = "high";
-
-  // Fill BG so the background remover has a solid edge to grab. Sample the
-  // result's top-left pixel — VTON models keep the original studio backdrop
-  // there, which matches the subject's surrounding pixels.
-  try {
-    const probe = document.createElement("canvas");
-    probe.width = 1;
-    probe.height = 1;
-    probe.getContext("2d").drawImage(img, 0, 0, 1, 1, 0, 0, 1, 1);
-    const [r, g, b] = probe.getContext("2d").getImageData(0, 0, 1, 1).data;
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
-  } catch {
-    ctx.fillStyle = "#ffffff";
-  }
-  ctx.fillRect(0, 0, cw, ch);
-
-  // Scale the AI result to "contain" inside the target aspect — the whole
-  // subject stays visible, no horizontal squish, no facial features clipped.
-  let dw, dh;
-  if (srcAR > targetAR) {
-    dw = cw;
-    dh = Math.round(cw / srcAR);
-  } else {
-    dh = ch;
-    dw = Math.round(ch * srcAR);
-  }
-  const dx = Math.round((cw - dw) / 2);
-  const dy = Math.round((ch - dh) / 2);
-  ctx.drawImage(img, 0, 0, img.width, img.height, dx, dy, dw, dh);
-  return c;
-}
-
 window.__tryOn = {
   getPersonDataUrl() {
     if (lastSourceCanvas) {
       try {
-        lastPersonDims = { w: lastSourceCanvas.width, h: lastSourceCanvas.height };
         return lastSourceCanvas.toDataURL("image/png");
       } catch {}
     }
     const pc = $("previewCanvas");
     if (pc) {
       try {
-        lastPersonDims = { w: pc.width, h: pc.height };
         return pc.toDataURL("image/png");
       } catch {}
     }
@@ -811,8 +731,7 @@ window.__tryOn = {
       img.onerror = () => rej(new Error("Failed to load result image"));
       img.src = dataUrl;
     });
-    // Preserve original aspect ratio: no shrinking, no clipped mouth/ear.
-    const source = fitResultToPersonAspect(img, lastPersonDims);
+    const source = canvasFromImage(img);
     lastSourceCanvas = source;
     onStage && onStage("Removing background…");
     const mask = await computeMask(source, () => {});

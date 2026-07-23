@@ -8,27 +8,21 @@ import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outdir = resolve(root, "public/assets");
+const bundle = resolve(outdir, "app.min.js");
 
 mkdirSync(outdir, { recursive: true });
-// Clean previous outputs (main bundle + any split chunks).
-for (const f of ["app.min.js"]) {
-  const p = resolve(outdir, f);
-  if (existsSync(p)) rmSync(p, { force: true });
-}
+if (existsSync(bundle)) rmSync(bundle, { force: true });
 
 await build({
   entryPoints: [resolve(root, "src/client/main.js")],
-  outdir,
-  entryNames: "app.min",
-  chunkNames: "chunks/[name]-[hash]",
+  outfile: resolve(outdir, "app.min.js"),
   bundle: true,
   format: "esm",
   target: "es2020",
   minify: true,
-  splitting: true,
   sourcemap: false,
   legalComments: "none",
-  treeShaking: true,
+  treeShaking: false,
   external: ["three", "onnxruntime-web/webgpu"],
   logLevel: "info",
 });

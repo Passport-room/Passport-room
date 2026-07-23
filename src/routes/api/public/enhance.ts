@@ -1,29 +1,20 @@
-// Image enhance proxy — one model per request. The client rotates models
-// and shows a countdown when a model is busy. Returns upstream bytes
-// unchanged so resolution is preserved. Face-safe defaults (high fidelity,
-// low denoise) so passport photos stay recognizable.
+// Image enhance proxy — authenticated Hugging Face Space calls with a
+// second free Space as a fallback. Returns the upstream image bytes as-is
+// (no local pixel sharpen) so quality is preserved. On real failure returns
+// a JSON 502 the UI can surface.
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-const PER_ATTEMPT_TIMEOUT_MS = 140_000;
+const PER_ATTEMPT_TIMEOUT_MS = 120_000;
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Max-Age": "86400",
-};
-
-const MODELS = ["finegrain", "codeformer", "realesrgan", "gfpgan"] as const;
-type ModelId = (typeof MODELS)[number];
-const MODEL_LABELS: Record<ModelId, string> = {
-  finegrain: "Finegrain Enhancer",
-  codeformer: "CodeFormer",
-  realesrgan: "Real-ESRGAN",
-  gfpgan: "GFPGAN",
 };
 
 const json = (b: unknown, s = 200) =>
@@ -48,21 +39,14 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   });
 }
 
-function isBusyError(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)) || "";
-  return /429|503|504|queue|busy|loading|gpu|quota|timed out|timeout|unavailable|overloaded|rate.?limit|sleep|starting/i.test(
-    msg,
-  );
-}
-
 function extractUrl(data: unknown, rootHint?: string): string | undefined {
   const visit = (v: unknown): string | undefined => {
     if (!v) return undefined;
     if (typeof v === "string") return /^https?:\/\//.test(v) ? v : undefined;
     if (Array.isArray(v)) {
       for (const item of v) {
-        const f = visit(item);
-        if (f) return f;
+        const found = visit(item);
+        if (found) return found;
       }
       return undefined;
     }
@@ -86,94 +70,63 @@ async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
   return out;
 }
 
-async function toFile(b: Blob, name: string): Promise<File> {
-  return new File([await b.arrayBuffer()], name, { type: b.type || "image/png" });
-}
-
-async function callFinegrain(image: Blob, upscale: number, hf?: string) {
+async function callFinegrain(
+  image: Blob,
+  upscale: number,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
   const client = await Client.connect(
     "finegrain/finegrain-image-enhancer",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
   );
-  const file = handle_file(await toFile(image, "image.png"));
-  // Face-safe: low denoise (0.35), moderate steps (30), keep prompt neutral.
+  const file = new File([await image.arrayBuffer()], "image.png", {
+    type: image.type || "image/png",
+  });
   const result = await client.predict("/process", [
-    file,
+    handle_file(file),
     "", // prompt
-    "worst quality, low quality, normal quality, blurry", // negative prompt
-    Math.floor(Math.random() * 1_000_000), // seed
-    upscale,
-    0.6,
-    1,
-    1,
-    "Karras",
-    0.35,
-    30,
-    112,
-    144,
+    "worst quality, low quality, normal quality", // negative prompt
+    42, // seed
+    upscale, // upscale factor 1..4
+    0.6, // controlnet scale
+    1, // controlnet decay
+    1, // condition scale
+    "Karras", // solver
+    0.8, // denoise strength
+    18, // num inference steps
+    112, // tile width
+    144, // tile height
   ]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
-  if (!url) throw new Error("Finegrain returned no image URL");
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
+  if (!url) throw new Error("Finegrain enhancer returned no image URL");
   return fetchImageBuffer(url);
 }
 
-async function callCodeFormer(image: Blob, upscale: number, hf?: string) {
+async function callCodeFormer(
+  image: Blob,
+  upscale: number,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
   const client = await Client.connect(
     "sczhou/CodeFormer",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
   );
-  const file = handle_file(await toFile(image, "image.png"));
-  // fidelity 0.9 = preserve original identity (best for passport photos).
-  const result = await client.predict("/inference", [file, true, true, true, upscale, 0.9]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  const file = new File([await image.arrayBuffer()], "image.png", {
+    type: image.type || "image/png",
+  });
+  const result = await client.predict("/inference", [
+    handle_file(file),
+    true,
+    true,
+    true,
+    upscale,
+    0.7,
+  ]);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
   if (!url) throw new Error("CodeFormer returned no image URL");
   return fetchImageBuffer(url);
-}
-
-async function callRealEsrgan(image: Blob, upscale: number, hf?: string) {
-  const client = await Client.connect(
-    "doevent/Face-Real-ESRGAN",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
-  );
-  const file = handle_file(await toFile(image, "image.png"));
-  // Signature: (image, size) where size ∈ {2, 4}
-  const size = upscale >= 4 ? 4 : 2;
-  const result = await client.predict("/predict", [file, size]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
-  if (!url) throw new Error("Real-ESRGAN returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-async function callGfpgan(image: Blob, upscale: number, hf?: string) {
-  const client = await Client.connect(
-    "Xintao/GFPGAN",
-    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
-  );
-  const file = handle_file(await toFile(image, "image.png"));
-  const version = "v1.4";
-  const scale = Math.max(1, Math.min(4, upscale));
-  const result = await client.predict("/predict", [file, version, scale]);
-  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
-  if (!url) throw new Error("GFPGAN returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-function nextModel(current: ModelId): ModelId | null {
-  const i = MODELS.indexOf(current);
-  return i >= 0 && i < MODELS.length - 1 ? MODELS[i + 1] : null;
-}
-
-async function runModel(model: ModelId, image: Blob, upscale: number, hf?: string) {
-  switch (model) {
-    case "finegrain":
-      return callFinegrain(image, upscale, hf);
-    case "codeformer":
-      return callCodeFormer(image, upscale, hf);
-    case "realesrgan":
-      return callRealEsrgan(image, upscale, hf);
-    case "gfpgan":
-      return callGfpgan(image, upscale, hf);
-  }
 }
 
 export const Route = createFileRoute("/api/public/enhance")({
@@ -181,12 +134,6 @@ export const Route = createFileRoute("/api/public/enhance")({
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const requested = (url.searchParams.get("model") || "finegrain").toLowerCase();
-        const model = (MODELS as readonly string[]).includes(requested)
-          ? (requested as ModelId)
-          : "finegrain";
-
         let form: FormData;
         try {
           form = await request.formData();
@@ -202,55 +149,45 @@ export const Route = createFileRoute("/api/public/enhance")({
           return json({ error: `unsupported type ${image.type}` }, 415);
 
         const hfToken = process.env.HF_TOKEN;
+        const errors: string[] = [];
 
-        try {
-          const raw = await withTimeout(
-            runModel(model, image, upscale, hfToken),
-            PER_ATTEMPT_TIMEOUT_MS,
-            MODEL_LABELS[model],
-          );
-          return new Response(raw, {
-            status: 200,
-            headers: {
-              "Content-Type": "image/png",
-              "Cache-Control": "no-store",
-              "X-Model-Used": MODEL_LABELS[model],
-              ...CORS,
-            },
-          });
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.warn(`[enhance:${model}] failed:`, msg);
-          const nxt = nextModel(model);
-          if (isBusyError(err) && nxt) {
-            return json(
-              {
-                busy: true,
-                model,
-                modelLabel: MODEL_LABELS[model],
-                nextModel: nxt,
-                nextModelLabel: MODEL_LABELS[nxt],
-                waitMs: 5000,
-                detail: msg,
+        const attempts: Array<{ name: string; run: () => Promise<ArrayBuffer> }> = [
+          { name: "Finegrain enhancer", run: () => callFinegrain(image, upscale, hfToken) },
+          {
+            name: "Finegrain enhancer retry",
+            run: () => callFinegrain(image, upscale, hfToken),
+          },
+          { name: "CodeFormer", run: () => callCodeFormer(image, upscale, hfToken) },
+        ];
+
+        for (const attempt of attempts) {
+          try {
+            const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, attempt.name);
+            return new Response(raw, {
+              status: 200,
+              headers: {
+                "Content-Type": "image/png",
+                "Cache-Control": "no-store",
+                ...CORS,
               },
-              202,
-            );
+            });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn(`[enhance] ${attempt.name} failed:`, msg);
+            errors.push(`${attempt.name}: ${msg}`);
           }
-          return json(
-            {
-              error: nxt
-                ? `AI enhancer model ${MODEL_LABELS[model]} failed.`
-                : "All AI enhancer models are currently unavailable. Please try again shortly.",
-              model,
-              modelLabel: MODEL_LABELS[model],
-              nextModel: nxt,
-              nextModelLabel: nxt ? MODEL_LABELS[nxt] : null,
-              detail: msg,
-            },
-            nxt ? 502 : 503,
-          );
         }
+
+        return json(
+          {
+            error:
+              "The AI enhancer service is busy or unavailable right now. Please try again in a minute.",
+            details: errors,
+          },
+          502,
+        );
       },
     },
   },
 });
+

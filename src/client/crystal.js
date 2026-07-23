@@ -1,9 +1,8 @@
 // Animated WebGL crystal — low-poly icosahedron with dark core, purple shell, glowing edges.
-// three.js is dynamically imported so it isn't shipped to mobile / low-end clients.
+import * as THREE from "three";
 
-export async function initCrystal(canvas, box) {
+export function initCrystal(canvas, box) {
   if (!canvas || !box) return () => {};
-  const THREE = await import("three");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const renderer = new THREE.WebGLRenderer({
