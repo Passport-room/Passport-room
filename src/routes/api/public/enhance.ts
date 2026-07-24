@@ -1,7 +1,17 @@
-// Image enhance proxy — authenticated Hugging Face Space calls with a
-// second free Space as a fallback. Returns the upstream image bytes as-is
-// (no local pixel sharpen) so quality is preserved. On real failure returns
-// a JSON 502 the UI can surface.
+// Image enhance proxy — authenticated Hugging Face Space calls with an
+// automatic multi-worker failover chain. If a Space is busy, sleeping,
+// rate-limited, or errors, the same image request is transparently retried
+// against the next compatible Space until one succeeds or all fail.
+//
+// Primary + backups (all public, free-tier, gradio predict API):
+//   1. finegrain/finegrain-image-enhancer  (primary — highest-fidelity upscale)
+//   2. finegrain/finegrain-image-enhancer  (single quick retry)
+//   3. sczhou/CodeFormer                   (quality match, face restoration)
+//   4. Xintao/GFPGAN                       (face restoration, low traffic)
+//   5. doevent/Face-Real-ESRGAN            (general upscale + face)
+//
+// Optional env var ENHANCE_PRIMARY_SPACE lets the user prepend their own
+// duplicated Finegrain / CodeFormer Space without a code change.
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
@@ -9,6 +19,7 @@ import { Client, handle_file } from "@gradio/client";
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 const PER_ATTEMPT_TIMEOUT_MS = 120_000;
+const BACKOFF_MS = 1_500;
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -37,6 +48,13 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
       },
     );
   });
+}
+
+function isRetryable(err: unknown): boolean {
+  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
+  if (msg.includes("invalid input") || msg.includes("unsupported file"))
+    return false;
+  return true;
 }
 
 function extractUrl(data: unknown, rootHint?: string): string | undefined {
@@ -70,24 +88,32 @@ async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
   return out;
 }
 
+type HfAuth = Record<string, never> | undefined;
+const hfOpts = (t: string | undefined): HfAuth =>
+  t ? ({ hf_token: t } as unknown as Record<string, never>) : undefined;
+
+async function toFile(blob: Blob, name: string): Promise<File> {
+  return new File([await blob.arrayBuffer()], name, {
+    type: blob.type || "image/png",
+  });
+}
+
+// --- Worker adapters ------------------------------------------------------
+
 async function callFinegrain(
+  space: string,
   image: Blob,
   upscale: number,
   hfToken: string | undefined,
 ): Promise<ArrayBuffer> {
-  const client = await Client.connect(
-    "finegrain/finegrain-image-enhancer",
-    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
-  );
-  const file = new File([await image.arrayBuffer()], "image.png", {
-    type: image.type || "image/png",
-  });
+  const client = await Client.connect(space, hfOpts(hfToken));
+  const file = await toFile(image, "image.png");
   const result = await client.predict("/process", [
     handle_file(file),
     "", // prompt
     "worst quality, low quality, normal quality", // negative prompt
     42, // seed
-    upscale, // upscale factor 1..4
+    upscale, // upscale 1..4
     0.6, // controlnet scale
     1, // controlnet decay
     1, // condition scale
@@ -99,7 +125,7 @@ async function callFinegrain(
   ]);
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error("Finegrain enhancer returned no image URL");
+  if (!url) throw new Error(`${space} returned no image URL`);
   return fetchImageBuffer(url);
 }
 
@@ -108,26 +134,61 @@ async function callCodeFormer(
   upscale: number,
   hfToken: string | undefined,
 ): Promise<ArrayBuffer> {
-  const client = await Client.connect(
-    "sczhou/CodeFormer",
-    hfToken ? ({ hf_token: hfToken } as unknown as Record<string, never>) : undefined,
-  );
-  const file = new File([await image.arrayBuffer()], "image.png", {
-    type: image.type || "image/png",
-  });
+  const client = await Client.connect("sczhou/CodeFormer", hfOpts(hfToken));
+  const file = await toFile(image, "image.png");
   const result = await client.predict("/inference", [
     handle_file(file),
-    true,
-    true,
-    true,
+    true, // background enhance
+    true, // face upsample
+    true, // has aligned
     upscale,
-    0.7,
+    0.7, // fidelity weight
   ]);
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
   if (!url) throw new Error("CodeFormer returned no image URL");
   return fetchImageBuffer(url);
 }
+
+async function callGfpgan(
+  image: Blob,
+  upscale: number,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
+  const client = await Client.connect("Xintao/GFPGAN", hfOpts(hfToken));
+  const file = await toFile(image, "image.png");
+  // GFPGAN Space: /predict (img, version, scale)
+  const result = await client.predict("/predict", [
+    handle_file(file),
+    "v1.4",
+    upscale,
+  ]);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
+  if (!url) throw new Error("GFPGAN returned no image URL");
+  return fetchImageBuffer(url);
+}
+
+async function callFaceRealEsrgan(
+  image: Blob,
+  upscale: number,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
+  const client = await Client.connect(
+    "doevent/Face-Real-ESRGAN",
+    hfOpts(hfToken),
+  );
+  const file = await toFile(image, "image.png");
+  // Face-Real-ESRGAN: /predict (img, size)  — size is a "2x" | "3x" | "4x" enum.
+  const sizeArg = `${Math.min(4, Math.max(2, upscale))}x`;
+  const result = await client.predict("/predict", [handle_file(file), sizeArg]);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
+  if (!url) throw new Error("Face-Real-ESRGAN returned no image URL");
+  return fetchImageBuffer(url);
+}
+
+// --- Route ---------------------------------------------------------------
 
 export const Route = createFileRoute("/api/public/enhance")({
   server: {
@@ -141,33 +202,79 @@ export const Route = createFileRoute("/api/public/enhance")({
           return json({ error: "Expected multipart/form-data" }, 400);
         }
         const image = form.get("image");
-        const upscale = Math.min(4, Math.max(1, Number(form.get("upscale") ?? 2) || 2));
-        if (!(image instanceof File)) return json({ error: "image file required" }, 400);
+        const upscale = Math.min(
+          4,
+          Math.max(1, Number(form.get("upscale") ?? 2) || 2),
+        );
+        if (!(image instanceof File))
+          return json({ error: "image file required" }, 400);
         if (image.size === 0) return json({ error: "image is empty" }, 400);
-        if (image.size > MAX_BYTES) return json({ error: "image exceeds 12 MB" }, 413);
+        if (image.size > MAX_BYTES)
+          return json({ error: "image exceeds 12 MB" }, 413);
         if (image.type && !ALLOWED.has(image.type))
           return json({ error: `unsupported type ${image.type}` }, 415);
 
         const hfToken = process.env.HF_TOKEN;
+        const customPrimary = (process.env.ENHANCE_PRIMARY_SPACE || "").trim();
         const errors: string[] = [];
 
-        const attempts: Array<{ name: string; run: () => Promise<ArrayBuffer> }> = [
-          { name: "Finegrain enhancer", run: () => callFinegrain(image, upscale, hfToken) },
+        const attempts: Array<{
+          name: string;
+          run: () => Promise<ArrayBuffer>;
+        }> = [];
+
+        if (customPrimary) {
+          attempts.push({
+            name: `custom:${customPrimary}`,
+            run: () => callFinegrain(customPrimary, image, upscale, hfToken),
+          });
+        }
+
+        attempts.push(
+          {
+            name: "Finegrain enhancer",
+            run: () =>
+              callFinegrain(
+                "finegrain/finegrain-image-enhancer",
+                image,
+                upscale,
+                hfToken,
+              ),
+          },
           {
             name: "Finegrain enhancer retry",
-            run: () => callFinegrain(image, upscale, hfToken),
+            run: () =>
+              callFinegrain(
+                "finegrain/finegrain-image-enhancer",
+                image,
+                upscale,
+                hfToken,
+              ),
           },
-          { name: "CodeFormer", run: () => callCodeFormer(image, upscale, hfToken) },
-        ];
+          {
+            name: "CodeFormer",
+            run: () => callCodeFormer(image, upscale, hfToken),
+          },
+          { name: "GFPGAN", run: () => callGfpgan(image, upscale, hfToken) },
+          {
+            name: "Face-Real-ESRGAN",
+            run: () => callFaceRealEsrgan(image, upscale, hfToken),
+          },
+        );
 
         for (const attempt of attempts) {
           try {
-            const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, attempt.name);
+            const raw = await withTimeout(
+              attempt.run(),
+              PER_ATTEMPT_TIMEOUT_MS,
+              attempt.name,
+            );
             return new Response(raw, {
               status: 200,
               headers: {
                 "Content-Type": "image/png",
                 "Cache-Control": "no-store",
+                "X-Worker": attempt.name,
                 ...CORS,
               },
             });
@@ -175,6 +282,10 @@ export const Route = createFileRoute("/api/public/enhance")({
             const msg = err instanceof Error ? err.message : String(err);
             console.warn(`[enhance] ${attempt.name} failed:`, msg);
             errors.push(`${attempt.name}: ${msg}`);
+            if (!isRetryable(err)) break;
+            if (attempt.name.endsWith("retry")) {
+              await new Promise((r) => setTimeout(r, BACKOFF_MS));
+            }
           }
         }
 

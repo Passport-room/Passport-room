@@ -6,7 +6,10 @@ const HISTORY_KEY = "cubit_history_v2";
 export function getDefaultAccount() {
   const randomId = Math.floor(1000 + Math.random() * 9000);
   const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const dateStr = now.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   return {
     id: `usr_${randomId}`,
@@ -105,7 +108,8 @@ export function getHistory() {
 
 export function addHistoryItem(item) {
   try {
-    const isSaveEnabled = localStorage.getItem("cubit_save_photos_enabled") !== "false";
+    const isSaveEnabled =
+      localStorage.getItem("cubit_save_photos_enabled") !== "false";
     if (!isSaveEnabled) {
       return getHistory();
     }

@@ -1,5 +1,9 @@
 import { PASSPORT_SPECS } from "./passport-specs.js";
-import { renderPassport, canvasToBlob, downloadBlob } from "./passport-render.js";
+import {
+  renderPassport,
+  canvasToBlob,
+  downloadBlob,
+} from "./passport-render.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -146,7 +150,12 @@ function setPhotoCount(targetCount) {
 }
 
 function swapOrMoveSlots(fromIdx, toIdx) {
-  if (fromIdx < 0 || fromIdx >= state.slots.length || toIdx < 0 || toIdx >= state.slots.length)
+  if (
+    fromIdx < 0 ||
+    fromIdx >= state.slots.length ||
+    toIdx < 0 ||
+    toIdx >= state.slots.length
+  )
     return;
   const temp = state.slots[fromIdx];
   state.slots[fromIdx] = state.slots[toIdx];
@@ -159,8 +168,11 @@ function renderAll() {
 
   const placedCount = state.slots.filter((s) => s !== null).length;
   if ($("printQtyInput")) $("printQtyInput").value = placedCount;
-  if ($("statCopies")) $("statCopies").textContent = `${placedCount} / ${state.grid.totalSlots}`;
-  if ($("statSpec")) $("statSpec").textContent = `${state.spec.widthMM}×${state.spec.heightMM} mm`;
+  if ($("statCopies"))
+    $("statCopies").textContent = `${placedCount} / ${state.grid.totalSlots}`;
+  if ($("statSpec"))
+    $("statSpec").textContent =
+      `${state.spec.widthMM}×${state.spec.heightMM} mm`;
   if ($("statGrid"))
     $("statGrid").textContent =
       `${state.grid.totalSlots} slots (${state.grid.cols}×${state.grid.rows})`;
@@ -222,7 +234,9 @@ function renderAll() {
         e.dataTransfer.setData("text/plain", i.toString());
         slotEl.classList.add("dragging");
       });
-      slotEl.addEventListener("dragend", () => slotEl.classList.remove("dragging"));
+      slotEl.addEventListener("dragend", () =>
+        slotEl.classList.remove("dragging"),
+      );
     } else {
       // Empty slot
       const emptyLabel = document.createElement("span");
@@ -293,7 +307,8 @@ function renderInspector() {
 
   const photo = state.slots[state.selectedSlotIdx];
   inspBox.classList.remove("hidden");
-  if ($("inspPhotoNum")) $("inspPhotoNum").textContent = state.selectedSlotIdx + 1;
+  if ($("inspPhotoNum"))
+    $("inspPhotoNum").textContent = state.selectedSlotIdx + 1;
 
   const hasPhoto = !!photo;
   if ($("inspDupBtn")) $("inspDupBtn").disabled = !hasPhoto;
@@ -330,8 +345,10 @@ function bindEventsOnce() {
   if (isBound) return;
   isBound = true;
 
-  if ($("closePrintEditor")) $("closePrintEditor").addEventListener("click", closePrintEditor);
-  if ($("cancelPrintEditor")) $("cancelPrintEditor").addEventListener("click", closePrintEditor);
+  if ($("closePrintEditor"))
+    $("closePrintEditor").addEventListener("click", closePrintEditor);
+  if ($("cancelPrintEditor"))
+    $("cancelPrintEditor").addEventListener("click", closePrintEditor);
 
   if ($("printQtyDec"))
     $("printQtyDec").addEventListener("click", () => {
@@ -410,9 +427,13 @@ function bindEventsOnce() {
   }
 
   if ($("confirmDownloadSheet"))
-    $("confirmDownloadSheet").addEventListener("click", () => exportFullSheet("image"));
+    $("confirmDownloadSheet").addEventListener("click", () =>
+      exportFullSheet("image"),
+    );
   if ($("confirmPrintPdf"))
-    $("confirmPrintPdf").addEventListener("click", () => exportFullSheet("pdf"));
+    $("confirmPrintPdf").addEventListener("click", () =>
+      exportFullSheet("pdf"),
+    );
 }
 
 function printCanvasViaIframe(canvas) {
@@ -530,11 +551,16 @@ export function renderFullSheetCanvas() {
 
     const photo = state.slots[i];
     if (photo) {
-      const photoCanvas = renderPassport(state.cutout, state.spec, state.bgColor, {
-        zoom: photo.zoom,
-        offsetX: photo.offsetX,
-        offsetY: photo.offsetY,
-      });
+      const photoCanvas = renderPassport(
+        state.cutout,
+        state.spec,
+        state.bgColor,
+        {
+          zoom: photo.zoom,
+          offsetX: photo.offsetX,
+          offsetY: photo.offsetY,
+        },
+      );
 
       ctx.drawImage(photoCanvas, x, y, photoPxW, photoPxH);
     }

@@ -6,9 +6,16 @@
   --border: oklch(0.5 0.15 305 / 0.28);
   --primary: oklch(0.62 0.26 305);
   --accent: oklch(0.68 0.28 320);
-  --brand-gradient: linear-gradient(135deg, oklch(0.6 0.26 300), oklch(0.66 0.28 328));
-  --neon-glow: 0 0 24px oklch(0.62 0.26 305 / 0.55), 0 0 48px oklch(0.62 0.26 305 / 0.25);
-  --shadow-card: 0 1px 2px oklch(0.05 0.02 300 / 0.4), 0 18px 44px -16px oklch(0.5 0.2 305 / 0.35);
+  --brand-gradient: linear-gradient(
+    135deg,
+    oklch(0.6 0.26 300),
+    oklch(0.66 0.28 328)
+  );
+  --neon-glow:
+    0 0 24px oklch(0.62 0.26 305 / 0.55), 0 0 48px oklch(0.62 0.26 305 / 0.25);
+  --shadow-card:
+    0 1px 2px oklch(0.05 0.02 300 / 0.4),
+    0 18px 44px -16px oklch(0.5 0.2 305 / 0.35);
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
 }
@@ -28,8 +35,16 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(60% 50% at 50% 0%, oklch(0.3 0.12 305 / 0.35), transparent 70%),
-    radial-gradient(50% 40% at 100% 100%, oklch(0.28 0.12 328 / 0.25), transparent 70%);
+    radial-gradient(
+      60% 50% at 50% 0%,
+      oklch(0.3 0.12 305 / 0.35),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 40% at 100% 100%,
+      oklch(0.28 0.12 328 / 0.25),
+      transparent 70%
+    );
   background-attachment: fixed;
   overflow-x: hidden;
 }
@@ -1065,7 +1080,11 @@ select:focus {
 .aboutCard {
   position: relative;
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, oklch(0.2 0.06 305 / 0.7), oklch(0.16 0.05 300 / 0.7));
+  background: linear-gradient(
+    180deg,
+    oklch(0.2 0.06 305 / 0.7),
+    oklch(0.16 0.05 300 / 0.7)
+  );
   backdrop-filter: blur(14px);
   border-radius: 22px;
   padding: 28px;
@@ -1274,7 +1293,11 @@ select:focus {
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, oklch(0.62 0.26 305 / 0.1), oklch(0.68 0.28 320 / 0.08));
+  background: linear-gradient(
+    135deg,
+    oklch(0.62 0.26 305 / 0.1),
+    oklch(0.68 0.28 320 / 0.08)
+  );
   cursor: pointer;
   user-select: none;
   transition:
@@ -1394,7 +1417,11 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, oklch(0.28 0.15 305 / 0.5), oklch(0.22 0.12 260 / 0.5));
+  background: linear-gradient(
+    135deg,
+    oklch(0.28 0.15 305 / 0.5),
+    oklch(0.22 0.12 260 / 0.5)
+  );
   color: oklch(0.85 0.12 305);
   border-bottom: 1px solid oklch(0.62 0.26 305 / 0.18);
 }
@@ -1641,7 +1668,11 @@ select:focus {
     transform 0.1s;
 }
 .tryOnBtn.primary {
-  background: linear-gradient(90deg, oklch(0.55 0.22 305), oklch(0.65 0.22 285));
+  background: linear-gradient(
+    90deg,
+    oklch(0.55 0.22 305),
+    oklch(0.65 0.22 285)
+  );
   color: #fff;
   border: none;
 }
@@ -1761,7 +1792,11 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, oklch(0.65 0.25 140 / 0.25), oklch(0.62 0.26 305 / 0.25));
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.25 140 / 0.25),
+    oklch(0.62 0.26 305 / 0.25)
+  );
   border: 1px solid oklch(0.65 0.25 140 / 0.5);
   color: oklch(0.95 0.18 140);
   font-weight: 700;
@@ -2604,13 +2639,21 @@ select:focus {
 }
 
 .printMainActionBtn.primary {
-  background: linear-gradient(135deg, oklch(0.65 0.25 295), oklch(0.58 0.25 285));
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.25 295),
+    oklch(0.58 0.25 285)
+  );
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
 }
 
 .printMainActionBtn.primary:hover {
-  background: linear-gradient(135deg, oklch(0.7 0.26 295), oklch(0.63 0.26 285));
+  background: linear-gradient(
+    135deg,
+    oklch(0.7 0.26 295),
+    oklch(0.63 0.26 285)
+  );
   box-shadow: 0 6px 18px rgba(168, 85, 247, 0.5);
   transform: translateY(-1px);
 }
@@ -2831,7 +2874,11 @@ select:focus {
 }
 
 .btn.primary.alt {
-  background: linear-gradient(135deg, oklch(0.65 0.25 220), oklch(0.62 0.26 305));
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.25 220),
+    oklch(0.62 0.26 305)
+  );
   color: #fff;
 }
 

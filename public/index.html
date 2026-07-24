@@ -2,13 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Cubit.pics — Instant Passport Photo Maker</title>
     <meta
       name="description"
       content="Create compliant passport & visa photos in seconds. AI background removal runs fully in your browser: private, fast, and better."
     />
-    <meta property="og:title" content="Cubit.pics — Instant Passport Photo Maker" />
+    <meta
+      property="og:title"
+      content="Cubit.pics — Instant Passport Photo Maker"
+    />
     <meta
       property="og:description"
       content="AI passport photos in your browser. Private, instant, high-quality."
@@ -52,7 +58,12 @@
                   <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
                 </svg>
               </button>
-              <button id="menuBtn" class="iconBtn ghost" aria-label="Open menu" title="Open Menu">
+              <button
+                id="menuBtn"
+                class="iconBtn ghost"
+                aria-label="Open menu"
+                title="Open Menu"
+              >
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -79,8 +90,8 @@
         <div class="hero">
           <h1>Passport photos<br /><span class="grad">in seconds</span></h1>
           <p class="lead">
-            Remove backgrounds, change outfits, and enhance photos with AI. Fast processing, private
-            by design, and ready in seconds.
+            Remove backgrounds, change outfits, and enhance photos with AI. Fast
+            processing, private by design, and ready in seconds.
           </p>
           <div class="features">
             <div class="feat">
@@ -162,7 +173,9 @@
                 </svg>
               </div>
               <div class="dropTitle">Drop a photo or tap to choose</div>
-              <div class="dropSub">JPG or PNG · Your image never leaves this device</div>
+              <div class="dropSub">
+                JPG or PNG · Your image never leaves this device
+              </div>
               <button id="pickBtn" class="btn primary">Choose photo</button>
             </div>
           </div>
@@ -183,7 +196,9 @@
         <div class="resultHead">
           <div class="resultHeadText">
             <h1>Your passport photo is ready</h1>
-            <p class="muted small">Fine-tune framing, adjust, pick a background, then download.</p>
+            <p class="muted small">
+              Fine-tune framing, adjust, pick a background, then download.
+            </p>
           </div>
           <div class="resultHeadButtons">
             <button
@@ -199,7 +214,9 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                <path
+                  d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"
+                />
               </svg>
               Retry
             </button>
@@ -226,7 +243,11 @@
               <div class="frameHead previewHead"><h3>Preview</h3></div>
               <div class="previewBox">
                 <canvas id="previewCanvas"></canvas>
-                <img id="tryOnResult" class="tryOnResult hidden" alt="AI dress try-on result" />
+                <img
+                  id="tryOnResult"
+                  class="tryOnResult hidden"
+                  alt="AI dress try-on result"
+                />
               </div>
             </div>
           </div>
@@ -238,26 +259,43 @@
             <div id="tryOnDresses" class="tryOnDresses"></div>
             <div id="tryOnCustom" class="tryOnCustom hidden">
               <label class="tryOnUpload">
-                <input id="tryOnCustomFile" type="file" accept="image/*" hidden />
+                <input
+                  id="tryOnCustomFile"
+                  type="file"
+                  accept="image/*"
+                  hidden
+                />
                 <span id="tryOnCustomFileLabel">Upload garment image</span>
               </label>
-              <img id="tryOnCustomPreview" class="tryOnCustomPreview hidden" alt="Custom garment" />
+              <img
+                id="tryOnCustomPreview"
+                class="tryOnCustomPreview hidden"
+                alt="Custom garment"
+              />
               <textarea
                 id="tryOnCustomPrompt"
                 class="tryOnPrompt"
                 rows="2"
                 placeholder="Describe the garment (optional if you uploaded an image)"
               ></textarea>
-              <div class="tryOnCustomHint muted small">Provide an image, a prompt, or both.</div>
+              <div class="tryOnCustomHint muted small">
+                Provide an image, a prompt, or both.
+              </div>
             </div>
             <div class="tryOnActionRow">
-              <button id="tryOnGenerate" class="tryOnBtn primary" disabled>Change clothes</button>
-              <button id="tryOnRevert" class="tryOnBtn ghost hidden">Revert</button>
-              <button id="tryOnDownload" class="tryOnBtn ghost hidden">Download</button>
+              <button id="tryOnGenerate" class="tryOnBtn primary" disabled>
+                Change clothes
+              </button>
+              <button id="tryOnRevert" class="tryOnBtn ghost hidden">
+                Revert
+              </button>
+              <button id="tryOnDownload" class="tryOnBtn ghost hidden">
+                Download
+              </button>
             </div>
             <div class="tryOnHint">
-              Cloud AI Processing: Photos are processed securely on cloud AI servers. Initial
-              request may take 30–60s.
+              Cloud AI Processing: Photos are processed securely on cloud AI
+              servers. Initial request may take 30–60s.
             </div>
             <div id="tryOnStatus" class="tryOnStatus"></div>
           </div>
@@ -267,16 +305,32 @@
               <span class="tryOnTitle">AI Enhance</span>
             </div>
             <div class="enhanceRow">
-              <div class="enhanceScale" role="radiogroup" aria-label="Upscale factor">
-                <button type="button" class="enhanceScaleBtn active" data-scale="2x">2×</button>
-                <button type="button" class="enhanceScaleBtn" data-scale="4x">4×</button>
+              <div
+                class="enhanceScale"
+                role="radiogroup"
+                aria-label="Upscale factor"
+              >
+                <button
+                  type="button"
+                  class="enhanceScaleBtn active"
+                  data-scale="2x"
+                >
+                  2×
+                </button>
+                <button type="button" class="enhanceScaleBtn" data-scale="4x">
+                  4×
+                </button>
               </div>
-              <button id="enhanceGenerate" class="tryOnBtn primary" disabled>Enhance photo</button>
-              <button id="enhanceRevert" class="tryOnBtn ghost hidden">Revert</button>
+              <button id="enhanceGenerate" class="tryOnBtn primary" disabled>
+                Enhance photo
+              </button>
+              <button id="enhanceRevert" class="tryOnBtn ghost hidden">
+                Revert
+              </button>
             </div>
             <div class="tryOnHint">
-              Cloud AI Enhancement: Face-safe super-resolution on secure cloud servers — sharpens
-              detail and restores facial clarity.
+              Cloud AI Enhancement: Face-safe super-resolution on secure cloud
+              servers — sharpens detail and restores facial clarity.
             </div>
             <div id="enhanceStatus" class="tryOnStatus"></div>
           </div>
@@ -295,31 +349,42 @@
           <div class="panel cropPanel">
             <div class="frameHead">
               <h3>Crop</h3>
-              <label class="chk"><input id="guidesChk" type="checkbox" checked /> Guides</label>
+              <label class="chk"
+                ><input id="guidesChk" type="checkbox" checked /> Guides</label
+              >
             </div>
             <label class="slider"
               ><span class="sliderLabel">Zoom</span
-              ><input id="zoom" type="range" min="0.6" max="1.8" step="0.01" value="1" /><span
-                class="sliderValue"
-                id="zoomVal"
-                >1.00×</span
-              ></label
+              ><input
+                id="zoom"
+                type="range"
+                min="0.6"
+                max="1.8"
+                step="0.01"
+                value="1"
+              /><span class="sliderValue" id="zoomVal">1.00×</span></label
             >
             <label class="slider"
               ><span class="sliderLabel">Vertical</span
-              ><input id="offY" type="range" min="-0.35" max="0.35" step="0.005" value="0" /><span
-                class="sliderValue"
-                id="offYVal"
-                >0</span
-              ></label
+              ><input
+                id="offY"
+                type="range"
+                min="-0.35"
+                max="0.35"
+                step="0.005"
+                value="0"
+              /><span class="sliderValue" id="offYVal">0</span></label
             >
             <label class="slider"
               ><span class="sliderLabel">Horizontal</span
-              ><input id="offX" type="range" min="-0.35" max="0.35" step="0.005" value="0" /><span
-                class="sliderValue"
-                id="offXVal"
-                >0</span
-              ></label
+              ><input
+                id="offX"
+                type="range"
+                min="-0.35"
+                max="0.35"
+                step="0.005"
+                value="0"
+              /><span class="sliderValue" id="offXVal">0</span></label
             >
             <button id="resetFrame" class="linkBtn">Reset crop</button>
           </div>
@@ -344,11 +409,21 @@
                 <div class="bgQtySection">
                   <div class="pTitle">Photo copies</div>
                   <div id="qtyQuickBtns" class="qtyQuickBtns">
-                    <button type="button" class="qtyBtn" data-count="1">1</button>
-                    <button type="button" class="qtyBtn" data-count="2">2</button>
-                    <button type="button" class="qtyBtn active" data-count="4">4</button>
-                    <button type="button" class="qtyBtn" data-count="6">6</button>
-                    <button type="button" class="qtyBtn" data-count="8">8</button>
+                    <button type="button" class="qtyBtn" data-count="1">
+                      1
+                    </button>
+                    <button type="button" class="qtyBtn" data-count="2">
+                      2
+                    </button>
+                    <button type="button" class="qtyBtn active" data-count="4">
+                      4
+                    </button>
+                    <button type="button" class="qtyBtn" data-count="6">
+                      6
+                    </button>
+                    <button type="button" class="qtyBtn" data-count="8">
+                      8
+                    </button>
                   </div>
                   <div class="qtyCustomRow">
                     <span class="muted small">Custom:</span>
@@ -435,7 +510,9 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
                   <polyline points="14 2 14 8 20 8" />
                   <line x1="16" y1="13" x2="8" y2="13" />
                   <line x1="16" y1="17" x2="8" y2="17" />
@@ -446,7 +523,11 @@
                 <h2 class="printEditorTitle">A4 Print Sheet Editor</h2>
               </div>
             </div>
-            <button id="closePrintEditor" class="printEditorCloseBtn" title="Close editor">
+            <button
+              id="closePrintEditor"
+              class="printEditorCloseBtn"
+              title="Close editor"
+            >
               <svg
                 width="18"
                 height="18"
@@ -506,7 +587,13 @@
               <div class="combinedSubGroup">
                 <label class="printCtrlLabel">Copies:</label>
                 <div class="printQtyBox">
-                  <button id="printQtyDec" class="qtyStepBtn" title="Decrease copies">-</button>
+                  <button
+                    id="printQtyDec"
+                    class="qtyStepBtn"
+                    title="Decrease copies"
+                  >
+                    -
+                  </button>
                   <input
                     id="printQtyInput"
                     type="number"
@@ -515,7 +602,13 @@
                     value="4"
                     class="printQtyInput"
                   />
-                  <button id="printQtyInc" class="qtyStepBtn" title="Increase copies">+</button>
+                  <button
+                    id="printQtyInc"
+                    class="qtyStepBtn"
+                    title="Increase copies"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             </div>
@@ -574,10 +667,12 @@
               <h3 class="inspectorTitle">A4 Layout Details</h3>
               <div class="inspectorStats">
                 <div class="statRow">
-                  <span class="statLabel">Paper Size:</span><strong>A4 (210×297 mm)</strong>
+                  <span class="statLabel">Paper Size:</span
+                  ><strong>A4 (210×297 mm)</strong>
                 </div>
                 <div class="statRow">
-                  <span class="statLabel">Photo Size:</span><strong id="statSpec">45×55 mm</strong>
+                  <span class="statLabel">Photo Size:</span
+                  ><strong id="statSpec">45×55 mm</strong>
                 </div>
                 <div class="statRow">
                   <span class="statLabel">Grid Slots:</span
@@ -591,14 +686,21 @@
                   <span class="statLabel">Slot Gap:</span><strong>2 mm</strong>
                 </div>
                 <div class="statRow">
-                  <span class="statLabel">Page Margin:</span><strong>2 mm</strong>
+                  <span class="statLabel">Page Margin:</span
+                  ><strong>2 mm</strong>
                 </div>
               </div>
 
               <div id="itemInspectorBox" class="itemInspectorBox">
-                <h4 class="inspectorSubTitle">Selected Slot #<span id="inspPhotoNum">1</span></h4>
+                <h4 class="inspectorSubTitle">
+                  Selected Slot #<span id="inspPhotoNum">1</span>
+                </h4>
                 <div class="inspBtnRow">
-                  <button id="inspDupBtn" class="printBtn primarySmall" title="Duplicate photo">
+                  <button
+                    id="inspDupBtn"
+                    class="printBtn primarySmall"
+                    title="Duplicate photo"
+                  >
                     <svg
                       width="13"
                       height="13"
@@ -612,7 +714,11 @@
                     </svg>
                     Duplicate
                   </button>
-                  <button id="inspDelBtn" class="printBtn dangerSmall" title="Remove photo">
+                  <button
+                    id="inspDelBtn"
+                    class="printBtn dangerSmall"
+                    title="Remove photo"
+                  >
                     <svg
                       width="13"
                       height="13"
@@ -712,7 +818,9 @@
             </svg>
           </div>
           <div class="modalTitle">Your image is downloading…</div>
-          <p class="modalSub muted small">Check your device's downloads folder for the file.</p>
+          <p class="modalSub muted small">
+            Check your device's downloads folder for the file.
+          </p>
           <div class="modalBtns">
             <button id="modalNewImage" class="btn primary">New image</button>
             <button id="modalHome" class="btn ghost">Home</button>
@@ -721,10 +829,18 @@
       </div>
 
       <!-- Global Backdrop Overlay for Drawers & Modals -->
-      <div id="drawerBackdrop" class="drawerBackdrop hidden" aria-hidden="true"></div>
+      <div
+        id="drawerBackdrop"
+        class="drawerBackdrop hidden"
+        aria-hidden="true"
+      ></div>
 
       <!-- Slide-out Menu Panel -->
-      <aside id="menuDrawer" class="slideDrawer right hidden" aria-label="Main navigation menu">
+      <aside
+        id="menuDrawer"
+        class="slideDrawer right hidden"
+        aria-label="Main navigation menu"
+      >
         <div class="drawerHeader">
           <div class="drawerHeaderTitle">
             <img src="logo.png" alt="Cubit.pics" class="drawerLogo" />
@@ -765,7 +881,9 @@
           </div>
           <div>
             <div id="menuDrawerUserName" class="snippetName">Guest Citizen</div>
-            <div id="menuDrawerUserStats" class="snippetSub">Local Citizen • 0 photos created</div>
+            <div id="menuDrawerUserStats" class="snippetSub">
+              Local Citizen • 0 photos created
+            </div>
           </div>
         </div>
 
@@ -921,7 +1039,9 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
                 <polyline points="14 2 14 8 20 8" />
                 <line x1="16" y1="13" x2="8" y2="13" />
                 <line x1="16" y1="17" x2="8" y2="17" />
@@ -943,7 +1063,11 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              style="display: inline-block; vertical-align: -1px; margin-right: 4px"
+              style="
+                display: inline-block;
+                vertical-align: -1px;
+                margin-right: 4px;
+              "
             >
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -964,7 +1088,11 @@
           <div class="drawerHeaderTitle">
             <h3>My Account</h3>
           </div>
-          <button class="drawerCloseBtn" data-close-drawer title="Close account panel">
+          <button
+            class="drawerCloseBtn"
+            data-close-drawer
+            title="Close account panel"
+          >
             <svg
               width="20"
               height="20"
@@ -985,7 +1113,11 @@
           <!-- Profile Card -->
           <div class="profileCard">
             <div class="profileAvatarBox">
-              <img id="accAvatarImg" class="profileAvatarImg hidden" alt="Avatar" />
+              <img
+                id="accAvatarImg"
+                class="profileAvatarImg hidden"
+                alt="Avatar"
+              />
               <div id="accAvatarInitials" class="profileAvatarInitials">P</div>
               <label class="avatarEditBadge" title="Change Avatar Photo">
                 <svg
@@ -1013,9 +1145,17 @@
                   value="Passport Creator"
                   placeholder="Enter your name"
                 />
-                <button id="accSaveNameBtn" class="accSaveBtn" title="Save name">Save</button>
+                <button
+                  id="accSaveNameBtn"
+                  class="accSaveBtn"
+                  title="Save name"
+                >
+                  Save
+                </button>
               </div>
-              <div id="accCreatedDate" class="profileSubText">Member since July 2026</div>
+              <div id="accCreatedDate" class="profileSubText">
+                Member since July 2026
+              </div>
               <div class="profileBadgeTag">Pro Citizen • Local Account</div>
             </div>
           </div>
@@ -1092,12 +1232,18 @@
         <div class="appModalBox large">
           <header class="appModalHeader">
             <div>
-              <h2 class="appModalTitle">Official Passport &amp; Visa Size Specs</h2>
+              <h2 class="appModalTitle">
+                Official Passport &amp; Visa Size Specs
+              </h2>
               <p class="muted small">
                 Government compliance specifications for countries worldwide.
               </p>
             </div>
-            <button class="appModalCloseBtn" data-close-modal title="Close modal">
+            <button
+              class="appModalCloseBtn"
+              data-close-modal
+              title="Close modal"
+            >
               <svg
                 width="20"
                 height="20"
@@ -1145,9 +1291,15 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">My Recent Saved Photos</h2>
-              <p class="muted small">Local session history saved on this device.</p>
+              <p class="muted small">
+                Local session history saved on this device.
+              </p>
             </div>
-            <button class="appModalCloseBtn" data-close-modal title="Close history">
+            <button
+              class="appModalCloseBtn"
+              data-close-modal
+              title="Close history"
+            >
               <svg
                 width="20"
                 height="20"
@@ -1167,8 +1319,8 @@
               <span class="historySettingText">
                 <strong>Save created photos to history</strong>
                 <span class="muted small displayBlock"
-                  >Store photo history locally on this device. Disabling saves memory &amp; disk
-                  space.</span
+                  >Store photo history locally on this device. Disabling saves
+                  memory &amp; disk space.</span
                 >
               </span>
             </label>
@@ -1191,7 +1343,9 @@
                   stroke="currentColor"
                   stroke-width="2"
                 >
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                  />
                   <polyline points="17 21 17 13 7 13 7 21" />
                   <polyline points="7 3 7 8 15 8" />
                 </svg>
@@ -1204,8 +1358,8 @@
           </header>
           <div class="noticeModalBody">
             <p class="noticeBodyMsg">
-              Would you like Cubit.pics to automatically save your created photos locally in your
-              browser history?
+              Would you like Cubit.pics to automatically save your created
+              photos locally in your browser history?
             </p>
             <div class="noticeWarningCard">
               <svg
@@ -1224,16 +1378,24 @@
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
               <div class="noticeWarnText">
-                <strong>Important Storage Note:</strong> Saving many high-resolution photos locally
-                can accumulate data and may slow down your browser or computer over time. You can
-                change this setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
+                <strong>Important Storage Note:</strong> Saving many
+                high-resolution photos locally can accumulate data and may slow
+                down your browser or computer over time. You can change this
+                setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
               </div>
             </div>
             <label class="noticeCheckboxOption">
               <input id="noticeSaveCheckbox" type="checkbox" checked />
-              <span><strong>Yes, save my created photos in local history</strong></span>
+              <span
+                ><strong
+                  >Yes, save my created photos in local history</strong
+                ></span
+              >
             </label>
-            <button id="noticeConfirmBtn" class="btn primary fullWidth noticeBtn">
+            <button
+              id="noticeConfirmBtn"
+              class="btn primary fullWidth noticeBtn"
+            >
               Confirm &amp; Continue
             </button>
           </div>
@@ -1246,7 +1408,9 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">How Cubit.pics Works</h2>
-              <p class="muted small">4 easy steps to compliant, studio-grade passport photos.</p>
+              <p class="muted small">
+                4 easy steps to compliant, studio-grade passport photos.
+              </p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close">
               <svg
@@ -1266,24 +1430,31 @@
             <div class="howStepCard">
               <div class="howStepNum">1</div>
               <h4>Choose or Drop Photo</h4>
-              <p>Upload any clear portrait image from your camera or gallery.</p>
+              <p>
+                Upload any clear portrait image from your camera or gallery.
+              </p>
             </div>
             <div class="howStepCard">
               <div class="howStepNum">2</div>
               <h4>AI Background Matting</h4>
-              <p>Our on-device neural model isolates you with pixel accuracy.</p>
+              <p>
+                Our on-device neural model isolates you with pixel accuracy.
+              </p>
             </div>
             <div class="howStepCard">
               <div class="howStepNum">3</div>
               <h4>Frame &amp; Outfit Fine-Tuning</h4>
-              <p>Automatic face height framing to government specs + dress try-on.</p>
+              <p>
+                Automatic face height framing to government specs + dress
+                try-on.
+              </p>
             </div>
             <div class="howStepCard">
               <div class="howStepNum">4</div>
               <h4>Export &amp; Print</h4>
               <p>
-                Download single digital photos or 300 DPI A4 print sheets ready for home or kiosk
-                printing.
+                Download single digital photos or 300 DPI A4 print sheets ready
+                for home or kiosk printing.
               </p>
             </div>
           </div>
@@ -1295,9 +1466,12 @@
         <div class="appModalBox">
           <header class="appModalHeader">
             <div>
-              <h2 class="appModalTitle">Help &amp; Frequently Asked Questions</h2>
+              <h2 class="appModalTitle">
+                Help &amp; Frequently Asked Questions
+              </h2>
               <p class="muted small">
-                Everything you need to know about government passport photo standards.
+                Everything you need to know about government passport photo
+                standards.
               </p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close FAQ">
@@ -1320,17 +1494,20 @@
                 Are photos generated here accepted by governments?
               </summary>
               <div class="faqAnswer">
-                Yes! Cubit.pics formats photos according to official government dimensions (e.g.,
-                Bangladesh 45×55mm, US 2×2", Schengen 35×45mm), requiring neutral backgrounds and
-                60-70% face height ratios.
+                Yes! Cubit.pics formats photos according to official government
+                dimensions (e.g., Bangladesh 45×55mm, US 2×2", Schengen
+                35×45mm), requiring neutral backgrounds and 60-70% face height
+                ratios.
               </div>
             </details>
             <details class="faqItem">
-              <summary class="faqQuestion">Is my uploaded photo sent to a server?</summary>
+              <summary class="faqQuestion">
+                Is my uploaded photo sent to a server?
+              </summary>
               <div class="faqAnswer">
-                No! All background segmentation, face detection, and passport canvas rendering
-                happen 100% locally in your web browser using WebGPU / WebAssembly. Your photo never
-                leaves your device.
+                No! All background segmentation, face detection, and passport
+                canvas rendering happen 100% locally in your web browser using
+                WebGPU / WebAssembly. Your photo never leaves your device.
               </div>
             </details>
             <details class="faqItem">
@@ -1338,9 +1515,9 @@
                 Can I print these photos on home printers or at photo shops?
               </summary>
               <div class="faqAnswer">
-                Absolutely. Use the "Download Print Sheet" or "A4 Print Sheet Editor" to generate a
-                300 DPI print sheet tiled with 4, 8, 12, or 20 photo copies on standard A4 or 4×6
-                photo paper.
+                Absolutely. Use the "Download Print Sheet" or "A4 Print Sheet
+                Editor" to generate a 300 DPI print sheet tiled with 4, 8, 12,
+                or 20 photo copies on standard A4 or 4×6 photo paper.
               </div>
             </details>
             <details class="faqItem">
@@ -1348,8 +1525,9 @@
                 What expression and posture should I use in my photo?
               </summary>
               <div class="faqAnswer">
-                Look directly into the camera with a neutral facial expression (mouth closed), eyes
-                open and clearly visible. Avoid shadows on your face or background.
+                Look directly into the camera with a neutral facial expression
+                (mouth closed), eyes open and clearly visible. Avoid shadows on
+                your face or background.
               </div>
             </details>
           </div>
@@ -1362,9 +1540,15 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Terms of Service</h2>
-              <p class="muted small">Effective Date: July 2026 · Cubit.pics Legal Terms</p>
+              <p class="muted small">
+                Effective Date: July 2026 · Cubit.pics Legal Terms
+              </p>
             </div>
-            <button class="appModalCloseBtn" data-close-modal title="Close Terms of Service">
+            <button
+              class="appModalCloseBtn"
+              data-close-modal
+              title="Close Terms of Service"
+            >
               <svg
                 width="20"
                 height="20"
@@ -1381,39 +1565,44 @@
           <div class="legalContent">
             <h3>1. Acceptance of Terms</h3>
             <p>
-              By accessing or using Cubit.pics ("the Service"), you agree to be bound by these Terms
-              of Service and all applicable laws and regulations. If you do not agree with any of
-              these terms, you are prohibited from using the service.
+              By accessing or using Cubit.pics ("the Service"), you agree to be
+              bound by these Terms of Service and all applicable laws and
+              regulations. If you do not agree with any of these terms, you are
+              prohibited from using the service.
             </p>
 
             <h3>2. Description of Service</h3>
             <p>
-              Cubit.pics provides browser-based, client-side automated passport and visa photo
-              cropping, background removal, formal dress try-on, and print layout generation tools.
-              All core rendering operates directly on your local web browser.
+              Cubit.pics provides browser-based, client-side automated passport
+              and visa photo cropping, background removal, formal dress try-on,
+              and print layout generation tools. All core rendering operates
+              directly on your local web browser.
             </p>
 
             <h3>3. Local Privacy &amp; Data Ownership</h3>
             <p>
-              You retain full intellectual property rights to all images you upload and process.
-              Cubit.pics does not store, transmit, transmit, or retain your personal facial images
-              on external servers. All image processing occurs strictly within your device's browser
+              You retain full intellectual property rights to all images you
+              upload and process. Cubit.pics does not store, transmit, transmit,
+              or retain your personal facial images on external servers. All
+              image processing occurs strictly within your device's browser
               memory.
             </p>
 
             <h3>4. Government Compliance Disclaimer</h3>
             <p>
-              While Cubit.pics implements strict millimeter dimensions and face height ratios
-              recommended by passport authorities (including Bangladesh, United States, UK, and
-              Schengen countries), local embassy and immigration agencies maintain sole discretion
-              over final document approval. Users are encouraged to ensure their input photos meet
-              lighting, expression, and posture requirements.
+              While Cubit.pics implements strict millimeter dimensions and face
+              height ratios recommended by passport authorities (including
+              Bangladesh, United States, UK, and Schengen countries), local
+              embassy and immigration agencies maintain sole discretion over
+              final document approval. Users are encouraged to ensure their
+              input photos meet lighting, expression, and posture requirements.
             </p>
 
             <h3>5. Limitation of Liability</h3>
             <p>
-              In no event shall Cubit.pics or its operators be liable for any indirect, incidental,
-              or consequential damages resulting from the use or inability to use the application.
+              In no event shall Cubit.pics or its operators be liable for any
+              indirect, incidental, or consequential damages resulting from the
+              use or inability to use the application.
             </p>
           </div>
         </div>
@@ -1425,9 +1614,15 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Privacy Policy</h2>
-              <p class="muted small">GDPR &amp; AdSense Compliant Privacy Statement</p>
+              <p class="muted small">
+                GDPR &amp; AdSense Compliant Privacy Statement
+              </p>
             </div>
-            <button class="appModalCloseBtn" data-close-modal title="Close Privacy Policy">
+            <button
+              class="appModalCloseBtn"
+              data-close-modal
+              title="Close Privacy Policy"
+            >
               <svg
                 width="20"
                 height="20"
@@ -1444,44 +1639,52 @@
           <div class="legalContent">
             <h3>1. Privacy-First Commitment</h3>
             <p>
-              At Cubit.pics, user privacy is our fundamental principle. We do not collect, upload,
-              store, or sell your personal photo data. Your images are processed 100% locally on
-              your computer or mobile device using WebGPU and WebAssembly machine learning models.
+              At Cubit.pics, user privacy is our fundamental principle. We do
+              not collect, upload, store, or sell your personal photo data. Your
+              images are processed 100% locally on your computer or mobile
+              device using WebGPU and WebAssembly machine learning models.
             </p>
 
             <h3>2. Local Storage &amp; Cookies</h3>
             <p>
-              We use local browser storage (localStorage) solely to remember your user preferences
-              (such as default export format, passport size selection, and local user display name).
-              No tracking cookies or cross-site fingerprinting tools are used.
+              We use local browser storage (localStorage) solely to remember
+              your user preferences (such as default export format, passport
+              size selection, and local user display name). No tracking cookies
+              or cross-site fingerprinting tools are used.
             </p>
 
             <h3>3. GDPR &amp; CCPA Compliance</h3>
             <p>
-              Because no personal data or facial biometric data is stored on remote servers, your
-              rights under GDPR and CCPA are natively protected. You can clear all local application
-              data at any time via the Account Settings panel.
+              Because no personal data or facial biometric data is stored on
+              remote servers, your rights under GDPR and CCPA are natively
+              protected. You can clear all local application data at any time
+              via the Account Settings panel.
             </p>
 
             <h3>4. Contact &amp; Inquiries</h3>
             <p>
-              If you have questions regarding privacy or technical compliance, feel free to reach
-              out via our contact channels listed in the site footer.
+              If you have questions regarding privacy or technical compliance,
+              feel free to reach out via our contact channels listed in the site
+              footer.
             </p>
           </div>
         </div>
       </div>
 
       <footer class="siteFooter">
-        <section class="articles" data-home-only aria-labelledby="articlesTitle">
+        <section
+          class="articles"
+          data-home-only
+          aria-labelledby="articlesTitle"
+        >
           <header class="articlesHead">
             <div class="aboutKicker">Insights</div>
             <h2 id="articlesTitle" class="aboutTitle">
               From the <span class="grad">Cubit.pics</span> journal
             </h2>
             <p class="articlesLead">
-              Practical, in-depth reads on modern imaging, composition, and the craft of building
-              fast, beautiful visuals for the web.
+              Practical, in-depth reads on modern imaging, composition, and the
+              craft of building fast, beautiful visuals for the web.
             </p>
           </header>
           <div class="articleGrid">
@@ -1504,14 +1707,17 @@
               </div>
               <div class="articleBody">
                 <div class="articleMeta">
-                  <span class="tag">AI &amp; Craft</span><span>· 5 min read</span>
+                  <span class="tag">AI &amp; Craft</span
+                  ><span>· 5 min read</span>
                 </div>
                 <h3 class="articleTitle">
-                  The Future of Visual Storytelling: How AI and Photography Collide
+                  The Future of Visual Storytelling: How AI and Photography
+                  Collide
                 </h3>
                 <p class="articleExcerpt">
-                  Explore how modern creators are leveraging automated tools to enhance
-                  high-resolution imagery without losing the human touch.
+                  Explore how modern creators are leveraging automated tools to
+                  enhance high-resolution imagery without losing the human
+                  touch.
                 </p>
               </div>
             </article>
@@ -1535,11 +1741,13 @@
                   <span class="tag">Composition</span><span>· 7 min read</span>
                 </div>
                 <h3 class="articleTitle">
-                  Mastering Digital Composition: 5 Rules Every Creator Should Break
+                  Mastering Digital Composition: 5 Rules Every Creator Should
+                  Break
                 </h3>
                 <p class="articleExcerpt">
-                  A deep dive into advanced framing techniques, color theory, and why breaking
-                  traditional design rules can elevate your portfolio.
+                  A deep dive into advanced framing techniques, color theory,
+                  and why breaking traditional design rules can elevate your
+                  portfolio.
                 </p>
               </div>
             </article>
@@ -1562,11 +1770,13 @@
                   <span class="tag">Performance</span><span>· 6 min read</span>
                 </div>
                 <h3 class="articleTitle">
-                  Optimizing Web Images for Maximum Speed and Crystal-Clear Resolution
+                  Optimizing Web Images for Maximum Speed and Crystal-Clear
+                  Resolution
                 </h3>
                 <p class="articleExcerpt">
-                  Slow loading times kill conversions. Learn the exact compression techniques to
-                  keep your site lightning-fast while maintaining flawless quality.
+                  Slow loading times kill conversions. Learn the exact
+                  compression techniques to keep your site lightning-fast while
+                  maintaining flawless quality.
                 </p>
               </div>
             </article>
@@ -1590,14 +1800,17 @@
             </div>
             <div>
               <div class="aboutKicker">About</div>
-              <h2 class="aboutTitle">About <span class="grad">Cubit.pics</span></h2>
+              <h2 class="aboutTitle">
+                About <span class="grad">Cubit.pics</span>
+              </h2>
             </div>
           </div>
           <p class="aboutText">
-            Cubit.pics is a fully in-browser passport and visa photo studio. Our AI segmentation
-            model runs locally on your device using WebGPU (with a WebAssembly fallback), so your
-            photo never leaves your computer or phone. There are no uploads, no cloud processing, no
-            accounts, and no tracking of your images — just an instant, professional result.
+            Cubit.pics is a fully in-browser passport and visa photo studio. Our
+            AI segmentation model runs locally on your device using WebGPU (with
+            a WebAssembly fallback), so your photo never leaves your computer or
+            phone. There are no uploads, no cloud processing, no accounts, and
+            no tracking of your images — just an instant, professional result.
           </p>
 
           <div class="aboutDemoBox">
@@ -1607,25 +1820,28 @@
               class="aboutDemoImg"
             />
             <div class="aboutDemoCaption">
-              <strong>Before vs. After:</strong> Instant on-device background removal &amp; AI
-              formal dress try-on
+              <strong>Before vs. After:</strong> Instant on-device background
+              removal &amp; AI formal dress try-on
             </div>
           </div>
 
           <p class="aboutText">
-            Behind the scenes we combine a modern neural background-removal pipeline with an
-            edge-aware compositor and a color-managed rendering engine. That means clean hair edges,
-            accurate skin tones, and print-ready output at the exact millimeter and DPI
-            specifications used by governments around the world — US, Schengen, UK, Canada, India,
-            China, Australia, Japan and many more presets are built in.
+            Behind the scenes we combine a modern neural background-removal
+            pipeline with an edge-aware compositor and a color-managed rendering
+            engine. That means clean hair edges, accurate skin tones, and
+            print-ready output at the exact millimeter and DPI specifications
+            used by governments around the world — US, Schengen, UK, Canada,
+            India, China, Australia, Japan and many more presets are built in.
           </p>
 
           <p class="aboutText">
-            You stay in full creative control. Adjust framing with live compliance guides, tune
-            brightness, contrast, exposure, shadows, highlights, clarity and noise, pick a compliant
-            white or off-white background (or any custom color), and export as JPEG or PNG. Need a
-            physical copy? Generate a perfectly tiled 4×6″ print sheet ready for home printers or
-            any photo kiosk — all in seconds, all on your device.
+            You stay in full creative control. Adjust framing with live
+            compliance guides, tune brightness, contrast, exposure, shadows,
+            highlights, clarity and noise, pick a compliant white or off-white
+            background (or any custom color), and export as JPEG or PNG. Need a
+            physical copy? Generate a perfectly tiled 4×6″ print sheet ready for
+            home printers or any photo kiosk — all in seconds, all on your
+            device.
           </p>
 
           <div class="freeBadge">
@@ -1638,7 +1854,11 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              style="display: inline-block; vertical-align: -2px; margin-right: 5px"
+              style="
+                display: inline-block;
+                vertical-align: -2px;
+                margin-right: 5px;
+              "
             >
               <path
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
@@ -1686,8 +1906,12 @@
                 </svg>
               </span>
               <div>
-                <div class="aboutItemT">Adjustable framing, zoom &amp; rotation</div>
-                <div class="aboutItemS">Dial in the perfect crop with live guides.</div>
+                <div class="aboutItemT">
+                  Adjustable framing, zoom &amp; rotation
+                </div>
+                <div class="aboutItemS">
+                  Dial in the perfect crop with live guides.
+                </div>
               </div>
             </li>
             <li>
@@ -1706,7 +1930,9 @@
                 </svg>
               </span>
               <div>
-                <div class="aboutItemT">Multiple passport &amp; visa presets</div>
+                <div class="aboutItemT">
+                  Multiple passport &amp; visa presets
+                </div>
                 <div class="aboutItemS">
                   US, Schengen, UK, India, Canada, China, Australia and more.
                 </div>
@@ -1729,7 +1955,9 @@
               </span>
               <div>
                 <div class="aboutItemT">Download as JPEG or PNG</div>
-                <div class="aboutItemS">High-resolution files ready for online applications.</div>
+                <div class="aboutItemS">
+                  High-resolution files ready for online applications.
+                </div>
               </div>
             </li>
             <li>
@@ -1771,7 +1999,11 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
+                style="
+                  display: inline-block;
+                  vertical-align: -1px;
+                  margin-right: 4px;
+                "
               >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
@@ -1788,7 +2020,11 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
+                style="
+                  display: inline-block;
+                  vertical-align: -1px;
+                  margin-right: 4px;
+                "
               >
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
@@ -1806,7 +2042,11 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
+                style="
+                  display: inline-block;
+                  vertical-align: -1px;
+                  margin-right: 4px;
+                "
               >
                 <path
                   d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
@@ -1819,20 +2059,27 @@
           <div class="homeFooterSocial">
             <div class="homeFooterSocialTitle">Follow Us</div>
             <div class="homeFooterSocialLinks">
-              <a href="#">Facebook</a> • <a href="#">Youtube</a> • <a href="#">Instagram</a>
+              <a href="#">Facebook</a> • <a href="#">Youtube</a> •
+              <a href="#">Instagram</a>
             </div>
           </div>
           <div class="homeFooterDivider"></div>
           <div class="homeFooterBottom">
             <div class="homeFooterLinks">
-              <button id="footerPrivacyBtn" class="footerLinkBtn">Privacy Policy</button> |
-              <button id="footerTosBtn" class="footerLinkBtn">Terms &amp; Conditions</button>
+              <button id="footerPrivacyBtn" class="footerLinkBtn">
+                Privacy Policy
+              </button>
+              |
+              <button id="footerTosBtn" class="footerLinkBtn">
+                Terms &amp; Conditions
+              </button>
             </div>
           </div>
         </div>
 
         <div class="footNote">
-          © <span id="year"></span> Cubit.pics · Made for private, on-device photo editing.
+          © <span id="year"></span> Cubit.pics · Made for private, on-device
+          photo editing.
         </div>
       </footer>
     </div>

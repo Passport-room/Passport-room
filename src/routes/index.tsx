@@ -10,7 +10,10 @@ export const Route = createFileRoute("/")({
         content:
           "Change clothes on your photo with AI virtual try-on and enhance to HD while preserving facial identity. Free, no signup.",
       },
-      { property: "og:title", content: "AI Photo Studio — Virtual Try-On & HD Enhance" },
+      {
+        property: "og:title",
+        content: "AI Photo Studio — Virtual Try-On & HD Enhance",
+      },
       {
         property: "og:description",
         content:

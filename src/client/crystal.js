@@ -3,7 +3,9 @@ import * as THREE from "three";
 
 export function initCrystal(canvas, box) {
   if (!canvas || !box) return () => {};
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   let renderer;
   try {
@@ -40,7 +42,11 @@ export function initCrystal(canvas, box) {
   const geometry = new THREE.IcosahedronGeometry(1.2, 0);
   const core = new THREE.Mesh(
     geometry,
-    new THREE.MeshStandardMaterial({ color: 0x101015, metalness: 0.75, roughness: 0.42 }),
+    new THREE.MeshStandardMaterial({
+      color: 0x101015,
+      metalness: 0.75,
+      roughness: 0.42,
+    }),
   );
   core.scale.setScalar(0.935);
   group.add(core);
@@ -59,7 +65,11 @@ export function initCrystal(canvas, box) {
 
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geometry),
-    new THREE.LineBasicMaterial({ color: 0xbda7ff, transparent: true, opacity: 0.62 }),
+    new THREE.LineBasicMaterial({
+      color: 0xbda7ff,
+      transparent: true,
+      opacity: 0.62,
+    }),
   );
   group.add(edges);
 

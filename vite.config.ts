@@ -12,7 +12,9 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 // Inside Lovable's own build, the plugin forces the Cloudflare preset regardless,
 // so the preview keeps working exactly as before.
 const nitroOptions =
-  process.env.VERCEL || process.env.NITRO_PRESET === "vercel" ? { preset: "vercel" } : undefined;
+  process.env.VERCEL || process.env.NITRO_PRESET === "vercel"
+    ? { preset: "vercel" }
+    : undefined;
 
 export default defineConfig({
   tanstackStart: {
