@@ -62,10 +62,7 @@ export function detectFaceInCanvas(sourceCanvas, maskCanvas) {
   const cutoutSampleH = headBottomSampleY - headTopSampleY + 1;
 
   // 2. Measure head width & center in the upper 30% section of person cutout
-  const upperYEnd = Math.min(
-    sampleH - 1,
-    Math.round(headTopSampleY + cutoutSampleH * 0.35),
-  );
+  const upperYEnd = Math.min(sampleH - 1, Math.round(headTopSampleY + cutoutSampleH * 0.35));
   let headMinX = sampleW,
     headMaxX = 0;
   let headXSum = 0,
@@ -85,19 +82,14 @@ export function detectFaceInCanvas(sourceCanvas, maskCanvas) {
   }
 
   const headSampleWidth = Math.max(10, headMaxX - headMinX);
-  const headSampleCenterX =
-    headXCount > 0 ? headXSum / headXCount : (minSampleX + maxSampleX) / 2;
+  const headSampleCenterX = headXCount > 0 ? headXSum / headXCount : (minSampleX + maxSampleX) / 2;
 
   // 3. Scan face skin tone for chin location
   const skinMap = new Uint8Array(sampleW * sampleH);
   let skinCount = 0;
   let sumSkinX = 0;
 
-  for (
-    let y = headTopSampleY;
-    y <= Math.min(sampleH - 1, headBottomSampleY);
-    y++
-  ) {
+  for (let y = headTopSampleY; y <= Math.min(sampleH - 1, headBottomSampleY); y++) {
     for (let x = headMinX; x <= headMaxX; x++) {
       const i = (y * sampleW + x) * 4;
       if (maskData && maskData[i + 3] < 80) continue;
@@ -123,8 +115,7 @@ export function detectFaceInCanvas(sourceCanvas, maskCanvas) {
   }
 
   let chinSampleY = -1;
-  let faceCenterSampleX =
-    skinCount > 20 ? sumSkinX / skinCount : headSampleCenterX;
+  let faceCenterSampleX = skinCount > 20 ? sumSkinX / skinCount : headSampleCenterX;
 
   if (skinCount > 20) {
     let lastSkinY = headTopSampleY;
@@ -147,18 +138,13 @@ export function detectFaceInCanvas(sourceCanvas, maskCanvas) {
   // Calculate face height (crown of head to chin)
   // Anatomically head height is ~1.28x head width or ~45% of head+torso cutout
   let rawDetectedFaceH =
-    chinSampleY > headTopSampleY + 10
-      ? chinSampleY - headTopSampleY
-      : headSampleWidth * 1.28;
+    chinSampleY > headTopSampleY + 10 ? chinSampleY - headTopSampleY : headSampleWidth * 1.28;
 
   // Cap face height to avoid counting exposed neck/chest skin as face
   const maxFaceH = Math.min(cutoutSampleH * 0.52, headSampleWidth * 1.35);
   const minFaceH = Math.max(15, headSampleWidth * 1.1);
 
-  const sampleFaceHeight = Math.min(
-    maxFaceH,
-    Math.max(minFaceH, rawDetectedFaceH),
-  );
+  const sampleFaceHeight = Math.min(maxFaceH, Math.max(minFaceH, rawDetectedFaceH));
 
   // Convert to full resolution coordinates
   const scaleX = w / sampleW;

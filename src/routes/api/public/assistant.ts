@@ -28,12 +28,7 @@ export const Route = createFileRoute("/api/public/assistant")({
 
           const apiKey = process.env.GEMINI_API_KEY;
           if (!apiKey) {
-            return json(
-              {
-                error: "GEMINI_API_KEY environment variable is not configured",
-              },
-              500,
-            );
+            return json({ error: "GEMINI_API_KEY environment variable is not configured" }, 500);
           }
 
           const ai = new GoogleGenAI({ apiKey });

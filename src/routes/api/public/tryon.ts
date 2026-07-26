@@ -1,25 +1,26 @@
 // Virtual try-on proxy — authenticated Hugging Face Space calls with an
-// automatic multi-worker failover chain. If the primary Space is busy,
-// sleeping, rate-limited, or returns an error, the request is transparently
-// retried against compatible backup Spaces until one succeeds or all fail.
+// automatic multi-worker failover chain that LOOPS. If the last worker
+// fails, the chain restarts from the first worker (up to MAX_ROUNDS
+// rounds) so a transient busy state anywhere in the chain still resolves
+// on the next pass.
 //
-// Primary + backups (all public, free-tier, gradio predict API):
-//   1. yisol/IDM-VTON                          (primary — quality reference)
-//   2. yisol/IDM-VTON                          (single quick retry)
-//   3. Kwai-Kolors/Kolors-Virtual-Try-On       (ZeroGPU, reliable)
-//   4. levihsu/OOTDiffusion                    (high-quality diffusion VTON)
-//   5. franciszzj/Leffa                        (newer VTON, low traffic)
+// Workers (all public, free-tier, gradio predict API):
+//   1. yisol/IDM-VTON                    (primary — quality reference)
+//   2. Kwai-Kolors/Kolors-Virtual-Try-On  (ZeroGPU, very reliable)
+//   3. levihsu/OOTDiffusion               (high-quality diffusion VTON)
+//   4. franciszzj/Leffa                   (newer VTON, low traffic)
+//   5. zhengchong/CatVTON                 (efficient VTON, backup)
 //
 // Optional env var TRYON_PRIMARY_SPACE lets the user prepend their own
-// duplicated Space (e.g. "myuser/IDM-VTON") without a code change.
+// duplicated Space without a code change.
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const PER_ATTEMPT_TIMEOUT_MS = 90_000;
-const BACKOFF_MS = 1_500;
+const PER_ATTEMPT_TIMEOUT_MS = 75_000;
+const MAX_ROUNDS = 2; // loop through the full chain twice before giving up
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -28,37 +29,25 @@ const CORS: Record<string, string> = {
   "Access-Control-Max-Age": "86400",
 };
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
+const json = (b: unknown, s = 200) =>
+  new Response(JSON.stringify(b), {
+    status: s,
     headers: { "Content-Type": "application/json", ...CORS },
   });
-}
 
 function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const t = setTimeout(() => reject(new Error(`${label} timed out`)), ms);
     p.then(
-      (v) => {
-        clearTimeout(t);
-        resolve(v);
-      },
-      (e) => {
-        clearTimeout(t);
-        reject(e);
-      },
+      (v) => { clearTimeout(t); resolve(v); },
+      (e) => { clearTimeout(t); reject(e); },
     );
   });
 }
 
-// A worker failure is "retryable" (try next worker) unless it's clearly our
-// own client-side validation error — those we don't have here, since we
-// validate before the failover loop begins.
 function isRetryable(err: unknown): boolean {
   const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
-  // Explicit non-retryable signals from gradio/HF (rare).
-  if (msg.includes("invalid input") || msg.includes("unsupported file"))
-    return false;
+  if (msg.includes("invalid input") || msg.includes("unsupported file")) return false;
   return true;
 }
 
@@ -94,11 +83,8 @@ async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
 }
 
 type HfAuth = Record<string, never> | undefined;
-function hfOpts(token: string | undefined): HfAuth {
-  return token
-    ? ({ hf_token: token } as unknown as Record<string, never>)
-    : undefined;
-}
+const hfOpts = (t: string | undefined): HfAuth =>
+  t ? ({ hf_token: t } as unknown as Record<string, never>) : undefined;
 
 async function toFile(blob: Blob, name: string): Promise<File> {
   return new File([await blob.arrayBuffer()], name, {
@@ -141,17 +127,14 @@ async function callKolorsVton(
   garmentBlob: Blob,
   hfToken: string | undefined,
 ): Promise<ArrayBuffer> {
-  const client = await Client.connect(
-    "Kwai-Kolors/Kolors-Virtual-Try-On",
-    hfOpts(hfToken),
-  );
+  const client = await Client.connect("Kwai-Kolors/Kolors-Virtual-Try-On", hfOpts(hfToken));
   const personFile = await toFile(personBlob, "person.png");
   const garmentFile = await toFile(garmentBlob, "garment.png");
   const result = await client.predict("/tryon", [
     handle_file(personFile),
     handle_file(garmentFile),
-    0, // seed
-    true, // random seed
+    0,
+    true,
   ]);
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
@@ -167,15 +150,13 @@ async function callOotdiffusion(
   const client = await Client.connect("levihsu/OOTDiffusion", hfOpts(hfToken));
   const personFile = await toFile(personBlob, "person.png");
   const garmentFile = await toFile(garmentBlob, "garment.png");
-  // /process_hd — half-body single-endpoint flow. Args: vton_img, garm_img,
-  // n_samples, n_steps, image_scale, seed.
   const result = await client.predict("/process_hd", [
     handle_file(personFile),
     handle_file(garmentFile),
-    1, // n_samples
-    20, // n_steps
-    2, // image_scale
-    -1, // seed (random)
+    1,
+    20,
+    2,
+    -1,
   ]);
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
@@ -191,8 +172,6 @@ async function callLeffa(
   const client = await Client.connect("franciszzj/Leffa", hfOpts(hfToken));
   const personFile = await toFile(personBlob, "person.png");
   const garmentFile = await toFile(garmentBlob, "garment.png");
-  // Leffa VTON endpoint accepts src_image, ref_image, ref_acceleration,
-  // step, scale, seed, vt_model_type, vt_garment_type, vt_repaint.
   const result = await client.predict("/leffa_predict_vt", [
     handle_file(personFile),
     handle_file(garmentFile),
@@ -207,6 +186,29 @@ async function callLeffa(
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
   if (!url) throw new Error("Leffa returned no image URL");
+  return fetchImageBuffer(url);
+}
+
+async function callCatVton(
+  personBlob: Blob,
+  garmentBlob: Blob,
+  hfToken: string | undefined,
+): Promise<ArrayBuffer> {
+  const client = await Client.connect("zhengchong/CatVTON", hfOpts(hfToken));
+  const personFile = await toFile(personBlob, "person.png");
+  const garmentFile = await toFile(garmentBlob, "garment.png");
+  const result = await client.predict("/submit_function", [
+    handle_file(personFile),
+    handle_file(garmentFile),
+    "upper",
+    50,
+    2.5,
+    42,
+    true,
+  ]);
+  const rootHint = client.config?.root;
+  const url = extractUrl((result as { data?: unknown }).data, rootHint);
+  if (!url) throw new Error("CatVTON returned no image URL");
   return fetchImageBuffer(url);
 }
 
@@ -229,19 +231,11 @@ export const Route = createFileRoute("/api/public/tryon")({
         const description = String(form.get("description") ?? "");
 
         if (!(person instanceof File) || !(garment instanceof File)) {
-          return json(
-            { error: "Both 'person' and 'garment' image files are required" },
-            400,
-          );
+          return json({ error: "Both 'person' and 'garment' image files are required" }, 400);
         }
-        for (const [name, f] of [
-          ["person", person],
-          ["garment", garment],
-        ] as const) {
-          if (f.size === 0)
-            return json({ error: `${name} image is empty` }, 400);
-          if (f.size > MAX_BYTES)
-            return json({ error: `${name} image exceeds 12 MB limit` }, 413);
+        for (const [name, f] of [["person", person], ["garment", garment]] as const) {
+          if (f.size === 0) return json({ error: `${name} image is empty` }, 400);
+          if (f.size > MAX_BYTES) return json({ error: `${name} image exceeds 12 MB limit` }, 413);
           if (f.type && !ALLOWED_MIME.has(f.type))
             return json({ error: `${name} must be JPEG, PNG, or WebP` }, 415);
         }
@@ -250,79 +244,47 @@ export const Route = createFileRoute("/api/public/tryon")({
         const customPrimary = (process.env.TRYON_PRIMARY_SPACE || "").trim();
         const errors: string[] = [];
 
-        const attempts: Array<{
-          name: string;
-          run: () => Promise<ArrayBuffer>;
-        }> = [];
+        const chain: Array<{ name: string; run: () => Promise<ArrayBuffer> }> = [];
 
-        // Optional custom primary (e.g. user's duplicated Space, IDM-VTON API).
         if (customPrimary) {
-          attempts.push({
+          chain.push({
             name: `custom:${customPrimary}`,
-            run: () =>
-              callIdmVton(customPrimary, person, garment, description, hfToken),
+            run: () => callIdmVton(customPrimary, person, garment, description, hfToken),
           });
         }
 
-        attempts.push(
-          {
-            name: "IDM-VTON",
-            run: () =>
-              callIdmVton(
-                "yisol/IDM-VTON",
-                person,
-                garment,
-                description,
-                hfToken,
-              ),
-          },
-          {
-            name: "IDM-VTON retry",
-            run: () =>
-              callIdmVton(
-                "yisol/IDM-VTON",
-                person,
-                garment,
-                description,
-                hfToken,
-              ),
-          },
-          {
-            name: "Kolors-VTON",
-            run: () => callKolorsVton(person, garment, hfToken),
-          },
-          {
-            name: "OOTDiffusion",
-            run: () => callOotdiffusion(person, garment, hfToken),
-          },
-          { name: "Leffa", run: () => callLeffa(person, garment, hfToken) },
+        chain.push(
+          { name: "IDM-VTON",     run: () => callIdmVton("yisol/IDM-VTON", person, garment, description, hfToken) },
+          { name: "Kolors-VTON",  run: () => callKolorsVton(person, garment, hfToken) },
+          { name: "OOTDiffusion", run: () => callOotdiffusion(person, garment, hfToken) },
+          { name: "Leffa",        run: () => callLeffa(person, garment, hfToken) },
+          { name: "CatVTON",      run: () => callCatVton(person, garment, hfToken) },
         );
 
-        for (let i = 0; i < attempts.length; i++) {
-          const attempt = attempts[i];
-          try {
-            const raw = await withTimeout(
-              attempt.run(),
-              PER_ATTEMPT_TIMEOUT_MS,
-              attempt.name,
-            );
-            return new Response(raw, {
-              status: 200,
-              headers: {
-                "Content-Type": "image/png",
-                "Cache-Control": "no-store",
-                "X-Worker": attempt.name,
-                ...CORS,
-              },
-            });
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.warn(`[tryon] ${attempt.name} failed:`, msg);
-            errors.push(`${attempt.name}: ${msg}`);
-            if (!isRetryable(err)) break;
-            // Small backoff before same-Space retry only.
-            if (attempt.name.endsWith("retry")) {
-              await new Promise((r) => setTimeout(r, BACKOFF_MS));
+        for (let round = 1; round <= MAX_ROUNDS; round++) {
+          for (const attempt of chain) {
+            const label = round === 1 ? attempt.name : `${attempt.name} (retry ${round})`;
+            try {
+              const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, label);
+              return new Response(raw, {
+                status: 200,
+                headers: {
+                  "Content-Type": "image/png",
+                  "Cache-Control": "no-store",
+                  "X-Worker": label,
+                  ...CORS,
+                },
+              });
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : String(err);
+              console.warn(`[tryon] ${label} failed:`, msg);
+              errors.push(`${label}: ${msg}`);
+              if (!isRetryable(err)) {
+                return json(
+                  { error: "The uploaded image was rejected by the AI service.", details: errors },
+                  400,
+                );
+              }
             }
           }
         }

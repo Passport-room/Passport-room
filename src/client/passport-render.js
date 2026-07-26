@@ -78,13 +78,7 @@ export function drawCropToCanvas(
     ctx.fillRect(dstX, dstY, dstW, dstH);
   }
 
-  if (
-    !srcCanvas ||
-    !srcCanvas.width ||
-    !srcCanvas.height ||
-    cropW <= 0 ||
-    cropH <= 0
-  ) {
+  if (!srcCanvas || !srcCanvas.width || !srcCanvas.height || cropW <= 0 || cropH <= 0) {
     return;
   }
 
@@ -189,19 +183,7 @@ export function renderPassport(cutout, spec, bgColor, adjust) {
     );
     ctx.restore();
   } else {
-    drawCropToCanvas(
-      ctx,
-      cutout.canvas,
-      cropX,
-      cropY,
-      cropW,
-      cropH,
-      0,
-      0,
-      outW,
-      outH,
-      bgColor,
-    );
+    drawCropToCanvas(ctx, cutout.canvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH, bgColor);
   }
   return canvas;
 }
@@ -214,14 +196,8 @@ export function buildPrintSheet(photo, spec) {
   const sheetLong = 6 * dpi,
     sheetShort = 4 * dpi;
   const tryLayout = (sheetW, sheetH) => {
-    const cols = Math.max(
-      1,
-      Math.floor((sheetW - 2 * margin + gap) / (pW + gap)),
-    );
-    const rows = Math.max(
-      1,
-      Math.floor((sheetH - 2 * margin + gap) / (pH + gap)),
-    );
+    const cols = Math.max(1, Math.floor((sheetW - 2 * margin + gap) / (pW + gap)));
+    const rows = Math.max(1, Math.floor((sheetH - 2 * margin + gap) / (pH + gap)));
     return { sheetW, sheetH, cols, rows, count: cols * rows };
   };
   const portrait = tryLayout(sheetShort, sheetLong);
@@ -253,11 +229,7 @@ export function buildPrintSheet(photo, spec) {
 
 export function canvasToBlob(canvas, type, quality) {
   return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("Export failed"))),
-      type,
-      quality,
-    );
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Export failed"))), type, quality);
   });
 }
 

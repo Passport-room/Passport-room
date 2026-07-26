@@ -8,104 +8,110 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as ApiPublicAssistantRouteImport } from "./routes/api/public/assistant";
-import { Route as ApiPublicEnhanceRouteImport } from "./routes/api/public/enhance";
-import { Route as ApiPublicTryonRouteImport } from "./routes/api/public/tryon";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicTryonRouteImport } from './routes/api/public/tryon'
+import { Route as ApiPublicEnhanceRouteImport } from './routes/api/public/enhance'
+import { Route as ApiPublicAssistantRouteImport } from './routes/api/public/assistant'
 
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
-const ApiPublicAssistantRoute = ApiPublicAssistantRouteImport.update({
-  id: "/api/public/assistant",
-  path: "/api/public/assistant",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const ApiPublicEnhanceRoute = ApiPublicEnhanceRouteImport.update({
-  id: "/api/public/enhance",
-  path: "/api/public/enhance",
-  getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApiPublicTryonRoute = ApiPublicTryonRouteImport.update({
-  id: "/api/public/tryon",
-  path: "/api/public/tryon",
+  id: '/api/public/tryon',
+  path: '/api/public/tryon',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ApiPublicEnhanceRoute = ApiPublicEnhanceRouteImport.update({
+  id: '/api/public/enhance',
+  path: '/api/public/enhance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAssistantRoute = ApiPublicAssistantRouteImport.update({
+  id: '/api/public/assistant',
+  path: '/api/public/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/api/public/assistant": typeof ApiPublicAssistantRoute;
-  "/api/public/enhance": typeof ApiPublicEnhanceRoute;
-  "/api/public/tryon": typeof ApiPublicTryonRoute;
+  '/': typeof IndexRoute
+  '/api/public/assistant': typeof ApiPublicAssistantRoute
+  '/api/public/enhance': typeof ApiPublicEnhanceRoute
+  '/api/public/tryon': typeof ApiPublicTryonRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/api/public/assistant": typeof ApiPublicAssistantRoute;
-  "/api/public/enhance": typeof ApiPublicEnhanceRoute;
-  "/api/public/tryon": typeof ApiPublicTryonRoute;
+  '/': typeof IndexRoute
+  '/api/public/assistant': typeof ApiPublicAssistantRoute
+  '/api/public/enhance': typeof ApiPublicEnhanceRoute
+  '/api/public/tryon': typeof ApiPublicTryonRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/api/public/assistant": typeof ApiPublicAssistantRoute;
-  "/api/public/enhance": typeof ApiPublicEnhanceRoute;
-  "/api/public/tryon": typeof ApiPublicTryonRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/api/public/assistant': typeof ApiPublicAssistantRoute
+  '/api/public/enhance': typeof ApiPublicEnhanceRoute
+  '/api/public/tryon': typeof ApiPublicTryonRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    "/" | "/api/public/assistant" | "/api/public/enhance" | "/api/public/tryon";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/api/public/assistant'
+    | '/api/public/enhance'
+    | '/api/public/tryon'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    "/" | "/api/public/assistant" | "/api/public/enhance" | "/api/public/tryon";
+    | '/'
+    | '/api/public/assistant'
+    | '/api/public/enhance'
+    | '/api/public/tryon'
   id:
-    | "__root__"
-    | "/"
-    | "/api/public/assistant"
-    | "/api/public/enhance"
-    | "/api/public/tryon";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/api/public/assistant'
+    | '/api/public/enhance'
+    | '/api/public/tryon'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  ApiPublicAssistantRoute: typeof ApiPublicAssistantRoute;
-  ApiPublicEnhanceRoute: typeof ApiPublicEnhanceRoute;
-  ApiPublicTryonRoute: typeof ApiPublicTryonRoute;
+  IndexRoute: typeof IndexRoute
+  ApiPublicAssistantRoute: typeof ApiPublicAssistantRoute
+  ApiPublicEnhanceRoute: typeof ApiPublicEnhanceRoute
+  ApiPublicTryonRoute: typeof ApiPublicTryonRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/public/assistant": {
-      id: "/api/public/assistant";
-      path: "/api/public/assistant";
-      fullPath: "/api/public/assistant";
-      preLoaderRoute: typeof ApiPublicAssistantRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/public/enhance": {
-      id: "/api/public/enhance";
-      path: "/api/public/enhance";
-      fullPath: "/api/public/enhance";
-      preLoaderRoute: typeof ApiPublicEnhanceRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/api/public/tryon": {
-      id: "/api/public/tryon";
-      path: "/api/public/tryon";
-      fullPath: "/api/public/tryon";
-      preLoaderRoute: typeof ApiPublicTryonRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tryon': {
+      id: '/api/public/tryon'
+      path: '/api/public/tryon'
+      fullPath: '/api/public/tryon'
+      preLoaderRoute: typeof ApiPublicTryonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/enhance': {
+      id: '/api/public/enhance'
+      path: '/api/public/enhance'
+      fullPath: '/api/public/enhance'
+      preLoaderRoute: typeof ApiPublicEnhanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/assistant': {
+      id: '/api/public/assistant'
+      path: '/api/public/assistant'
+      fullPath: '/api/public/assistant'
+      preLoaderRoute: typeof ApiPublicAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -114,17 +120,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAssistantRoute: ApiPublicAssistantRoute,
   ApiPublicEnhanceRoute: ApiPublicEnhanceRoute,
   ApiPublicTryonRoute: ApiPublicTryonRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
-
-import type { getRouter } from "./router.tsx";
-import type { startInstance } from "./start.ts";
-declare module "@tanstack/react-start" {
-  interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>;
-  }
-}
+  ._addFileTypes<FileRouteTypes>()

@@ -52,13 +52,7 @@ export function showToast(message, type = "info", duration = 3200) {
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (m) => {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    }[m];
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
   });
 }
 
@@ -189,16 +183,12 @@ export function renderAccountPanel() {
   if (nameInput) nameInput.value = acc.displayName;
 
   const dateEl = $("accCreatedDate");
-  if (dateEl)
-    dateEl.textContent = `Member since ${acc.createdDate || "July 2026"}`;
+  if (dateEl) dateEl.textContent = `Member since ${acc.createdDate || "July 2026"}`;
 
   // Statistics
-  if ($("statPhotosCount"))
-    $("statPhotosCount").textContent = acc.stats.photosProcessed || 0;
-  if ($("statSheetsCount"))
-    $("statSheetsCount").textContent = acc.stats.printSheetsCreated || 0;
-  if ($("statSingleCount"))
-    $("statSingleCount").textContent = acc.stats.singleDownloads || 0;
+  if ($("statPhotosCount")) $("statPhotosCount").textContent = acc.stats.photosProcessed || 0;
+  if ($("statSheetsCount")) $("statSheetsCount").textContent = acc.stats.printSheetsCreated || 0;
+  if ($("statSingleCount")) $("statSingleCount").textContent = acc.stats.singleDownloads || 0;
 
   const lastActiveEl = $("statLastActive");
   if (lastActiveEl) {
@@ -233,8 +223,7 @@ export function updateHeaderProfileWidget(acc = loadAccount()) {
   const nameEl = $("topProfileName");
   const subEl = $("topProfileSub");
   if (nameEl) nameEl.textContent = acc.displayName;
-  if (subEl)
-    subEl.textContent = `${acc.stats.photosProcessed || 0} photos created`;
+  if (subEl) subEl.textContent = `${acc.stats.photosProcessed || 0} photos created`;
 }
 
 function renderMenuDrawerHeader() {
@@ -257,9 +246,7 @@ export function renderPresetsGuide(filterRegion = "ALL", searchQuery = "") {
 
   const filtered = PASSPORT_SPECS.filter((spec) => {
     const matchesSearch =
-      !q ||
-      spec.label.toLowerCase().includes(q) ||
-      spec.country.toLowerCase().includes(q);
+      !q || spec.label.toLowerCase().includes(q) || spec.country.toLowerCase().includes(q);
     return matchesSearch;
   });
 
@@ -314,15 +301,11 @@ export function checkAndShowSavePhotosNotice() {
 export function renderHistoryModal() {
   const toggle = $("historyAutoSaveToggle");
   if (toggle) {
-    const isSaveEnabled =
-      localStorage.getItem("cubit_save_photos_enabled") !== "false";
+    const isSaveEnabled = localStorage.getItem("cubit_save_photos_enabled") !== "false";
     toggle.checked = isSaveEnabled;
     toggle.onchange = (e) => {
       const checked = e.target.checked;
-      localStorage.setItem(
-        "cubit_save_photos_enabled",
-        checked ? "true" : "false",
-      );
+      localStorage.setItem("cubit_save_photos_enabled", checked ? "true" : "false");
       localStorage.setItem("cubit_save_notice_prompted", "true");
       updateSettings({ savePhotos: checked });
     };
@@ -382,10 +365,7 @@ export function initModalsManager(onSelectPreset) {
     noticeConfirmBtn.addEventListener("click", () => {
       const checkbox = $("noticeSaveCheckbox");
       const isChecked = checkbox ? checkbox.checked : true;
-      localStorage.setItem(
-        "cubit_save_photos_enabled",
-        isChecked ? "true" : "false",
-      );
+      localStorage.setItem("cubit_save_photos_enabled", isChecked ? "true" : "false");
       localStorage.setItem("cubit_save_notice_prompted", "true");
       updateSettings({ savePhotos: isChecked });
       closeActiveModal();
@@ -462,10 +442,7 @@ export function initModalsManager(onSelectPreset) {
   if (formatSelect) {
     formatSelect.addEventListener("change", (e) => {
       updateSettings({ defaultFormat: e.target.value });
-      showToast(
-        `Default export format set to ${e.target.value.toUpperCase()}`,
-        "success",
-      );
+      showToast(`Default export format set to ${e.target.value.toUpperCase()}`, "success");
     });
   }
 

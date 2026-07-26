@@ -6,30 +6,15 @@ const ENDPOINT = "/api/public/tryon";
 const TIMEOUT_MS = 180_000;
 
 const GARMENTS = [
-  {
-    id: "formal",
-    label: "Formal",
-    img: "/garments/1.png",
-    description: "a formal shirt",
-  },
+  { id: "formal", label: "Formal", img: "/garments/1.png", description: "a formal shirt" },
   {
     id: "whitetshirt",
     label: "White T-Shirt",
     img: "/garments/2.png",
     description: "a white t-shirt",
   },
-  {
-    id: "shirt",
-    label: "Shirt",
-    img: "/garments/3.png",
-    description: "a shirt",
-  },
-  {
-    id: "tshirt",
-    label: "T-Shirt",
-    img: "/garments/4.png",
-    description: "a t-shirt",
-  },
+  { id: "shirt", label: "Shirt", img: "/garments/3.png", description: "a shirt" },
+  { id: "tshirt", label: "T-Shirt", img: "/garments/4.png", description: "a t-shirt" },
   {
     id: "traditional",
     label: "Traditional",
@@ -219,17 +204,7 @@ async function restoreTryOnResultAspect(resultBlob, placement) {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  ctx.drawImage(
-    img,
-    srcX,
-    srcY,
-    srcW,
-    srcH,
-    0,
-    0,
-    placement.origW,
-    placement.origH,
-  );
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, placement.origW, placement.origH);
 
   return canvas.toDataURL("image/png");
 }
@@ -244,17 +219,11 @@ async function callTryOn(personBlob, garmentBlob, description) {
   const t = setTimeout(() => ctl.abort("timeout"), TIMEOUT_MS);
   let res;
   try {
-    res = await fetch(ENDPOINT, {
-      method: "POST",
-      body: form,
-      signal: ctl.signal,
-    });
+    res = await fetch(ENDPOINT, { method: "POST", body: form, signal: ctl.signal });
   } catch (err) {
     clearTimeout(t);
     if (err?.name === "AbortError")
-      throw new Error(
-        "Request timed out — the cloud AI server is warming up. Please try again.",
-      );
+      throw new Error("Request timed out — the cloud AI server is warming up. Please try again.");
     throw new Error("Network error contacting the AI service.");
   }
   clearTimeout(t);
@@ -266,10 +235,7 @@ async function callTryOn(personBlob, garmentBlob, description) {
       try {
         const j = await res.json();
         if (j?.error) {
-          msg =
-            typeof j.error === "string"
-              ? j.error
-              : j.error.message || JSON.stringify(j.error);
+          msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
         }
       } catch {}
     }
@@ -320,11 +286,7 @@ async function generate() {
     }
   } catch (e) {
     const errMsg =
-      e instanceof Error
-        ? e.message
-        : typeof e === "string"
-          ? e
-          : "Could not load garment.";
+      e instanceof Error ? e.message : typeof e === "string" ? e : "Could not load garment.";
     setStatus(errMsg, "err");
     return;
   }
@@ -348,13 +310,9 @@ async function generate() {
 
   try {
     preTryOnSnapshot = personDataUrl;
-    const { preparedBlob, placement } =
-      await preparePersonBlobForTryOn(personDataUrl);
+    const { preparedBlob, placement } = await preparePersonBlobForTryOn(personDataUrl);
     const resultBlob = await callTryOn(preparedBlob, garmentBlob, description);
-    const restoredDataUrl = await restoreTryOnResultAspect(
-      resultBlob,
-      placement,
-    );
+    const restoredDataUrl = await restoreTryOnResultAspect(resultBlob, placement);
     const restoredBlob = await dataUrlToBlob(restoredDataUrl);
     lastResultBlob = restoredBlob;
     clearInterval(progressInterval);
@@ -409,9 +367,7 @@ async function makePlaceholderGarmentBlob() {
   const ctx = c.getContext("2d");
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, c.width, c.height);
-  return await new Promise((resolve) =>
-    c.toBlob((b) => resolve(b), "image/png"),
-  );
+  return await new Promise((resolve) => c.toBlob((b) => resolve(b), "image/png"));
 }
 
 function bindCustomUpload() {
@@ -456,8 +412,7 @@ function bind() {
   if (dlBtn) dlBtn.onclick = downloadResult;
   const obs = new MutationObserver(updateGenerateBtn);
   const resultView = document.getElementById("resultView");
-  if (resultView)
-    obs.observe(resultView, { attributes: true, attributeFilter: ["class"] });
+  if (resultView) obs.observe(resultView, { attributes: true, attributeFilter: ["class"] });
   updateGenerateBtn();
 }
 
@@ -477,10 +432,7 @@ async function downloadResult() {
       img.src = dataUrl;
     });
     const MAX = 1600;
-    const scale = Math.min(
-      1,
-      MAX / Math.max(img.naturalWidth, img.naturalHeight),
-    );
+    const scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
     const w = Math.max(1, Math.round(img.naturalWidth * scale));
     const h = Math.max(1, Math.round(img.naturalHeight * scale));
     const canvas = document.createElement("canvas");
@@ -511,6 +463,5 @@ async function downloadResult() {
   }
 }
 
-if (document.readyState === "loading")
-  document.addEventListener("DOMContentLoaded", bind);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
 else bind();

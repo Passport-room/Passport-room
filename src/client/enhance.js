@@ -48,17 +48,11 @@ async function callEnhance(personBlob, upscale) {
   const t = setTimeout(() => ctl.abort("timeout"), TIMEOUT_MS);
   let res;
   try {
-    res = await fetch(ENDPOINT, {
-      method: "POST",
-      body: form,
-      signal: ctl.signal,
-    });
+    res = await fetch(ENDPOINT, { method: "POST", body: form, signal: ctl.signal });
   } catch (err) {
     clearTimeout(t);
     if (err?.name === "AbortError")
-      throw new Error(
-        "Request timed out — the cloud AI enhancer is warming up. Please try again.",
-      );
+      throw new Error("Request timed out — the cloud AI enhancer is warming up. Please try again.");
     throw new Error("Network error contacting the enhancer.");
   }
   clearTimeout(t);
@@ -70,10 +64,7 @@ async function callEnhance(personBlob, upscale) {
       try {
         const j = await res.json();
         if (j?.error)
-          msg =
-            typeof j.error === "string"
-              ? j.error
-              : j.error.message || JSON.stringify(j.error);
+          msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
       } catch {}
     }
     throw new Error(msg);
@@ -84,9 +75,7 @@ async function callEnhance(personBlob, upscale) {
       text = await res.text();
     } catch {}
     console.error("Enhance unexpected non-image response:", ct, text);
-    throw new Error(
-      "Enhancer service did not return an image. Please try again.",
-    );
+    throw new Error("Enhancer service did not return an image. Please try again.");
   }
   return await res.blob();
 }
@@ -175,11 +164,9 @@ function bind() {
   if (rev) rev.onclick = revert;
   const obs = new MutationObserver(updateBtn);
   const resultView = document.getElementById("resultView");
-  if (resultView)
-    obs.observe(resultView, { attributes: true, attributeFilter: ["class"] });
+  if (resultView) obs.observe(resultView, { attributes: true, attributeFilter: ["class"] });
   updateBtn();
 }
 
-if (document.readyState === "loading")
-  document.addEventListener("DOMContentLoaded", bind);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
 else bind();
