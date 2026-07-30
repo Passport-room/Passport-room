@@ -1,11 +1,16 @@
 // Local High-Definition AI Face & Image Enhancer for Passport Photos.
 // Enhances, upscales, smooths skin, and removes dark spots — all on-device.
-// No paid APIs. Uses advanced multi-pass bilateral-like filtering,
-// luminance-based blemish detection, and multi-step upscaling.
+// No paid APIs.
+//
+// Performance: all heavy pixel processing runs on a capped working canvas
+// (max ~1200px) so the browser never freezes or crashes. The final 4x
+// upscale is applied afterwards via the GPU-accelerated canvas drawImage.
 
 import { detectFaceInCanvas } from "./face-detector.js";
 
-let scale = 4;
+const UPSCALE_FACTOR = 4;
+const MAX_WORKING_DIM = 1200;
+
 let busy = false;
 let preSnapshot = null;
 
@@ -40,6 +45,8 @@ function updateBtn() {
   btn.textContent = isTryOn ? "Try-On in progress..." : busy ? "Enhancing…" : "Enhance photo";
 }
 
+const yieldToUI = () => new Promise((r) => setTimeout(r, 0));
+
 // ---------------------------------------------------------------------------
 // Skin detection — works across all skin tones (light to deep)
 // ---------------------------------------------------------------------------
@@ -50,7 +57,6 @@ function isSkinPixel(r, g, b) {
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
   const chroma = max - min;
-  // Red-dominant, not grey, not pure-white
   const isRedDominant = r >= g - 10 && r >= b - 10;
   const isNotGrey = chroma >= 4;
   const isNotWhite = !(r > 240 && g > 240 && b > 240);
@@ -62,71 +68,64 @@ function isLipPixel(r, g, b) {
 }
 
 function isEyeOrBrow(r, g, b) {
-  // Protect dark eye and eyebrow regions from smoothing
   const luma = 0.299 * r + 0.587 * g + 0.114 * b;
-  return luma < 70 && (Math.abs(r - g) < 30 && Math.abs(g - b) < 30);
+  return luma < 70 && Math.abs(r - g) < 30 && Math.abs(g - b) < 30;
 }
 
 // ---------------------------------------------------------------------------
-// Bilateral filter — edge-preserving smoothing
-// Smooths skin texture while keeping sharp edges (eyes, lips, hair, glasses)
+// Bilateral filter — edge-preserving smoothing (chunked to stay responsive)
 // ---------------------------------------------------------------------------
 
-function bilateralFilter(data, w, h, radius, sigmaSpatial, sigmaColor) {
+async function bilateralFilter(data, w, h, radius, sigmaSpatial, sigmaColor, onProgress) {
   const result = new Uint8ClampedArray(data);
   const sigmaS2 = 2 * sigmaSpatial * sigmaSpatial;
   const sigmaC2 = 2 * sigmaColor * sigmaColor;
+  const CHUNK = 64;
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const idx = (y * w + x) * 4;
-      const cr = data[idx], cg = data[idx + 1], cb = data[idx + 2];
+  for (let yStart = 0; yStart < h; yStart += CHUNK) {
+    const yEnd = Math.min(h, yStart + CHUNK);
+    for (let y = yStart; y < yEnd; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const cr = data[idx], cg = data[idx + 1], cb = data[idx + 2];
+        if (!isSkinPixel(cr, cg, cb) || isLipPixel(cr, cg, cb) || isEyeOrBrow(cr, cg, cb)) continue;
 
-      if (!isSkinPixel(cr, cg, cb) || isLipPixel(cr, cg, cb) || isEyeOrBrow(cr, cg, cb)) continue;
-
-      let wSum = 0, rSum = 0, gSum = 0, bSum = 0;
-
-      for (let dy = -radius; dy <= radius; dy++) {
-        const ny = y + dy;
-        if (ny < 0 || ny >= h) continue;
-        for (let dx = -radius; dx <= radius; dx++) {
-          const nx = x + dx;
-          if (nx < 0 || nx >= w) continue;
-          const nidx = (ny * w + nx) * 4;
-          const nr = data[nidx], ng = data[nidx + 1], nb = data[nidx + 2];
-
-          if (!isSkinPixel(nr, ng, nb) || isLipPixel(nr, ng, nb) || isEyeOrBrow(nr, ng, nb)) continue;
-
-          const spatialDist = dx * dx + dy * dy;
-          const colorDist = (cr - nr) * (cr - nr) + (cg - ng) * (cg - ng) + (cb - nb) * (cb - nb);
-          const weight = Math.exp(-(spatialDist / sigmaS2) - (colorDist / sigmaC2));
-
-          wSum += weight;
-          rSum += nr * weight;
-          gSum += ng * weight;
-          bSum += nb * weight;
+        let wSum = 0, rSum = 0, gSum = 0, bSum = 0;
+        for (let dy = -radius; dy <= radius; dy++) {
+          const ny = y + dy;
+          if (ny < 0 || ny >= h) continue;
+          for (let dx = -radius; dx <= radius; dx++) {
+            const nx = x + dx;
+            if (nx < 0 || nx >= w) continue;
+            const nidx = (ny * w + nx) * 4;
+            const nr = data[nidx], ng = data[nidx + 1], nb = data[nidx + 2];
+            if (!isSkinPixel(nr, ng, nb) || isLipPixel(nr, ng, nb) || isEyeOrBrow(nr, ng, nb)) continue;
+            const spatialDist = dx * dx + dy * dy;
+            const colorDist = (cr - nr) * (cr - nr) + (cg - ng) * (cg - ng) + (cb - nb) * (cb - nb);
+            const weight = Math.exp(-(spatialDist / sigmaS2) - (colorDist / sigmaC2));
+            wSum += weight; rSum += nr * weight; gSum += ng * weight; bSum += nb * weight;
+          }
+        }
+        if (wSum > 0) {
+          result[idx] = Math.round(rSum / wSum);
+          result[idx + 1] = Math.round(gSum / wSum);
+          result[idx + 2] = Math.round(bSum / wSum);
         }
       }
-
-      if (wSum > 0) {
-        result[idx] = Math.round(rSum / wSum);
-        result[idx + 1] = Math.round(gSum / wSum);
-        result[idx + 2] = Math.round(bSum / wSum);
-      }
     }
+    onProgress?.(yEnd / h);
+    await yieldToUI();
   }
   return result;
 }
 
 // ---------------------------------------------------------------------------
-// Dark spot / blemish / dark circle removal
-// Compares each skin pixel's luminance to local average; brightens dark spots
+// Dark spot / blemish / dark circle removal (single neighborhood pass)
 // ---------------------------------------------------------------------------
 
-function removeDarkSpots(data, w, h, faceInfo, origW, origH) {
+async function removeDarkSpots(data, w, h, faceInfo, origW, origH, onProgress) {
   const result = new Uint8ClampedArray(data);
   let fcx = w / 2, fcy = h * 0.4, fradX = w * 0.45, fradY = h * 0.45;
-
   if (faceInfo) {
     const sx = w / origW, sy = h / origH;
     fcx = faceInfo.faceCenterX * sx;
@@ -134,66 +133,45 @@ function removeDarkSpots(data, w, h, faceInfo, origW, origH) {
     fradX = Math.max(w * 0.35, faceInfo.faceHeight * 1.3 * sx);
     fradY = Math.max(h * 0.45, faceInfo.faceHeight * 1.5 * sy);
   }
+  const radius = Math.max(4, Math.round(w * 0.02));
+  const step = Math.max(1, Math.round(radius / 3));
+  const CHUNK = 64;
 
-  const radius = Math.max(6, Math.round(w * 0.02));
-  const step = Math.max(1, Math.round(radius / 4));
+  for (let yStart = 0; yStart < h; yStart += CHUNK) {
+    const yEnd = Math.min(h, yStart + CHUNK);
+    for (let y = yStart; y < yEnd; y++) {
+      const dyNorm = (y - fcy) / fradY;
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+        if (!isSkinPixel(r, g, b) || isLipPixel(r, g, b) || isEyeOrBrow(r, g, b)) continue;
+        const dxNorm = (x - fcx) / fradX;
+        const distSq = dxNorm * dxNorm + dyNorm * dyNorm;
+        const faceWeight = Math.max(0, Math.min(1, 1 - distSq * 0.4));
+        if (faceWeight < 0.05) continue;
 
-  for (let y = 0; y < h; y++) {
-    const dyNorm = (y - fcy) / fradY;
-    for (let x = 0; x < w; x++) {
-      const idx = (y * w + x) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-
-      if (!isSkinPixel(r, g, b) || isLipPixel(r, g, b) || isEyeOrBrow(r, g, b)) continue;
-
-      const dxNorm = (x - fcx) / fradX;
-      const distSq = dxNorm * dxNorm + dyNorm * dyNorm;
-      const faceWeight = Math.max(0, Math.min(1, 1 - distSq * 0.4));
-      if (faceWeight < 0.05) continue;
-
-      // Compute local average luminance
-      let lumaSum = 0, lumaCount = 0;
-      const currentLuma = 0.299 * r + 0.587 * g + 0.114 * b;
-
-      for (let dy = -radius; dy <= radius; dy += step) {
-        const ny = y + dy;
-        if (ny < 0 || ny >= h) continue;
-        for (let dx = -radius; dx <= radius; dx += step) {
-          const nx = x + dx;
-          if (nx < 0 || nx >= w) continue;
-          const nidx = (ny * w + nx) * 4;
-          const nr = data[nidx], ng = data[nidx + 1], nb = data[nidx + 2];
-          if (isSkinPixel(nr, ng, nb) && !isLipPixel(nr, ng, nb) && !isEyeOrBrow(nr, ng, nb)) {
-            lumaSum += 0.299 * nr + 0.587 * ng + 0.114 * nb;
-            lumaCount++;
-          }
-        }
-      }
-
-      if (lumaCount >= 5) {
-        const avgLuma = lumaSum / lumaCount;
-        // Dark spot detection: pixel is significantly darker than local average
-        if (currentLuma < avgLuma * 0.85) {
-          const lumaDiff = (avgLuma - currentLuma) / Math.max(avgLuma, 1);
-          const eraseBlend = Math.min(0.85, lumaDiff * 2.5) * faceWeight;
-
-          // Brighten towards local average color
-          let avgR = 0, avgG = 0, avgB = 0, cCount = 0;
-          for (let dy = -radius; dy <= radius; dy += step) {
-            const ny = y + dy;
-            if (ny < 0 || ny >= h) continue;
-            for (let dx = -radius; dx <= radius; dx += step) {
-              const nx = x + dx;
-              if (nx < 0 || nx >= w) continue;
-              const nidx = (ny * w + nx) * 4;
-              const nr = data[nidx], ng = data[nidx + 1], nb = data[nidx + 2];
-              if (isSkinPixel(nr, ng, nb) && !isLipPixel(nr, ng, nb) && !isEyeOrBrow(nr, ng, nb)) {
-                avgR += nr; avgG += ng; avgB += nb; cCount++;
-              }
+        const currentLuma = 0.299 * r + 0.587 * g + 0.114 * b;
+        let lumaSum = 0, avgR = 0, avgG = 0, avgB = 0, count = 0;
+        for (let dy = -radius; dy <= radius; dy += step) {
+          const ny = y + dy;
+          if (ny < 0 || ny >= h) continue;
+          for (let dx = -radius; dx <= radius; dx += step) {
+            const nx = x + dx;
+            if (nx < 0 || nx >= w) continue;
+            const nidx = (ny * w + nx) * 4;
+            const nr = data[nidx], ng = data[nidx + 1], nb = data[nidx + 2];
+            if (isSkinPixel(nr, ng, nb) && !isLipPixel(nr, ng, nb) && !isEyeOrBrow(nr, ng, nb)) {
+              lumaSum += 0.299 * nr + 0.587 * ng + 0.114 * nb;
+              avgR += nr; avgG += ng; avgB += nb; count++;
             }
           }
-          if (cCount > 0) {
-            avgR /= cCount; avgG /= cCount; avgB /= cCount;
+        }
+        if (count >= 5) {
+          const avgLuma = lumaSum / count;
+          if (currentLuma < avgLuma * 0.85) {
+            const lumaDiff = (avgLuma - currentLuma) / Math.max(avgLuma, 1);
+            const eraseBlend = Math.min(0.85, lumaDiff * 2.5) * faceWeight;
+            avgR /= count; avgG /= count; avgB /= count;
             result[idx] = Math.round(r * (1 - eraseBlend) + avgR * eraseBlend);
             result[idx + 1] = Math.round(g * (1 - eraseBlend) + avgG * eraseBlend);
             result[idx + 2] = Math.round(b * (1 - eraseBlend) + avgB * eraseBlend);
@@ -201,64 +179,42 @@ function removeDarkSpots(data, w, h, faceInfo, origW, origH) {
         }
       }
     }
+    onProgress?.(yEnd / h);
+    await yieldToUI();
   }
   return result;
 }
 
 // ---------------------------------------------------------------------------
-// Unsharp masking — enhances detail clarity for passport photos
+// Separable Gaussian blur + unsharp masking
 // ---------------------------------------------------------------------------
-
-function unsharpMask(data, w, h, amount, radius) {
-  // Build a simple Gaussian blur
-  const blurred = gaussianBlur(data, w, h, radius);
-  const result = new Uint8ClampedArray(data.length);
-
-  for (let i = 0; i < data.length; i += 4) {
-    for (let c = 0; c < 3; c++) {
-      const original = data[i + c];
-      const lowFreq = blurred[i + c];
-      const highFreq = original - lowFreq;
-      let val = original + highFreq * amount;
-      result[i + c] = Math.min(255, Math.max(0, Math.round(val)));
-    }
-    result[i + 3] = data[i + 3];
-  }
-  return result;
-}
 
 function gaussianBlur(data, w, h, radius) {
-  // Separable Gaussian: horizontal then vertical
-  const sigma = radius / 2;
-  const kernel = [];
-  const kSize = Math.ceil(radius * 2) | 1;
+  const sigma = Math.max(0.5, radius / 2);
+  const kSize = Math.max(3, Math.ceil(radius * 2) | 1);
   const kHalf = Math.floor(kSize / 2);
+  const kernel = [];
   let kSum = 0;
   for (let i = 0; i < kSize; i++) {
-    const x = i - kHalf;
-    const val = Math.exp(-(x * x) / (2 * sigma * sigma));
-    kernel.push(val);
-    kSum += val;
+    const xv = i - kHalf;
+    const val = Math.exp(-(xv * xv) / (2 * sigma * sigma));
+    kernel.push(val); kSum += val;
   }
   for (let i = 0; i < kSize; i++) kernel[i] /= kSum;
 
   const temp = new Uint8ClampedArray(data.length);
-  // Horizontal pass
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let r = 0, g = 0, b = 0;
       for (let k = 0; k < kSize; k++) {
         const nx = Math.min(w - 1, Math.max(0, x + k - kHalf));
         const idx = (y * w + nx) * 4;
-        r += data[idx] * kernel[k];
-        g += data[idx + 1] * kernel[k];
-        b += data[idx + 2] * kernel[k];
+        r += data[idx] * kernel[k]; g += data[idx + 1] * kernel[k]; b += data[idx + 2] * kernel[k];
       }
       const idx = (y * w + x) * 4;
       temp[idx] = r; temp[idx + 1] = g; temp[idx + 2] = b; temp[idx + 3] = data[idx + 3];
     }
   }
-  // Vertical pass
   const result = new Uint8ClampedArray(data.length);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -266,13 +222,25 @@ function gaussianBlur(data, w, h, radius) {
       for (let k = 0; k < kSize; k++) {
         const ny = Math.min(h - 1, Math.max(0, y + k - kHalf));
         const idx = (ny * w + x) * 4;
-        r += temp[idx] * kernel[k];
-        g += temp[idx + 1] * kernel[k];
-        b += temp[idx + 2] * kernel[k];
+        r += temp[idx] * kernel[k]; g += temp[idx + 1] * kernel[k]; b += temp[idx + 2] * kernel[k];
       }
       const idx = (y * w + x) * 4;
       result[idx] = r; result[idx + 1] = g; result[idx + 2] = b; result[idx + 3] = data[idx + 3];
     }
+  }
+  return result;
+}
+
+function unsharpMask(data, w, h, amount, radius) {
+  const blurred = gaussianBlur(data, w, h, radius);
+  const result = new Uint8ClampedArray(data.length);
+  for (let i = 0; i < data.length; i += 4) {
+    for (let c = 0; c < 3; c++) {
+      const original = data[i + c];
+      const highFreq = original - blurred[i + c];
+      result[i + c] = Math.min(255, Math.max(0, Math.round(original + highFreq * amount)));
+    }
+    result[i + 3] = data[i + 3];
   }
   return result;
 }
@@ -284,7 +252,6 @@ function gaussianBlur(data, w, h, radius) {
 function equalizeLighting(data, w, h, faceInfo, origW, origH) {
   const result = new Uint8ClampedArray(data);
   let fcx = w / 2, fcy = h * 0.4, fradX = w * 0.45, fradY = h * 0.45;
-
   if (faceInfo) {
     const sx = w / origW, sy = h / origH;
     fcx = faceInfo.faceCenterX * sx;
@@ -292,18 +259,14 @@ function equalizeLighting(data, w, h, faceInfo, origW, origH) {
     fradX = Math.max(w * 0.35, faceInfo.faceHeight * 1.3 * sx);
     fradY = Math.max(h * 0.45, faceInfo.faceHeight * 1.5 * sy);
   }
-
   for (let y = 0; y < h; y++) {
     const dyNorm = (y - fcy) / fradY;
     for (let x = 0; x < w; x++) {
       const idx = (y * w + x) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
       const dxNorm = (x - fcx) / fradX;
       const distSq = dxNorm * dxNorm + dyNorm * dyNorm;
       const faceWeight = Math.max(0, Math.min(1, 1 - distSq * 0.5));
-
       if (faceWeight > 0.1) {
-        // Subtle brightness boost and contrast enhancement
         const lumaBoost = faceWeight * 6;
         const contrastFactor = 1.04 + faceWeight * 0.02;
         for (let c = 0; c < 3; c++) {
@@ -318,7 +281,7 @@ function equalizeLighting(data, w, h, faceInfo, origW, origH) {
 }
 
 // ---------------------------------------------------------------------------
-// Multi-step high-quality upscaling (avoids blocky artifacts)
+// Multi-step high-quality upscaling (GPU-accelerated drawImage)
 // ---------------------------------------------------------------------------
 
 function upscaleCanvas(srcCanvas, targetW, targetH) {
@@ -326,8 +289,6 @@ function upscaleCanvas(srcCanvas, targetW, targetH) {
   const origH = srcCanvas.height;
   const steps = [];
   let curW = origW, curH = origH;
-
-  // Build intermediate sizes (never more than 2x per step)
   while (curW * 2 <= targetW || curH * 2 <= targetH) {
     curW = Math.min(targetW, curW * 2);
     curH = Math.min(targetH, curH * 2);
@@ -338,9 +299,8 @@ function upscaleCanvas(srcCanvas, targetW, targetH) {
   let current = srcCanvas;
   for (const step of steps) {
     const canvas = document.createElement("canvas");
-    canvas.width = step.w;
-    canvas.height = step.h;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    canvas.width = step.w; canvas.height = step.h;
+    const ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(current, 0, 0, step.w, step.h);
@@ -350,62 +310,64 @@ function upscaleCanvas(srcCanvas, targetW, targetH) {
 }
 
 // ---------------------------------------------------------------------------
-// Main enhancement pipeline
+// Main enhancement pipeline — pixel work on capped working canvas, then upscale
 // ---------------------------------------------------------------------------
 
-async function processFaceEnhancement(srcCanvas, upscaleFactor, setStatusMsg) {
+async function processFaceEnhancement(srcCanvas, setStatusMsg) {
   const origW = srcCanvas.width;
   const origH = srcCanvas.height;
-  const faceInfo = detectFaceInCanvas(srcCanvas, null);
 
-  const targetW = Math.round(origW * upscaleFactor);
-  const targetH = Math.round(origH * upscaleFactor);
+  // Cap working resolution for heavy pixel processing
+  const workScale = Math.min(1, MAX_WORKING_DIM / Math.max(origW, origH));
+  const workW = Math.max(1, Math.round(origW * workScale));
+  const workH = Math.max(1, Math.round(origH * workScale));
 
-  setStatusMsg("Upscaling to high definition…");
-  await new Promise((r) => setTimeout(r, 80));
+  const workCanvas = document.createElement("canvas");
+  workCanvas.width = workW; workCanvas.height = workH;
+  const wctx = workCanvas.getContext("2d", { willReadFrequently: true });
+  wctx.imageSmoothingEnabled = true; wctx.imageSmoothingQuality = "high";
+  wctx.drawImage(srcCanvas, 0, 0, workW, workH);
 
-  const upscaledCanvas = upscaleCanvas(srcCanvas, targetW, targetH);
-  const ctx = upscaledCanvas.getContext("2d", { willReadFrequently: true });
-  let imgData = ctx.getImageData(0, 0, targetW, targetH);
+  const faceInfo = detectFaceInCanvas(workCanvas, null);
+  let imgData = wctx.getImageData(0, 0, workW, workH);
   let data = imgData.data;
 
   // Pass 1: Dark spot / blemish / dark circle removal
   setStatusMsg("Removing dark spots & blemishes…");
-  await new Promise((r) => setTimeout(r, 80));
-  data = removeDarkSpots(data, targetW, targetH, faceInfo, origW, origH);
-  imgData = new ImageData(data, targetW, targetH);
-  ctx.putImageData(imgData, 0, 0);
+  await yieldToUI();
+  data = await removeDarkSpots(data, workW, workH, faceInfo, workW, workH);
+  wctx.putImageData(new ImageData(data, workW, workH), 0, 0);
 
   // Pass 2: Bilateral skin smoothing (edge-preserving)
   setStatusMsg("Smoothing skin texture…");
-  await new Promise((r) => setTimeout(r, 80));
-  const radius = Math.max(3, Math.round(targetW * 0.008));
-  data = bilateralFilter(data, targetW, targetH, radius, radius * 1.5, 30);
-  imgData = new ImageData(data, targetW, targetH);
-  ctx.putImageData(imgData, 0, 0);
+  await yieldToUI();
+  const radius = Math.max(2, Math.round(workW * 0.012));
+  data = await bilateralFilter(data, workW, workH, radius, radius * 1.5, 30);
+  wctx.putImageData(new ImageData(data, workW, workH), 0, 0);
 
   // Pass 3: Unsharp masking for detail clarity
   setStatusMsg("Sharpening facial features…");
-  await new Promise((r) => setTimeout(r, 80));
-  data = unsharpMask(data, targetW, targetH, 0.6, Math.max(2, Math.round(targetW * 0.003)));
-  imgData = new ImageData(data, targetW, targetH);
-  ctx.putImageData(imgData, 0, 0);
+  await yieldToUI();
+  data = unsharpMask(data, workW, workH, 0.6, Math.max(2, Math.round(workW * 0.004)));
+  wctx.putImageData(new ImageData(data, workW, workH), 0, 0);
 
   // Pass 4: Lighting equalization for passport compliance
   setStatusMsg("Equalising lighting for passport standard…");
-  await new Promise((r) => setTimeout(r, 80));
-  data = equalizeLighting(data, targetW, targetH, faceInfo, origW, origH);
-  imgData = new ImageData(data, targetW, targetH);
-  ctx.putImageData(imgData, 0, 0);
+  await yieldToUI();
+  data = equalizeLighting(data, workW, workH, faceInfo, workW, workH);
+  wctx.putImageData(new ImageData(data, workW, workH), 0, 0);
+
+  // Final upscale to 4x from the enhanced working canvas
+  setStatusMsg("Upscaling to high definition…");
+  await yieldToUI();
+  const targetW = Math.round(origW * UPSCALE_FACTOR);
+  const targetH = Math.round(origH * UPSCALE_FACTOR);
+  const finalCanvas = upscaleCanvas(workCanvas, targetW, targetH);
 
   setStatusMsg("Finalizing high definition passport photo…");
-  await new Promise((r) => setTimeout(r, 80));
+  await yieldToUI();
 
-  return {
-    dataUrl: upscaledCanvas.toDataURL("image/png"),
-    width: targetW,
-    height: targetH,
-  };
+  return { dataUrl: finalCanvas.toDataURL("image/png"), width: targetW, height: targetH };
 }
 
 async function enhance() {
@@ -439,11 +401,11 @@ async function enhance() {
     const sctx = srcCanvas.getContext("2d");
     sctx.drawImage(img, 0, 0);
 
-    const res = await processFaceEnhancement(srcCanvas, scale, (m) => setStatus(m, "info"));
+    const res = await processFaceEnhancement(srcCanvas, (m) => setStatus(m, "info"));
 
     await window.__tryOn.applyResult(res.dataUrl, (m) => setStatus(m, "info"));
     $("enhanceRevert").classList.remove("hidden");
-    setStatus(`Enhanced & upscaled to ${scale}\u00d7 Studio HD. Dark spots reduced, skin smoothed. You can now also change clothes!`, "ok");
+    setStatus(`Enhanced & upscaled to ${UPSCALE_FACTOR}\u00d7 Studio HD. Dark spots reduced, skin smoothed. You can now also change clothes!`, "ok");
   } catch (e) {
     console.error(e);
     setStatus(e.message || "Enhance failed. Please try again.", "err");

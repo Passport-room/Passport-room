@@ -1,18 +1,19 @@
 // Virtual Try-On — Client-side Smart Multi-Space Router.
 //
-// Connects directly to ~50 Hugging Face Spaces from the browser using
+// Connects directly to real Hugging Face Spaces from the browser using
 // @gradio/client's browser build. No server needed — eliminates 404 errors.
 //
 // The router:
+//   - Stays on the FIRST available space, even if the queue is long.
+//   - Only moves to the next space on a CONFIRMED failure (connection error,
+//     generation error, timeout, or the space returns no image).
 //   - Ranks spaces by success rate, speed, and recent failures (in-memory).
-//   - Stays in the current space while the queue is short (1-2 people ahead).
-//   - Only moves to the next space on a CONFIRMED failure.
 //   - Streams live status to the UI via callback.
 
 import { detectFaceInCanvas } from "./face-detector.js";
 
 // ---------------------------------------------------------------------------
-// Space pool (~50 high-quality, low-traffic HF Spaces)
+// Space pool — only real, known Hugging Face Spaces
 // ---------------------------------------------------------------------------
 
 const SPACE_POOL = [
@@ -26,51 +27,10 @@ const SPACE_POOL = [
   { id: "zero-gpu-explorers/IDM-VTON", adapter: "idm-vton" },
   { id: "Nymbo/Virtual-Try-On", adapter: "idm-vton" },
   { id: "VikramRAG/IDM-VTON", adapter: "idm-vton" },
-  { id: "fotto/IDM-VTON", adapter: "idm-vton" },
-  { id: "fai-idm/IDM-VTON", adapter: "idm-vton" },
-  { id: "curtismcgee/IDM-VTON", adapter: "idm-vton" },
-  { id: "ShyamG3/IDM-VTON", adapter: "idm-vton" },
-  { id: "BhargavNaik/IDM-VTON", adapter: "idm-vton" },
-  { id: "Naqiuddin/IDM-VTON", adapter: "idm-vton" },
-  { id: "HumanAIGuy/IDM-VTON", adapter: "idm-vton" },
-  { id: "argilla/IDM-VTON", adapter: "idm-vton" },
-  { id: "droid-ai/IDM-VTON", adapter: "idm-vton" },
-  { id: "m-ric/IDM-VTON", adapter: "idm-vton" },
-  { id: "elonmusk/IDM-VTON", adapter: "idm-vton" },
-  { id: "saurav/IDM-VTON", adapter: "idm-vton" },
-  { id: "ravi0u/IDM-VTON", adapter: "idm-vton" },
-  { id: "kishore/IDM-VTON", adapter: "idm-vton" },
-  { id: "manish/IDM-VTON", adapter: "idm-vton" },
-  { id: "pradeep/IDM-VTON", adapter: "idm-vton" },
-  { id: "snehal/IDM-VTON", adapter: "idm-vton" },
-  { id: "vivek/IDM-VTON", adapter: "idm-vton" },
-  { id: "anil/IDM-VTON", adapter: "idm-vton" },
-  { id: "rajesh/IDM-VTON", adapter: "idm-vton" },
-  { id: "deepak/IDM-VTON", adapter: "idm-vton" },
-  { id: "sanjay/IDM-VTON", adapter: "idm-vton" },
-  { id: "vinod/IDM-VTON", adapter: "idm-vton" },
-  { id: "amit/IDM-VTON", adapter: "idm-vton" },
-  { id: "rohit/IDM-VTON", adapter: "idm-vton" },
-  { id: "kapil/IDM-VTON", adapter: "idm-vton" },
-  { id: "nitin/IDM-VTON", adapter: "idm-vton" },
-  { id: "pooja/IDM-VTON", adapter: "idm-vton" },
-  { id: "neha/IDM-VTON", adapter: "idm-vton" },
-  { id: "priya/IDM-VTON", adapter: "idm-vton" },
-  { id: "anita/IDM-VTON", adapter: "idm-vton" },
-  { id: "meena/IDM-VTON", adapter: "idm-vton" },
-  { id: "geeta/IDM-VTON", adapter: "idm-vton" },
-  { id: "sunita/IDM-VTON", adapter: "idm-vton" },
-  { id: "kamal/IDM-VTON", adapter: "idm-vton" },
-  { id: "rakesh/IDM-VTON", adapter: "idm-vton" },
-  { id: "suresh/IDM-VTON", adapter: "idm-vton" },
-  { id: "mahesh/IDM-VTON", adapter: "idm-vton" },
-  { id: "ganesh/IDM-VTON", adapter: "idm-vton" },
-  { id: "laxman/IDM-VTON", adapter: "idm-vton" },
-  { id: "bharat/IDM-VTON", adapter: "idm-vton" },
 ];
 
-const PER_SPACE_TIMEOUT_MS = 180_000;
-const MAX_TOTAL_ATTEMPTS = 50;
+const PER_SPACE_TIMEOUT_MS = 240_000;
+const MAX_TOTAL_ATTEMPTS = 10;
 const COOLDOWN_MS = 90_000;
 
 // ---------------------------------------------------------------------------
@@ -240,7 +200,7 @@ async function drainSubmission(submission, spaceName, onStatus) {
           onStatus(`People ahead of you: ${ahead}`, ahead);
         }
       } else if (st.stage === "generating") {
-        onStatus("Processing your image...");
+        onStatus("Processing your image...", null);
       } else if (st.stage === "error") {
         throw new Error(`${spaceName} generation failed: ${st.message || "error"}`);
       }
@@ -267,7 +227,7 @@ function runSpace(spaceId, client, personFile, garmentFile, description, onStatu
 }
 
 // ---------------------------------------------------------------------------
-// Main router: tries spaces in ranked order, switches only on confirmed failure
+// Main router: stays on first available space, moves only on confirmed failure
 // ---------------------------------------------------------------------------
 
 async function generateTryOn(personBlob, garmentBlob, description, onStatus) {
@@ -282,7 +242,7 @@ async function generateTryOn(personBlob, garmentBlob, description, onStatus) {
   for (const spaceId of ranked) {
     if (attempts >= MAX_TOTAL_ATTEMPTS) break;
 
-    onStatus("Connecting to AI server...");
+    onStatus("Connecting to AI server...", null);
 
     let client;
     try {
@@ -295,7 +255,7 @@ async function generateTryOn(personBlob, garmentBlob, description, onStatus) {
       recordFailure(spaceId);
       errors.push(`${spaceId}: ${msg}`);
       if (!isRetryableError(msg)) throw new Error("The uploaded image was rejected by the AI service.");
-      onStatus(`Server busy, shifting to another server... (attempt ${attempts + 1})`);
+      onStatus(`Server unavailable, trying next server... (attempt ${attempts + 1})`, null);
       await new Promise((r) => setTimeout(r, 800));
       attempts++;
       continue;
@@ -310,11 +270,11 @@ async function generateTryOn(personBlob, garmentBlob, description, onStatus) {
       const ms = Date.now() - start;
       recordSuccess(spaceId, ms);
 
-      onStatus("Enhancing image quality...");
+      onStatus("Enhancing image quality...", null);
       await new Promise((r) => setTimeout(r, 200));
-      onStatus("Almost finished...");
+      onStatus("Almost finished...", null);
       await new Promise((r) => setTimeout(r, 200));
-      onStatus("Finalising your result...");
+      onStatus("Finalising your result...", null);
       await new Promise((r) => setTimeout(r, 200));
 
       return resultBlob;
@@ -325,7 +285,7 @@ async function generateTryOn(personBlob, garmentBlob, description, onStatus) {
 
       if (!isRetryableError(msg)) throw new Error("The uploaded image was rejected by the AI service.");
 
-      onStatus(`Server busy, shifting to another server... (attempt ${attempts + 1})`);
+      onStatus(`Server busy, shifting to another server... (attempt ${attempts + 1})`, null);
       await new Promise((r) => setTimeout(r, 800));
       attempts++;
     }
