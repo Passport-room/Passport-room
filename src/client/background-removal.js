@@ -1,6 +1,7 @@
 // MODNet portrait matting via onnxruntime-web. Model streamed from Hugging Face,
 // WebGPU with WASM fallback. No local ONNX file is bundled.
-const MODEL_URL = "https://huggingface.co/Xenova/modnet/resolve/main/onnx/model_fp16.onnx";
+const MODEL_URL =
+  "https://huggingface.co/Xenova/modnet/resolve/main/onnx/model_fp16.onnx";
 const REF = 512;
 const STRIDE = 32;
 
@@ -50,13 +51,19 @@ async function downloadModel(onProgress) {
   if (cachedBytes) return cachedBytes;
   const cached = await idbGet();
   if (cached && cached.byteLength) {
-    cachedBytes = cached instanceof Uint8Array ? cached : new Uint8Array(cached);
+    cachedBytes =
+      cached instanceof Uint8Array ? cached : new Uint8Array(cached);
     onProgress &&
-      onProgress({ stage: "download", loaded: cachedBytes.length, total: cachedBytes.length });
+      onProgress({
+        stage: "download",
+        loaded: cachedBytes.length,
+        total: cachedBytes.length,
+      });
     return cachedBytes;
   }
   const res = await fetch(MODEL_URL);
-  if (!res.ok || !res.body) throw new Error(`Model download failed (${res.status})`);
+  if (!res.ok || !res.body)
+    throw new Error(`Model download failed (${res.status})`);
   const total = Number(res.headers.get("content-length")) || 0;
   const reader = res.body.getReader();
   const chunks = [];
@@ -83,9 +90,13 @@ export function loadModel(onProgress) {
   if (modelPromise) return modelPromise;
   modelPromise = (async () => {
     const ort = await import("onnxruntime-web/webgpu");
-    ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.27.0/dist/";
-    const hc = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 1;
-    ort.env.wasm.numThreads = globalThis.crossOriginIsolated ? Math.min(4, hc) : 1;
+    ort.env.wasm.wasmPaths =
+      "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.27.0/dist/";
+    const hc =
+      (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 1;
+    ort.env.wasm.numThreads = globalThis.crossOriginIsolated
+      ? Math.min(4, hc)
+      : 1;
 
     const bytes = await downloadModel(onProgress);
     onProgress && onProgress({ stage: "compile" });
