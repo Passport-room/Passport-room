@@ -215,22 +215,13 @@ function unsharpMask(data, w, h, amount, radius, midtoneWeight = false) {
     if (data[i + 3] === 0) continue;
     let weight = 1;
     if (midtoneWeight) {
-      const lum =
-        (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+      const lum = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
       weight = 1 - Math.abs(lum - 0.5) * 2; // 1 at mid, 0 at extremes
       if (weight < 0) weight = 0;
     }
     const gain = amount * weight;
     data[i] = clamp(data[i] + (data[i] - blurred[i]) * gain, 0, 255);
-    data[i + 1] = clamp(
-      data[i + 1] + (data[i + 1] - blurred[i + 1]) * gain,
-      0,
-      255,
-    );
-    data[i + 2] = clamp(
-      data[i + 2] + (data[i + 2] - blurred[i + 2]) * gain,
-      0,
-      255,
-    );
+    data[i + 1] = clamp(data[i + 1] + (data[i + 1] - blurred[i + 1]) * gain, 0, 255);
+    data[i + 2] = clamp(data[i + 2] + (data[i + 2] - blurred[i + 2]) * gain, 0, 255);
   }
 }

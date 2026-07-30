@@ -1,9 +1,5 @@
 import { initCrystal } from "./crystal.js";
-import {
-  PASSPORT_SPECS,
-  BACKGROUND_OPTIONS,
-  specPixels,
-} from "./passport-specs.js";
+import { PASSPORT_SPECS, BACKGROUND_OPTIONS, specPixels } from "./passport-specs.js";
 import { computeMask } from "./background-removal.js";
 import {
   composeCutout,
@@ -13,13 +9,7 @@ import {
   downloadBlob,
   DEFAULT_ADJUST,
 } from "./passport-render.js";
-import {
-  EDIT_KEYS,
-  DEFAULT_EDITS,
-  applyEdits,
-  loadEdits,
-  saveEdits,
-} from "./photo-editor.js";
+import { EDIT_KEYS, DEFAULT_EDITS, applyEdits, loadEdits, saveEdits } from "./photo-editor.js";
 import { openPrintEditor } from "./print-editor.js";
 import {
   openDrawer,
@@ -31,11 +21,7 @@ import {
   updateHeaderProfileWidget,
   checkAndShowSavePhotosNotice,
 } from "./modals-manager.js";
-import {
-  recordActivity,
-  addHistoryItem,
-  loadAccount,
-} from "./account-manager.js";
+import { recordActivity, addHistoryItem, loadAccount } from "./account-manager.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -66,10 +52,8 @@ let busy = false;
 
 // Load default settings from account
 const accountData = loadAccount();
-if (accountData?.settings?.defaultSpec)
-  specId = accountData.settings.defaultSpec;
-if (accountData?.settings?.defaultFormat)
-  format = accountData.settings.defaultFormat;
+if (accountData?.settings?.defaultSpec) specId = accountData.settings.defaultSpec;
+if (accountData?.settings?.defaultFormat) format = accountData.settings.defaultFormat;
 
 let procMessageTimer = null;
 
@@ -80,19 +64,10 @@ function startProcMessageCycle() {
   if (!title || !sub) return;
 
   const messages = [
-    {
-      title: "Creating your picture…",
-      sub: "Detecting face & studio lighting.",
-    },
+    { title: "Creating your picture…", sub: "Detecting face & studio lighting." },
     { title: "Working on details…", sub: "Applying precise edge isolation." },
-    {
-      title: "Polishing your portrait…",
-      sub: "Fitting passport frame specifications.",
-    },
-    {
-      title: "Giving final touches…",
-      sub: "Optimizing resolution & contrast.",
-    },
+    { title: "Polishing your portrait…", sub: "Fitting passport frame specifications." },
+    { title: "Giving final touches…", sub: "Optimizing resolution & contrast." },
   ];
   let idx = 0;
   title.textContent = messages[0].title;
@@ -113,15 +88,10 @@ function stopProcMessageCycle() {
 }
 
 // Views
-const views = {
-  upload: $("uploadView"),
-  processing: $("processingView"),
-  result: $("resultView"),
-};
+const views = { upload: $("uploadView"), processing: $("processingView"), result: $("resultView") };
 function setPhase(p) {
   phase = p;
-  for (const [k, el] of Object.entries(views))
-    el.classList.toggle("hidden", k !== p);
+  for (const [k, el] of Object.entries(views)) el.classList.toggle("hidden", k !== p);
   // Home-only sections (About + Articles) show only on the upload/home view
   document
     .querySelectorAll("[data-home-only]")
@@ -294,17 +264,9 @@ async function handleFile(file) {
     const source = await fileToSourceCanvas(file);
     lastSourceCanvas = source;
     const mask = await computeMask(source, (p) =>
-      updateProc(
-        p.stage,
-        p.total ? Math.round((p.loaded / p.total) * 100) : null,
-      ),
+      updateProc(p.stage, p.total ? Math.round((p.loaded / p.total) * 100) : null),
     );
-    cutout = composeCutout(
-      source,
-      mask.maskCanvas,
-      source.width,
-      source.height,
-    );
+    cutout = composeCutout(source, mask.maskCanvas, source.width, source.height);
     originalCutoutCanvas = cutout.canvas;
     backend = mask.backend;
     timings = { inference: mask.inferenceMs, total: performance.now() - t0 };
@@ -313,8 +275,7 @@ async function handleFile(file) {
     // Record activity and save tiny thumbnail to history
     recordActivity("photo_processed");
     hasCreatedImageInSession = true;
-    const currentSpec =
-      PASSPORT_SPECS.find((s) => s.id === specId) || PASSPORT_SPECS[0];
+    const currentSpec = PASSPORT_SPECS.find((s) => s.id === specId) || PASSPORT_SPECS[0];
     try {
       const tc = document.createElement("canvas");
       tc.width = 120;
@@ -338,14 +299,11 @@ async function handleFile(file) {
     applyEditsToCutout(); // may be no-op if edits are default
     renderResult();
     updateHeaderProfileWidget();
-    window.__updateToolButtons?.();
   } catch (err) {
     console.error(err);
     showError(
       uploadError,
-      err instanceof Error
-        ? err.message
-        : "Something went wrong while processing.",
+      err instanceof Error ? err.message : "Something went wrong while processing.",
     );
     setPhase("upload");
   }
@@ -430,9 +388,7 @@ if (bgSwatches) {
 document.querySelectorAll(".fmtBtn").forEach((b) => {
   b.addEventListener("click", () => {
     format = b.dataset.fmt;
-    document
-      .querySelectorAll(".fmtBtn")
-      .forEach((x) => x.classList.toggle("active", x === b));
+    document.querySelectorAll(".fmtBtn").forEach((x) => x.classList.toggle("active", x === b));
   });
 });
 
@@ -440,9 +396,7 @@ document.querySelectorAll(".fmtBtn").forEach((b) => {
 document.querySelectorAll(".qtyBtn").forEach((b) => {
   b.addEventListener("click", () => {
     photoCount = parseInt(b.dataset.count, 10) || 4;
-    document
-      .querySelectorAll(".qtyBtn")
-      .forEach((x) => x.classList.toggle("active", x === b));
+    document.querySelectorAll(".qtyBtn").forEach((x) => x.classList.toggle("active", x === b));
     const input = $("qtyCustomInput");
     if (input) input.value = photoCount;
   });
@@ -455,12 +409,7 @@ if (qtyInput) {
       photoCount = Math.min(60, val);
       document
         .querySelectorAll(".qtyBtn")
-        .forEach((x) =>
-          x.classList.toggle(
-            "active",
-            parseInt(x.dataset.count, 10) === photoCount,
-          ),
-        );
+        .forEach((x) => x.classList.toggle("active", parseInt(x.dataset.count, 10) === photoCount));
     }
   });
 }
@@ -523,10 +472,7 @@ if ($("retryBtn"))
     try {
       const t0 = performance.now();
       const mask = await computeMask(lastSourceCanvas, (p) =>
-        updateProc(
-          p.stage,
-          p.total ? Math.round((p.loaded / p.total) * 100) : null,
-        ),
+        updateProc(p.stage, p.total ? Math.round((p.loaded / p.total) * 100) : null),
       );
       cutout = composeCutout(
         lastSourceCanvas,
@@ -542,29 +488,21 @@ if ($("retryBtn"))
       syncEditorUI();
       applyEditsToCutout();
       renderResult();
-      showToast(
-        "Photo re-processed with improved lighting & face alignment!",
-        "success",
-      );
+      showToast("Photo re-processed with improved lighting & face alignment!", "success");
     } catch (err) {
       console.error(err);
       showError(
         uploadError,
-        err instanceof Error
-          ? err.message
-          : "Something went wrong during retry.",
+        err instanceof Error ? err.message : "Something went wrong during retry.",
       );
       setPhase("upload");
     }
   });
 
 if ($("newBtn")) $("newBtn").addEventListener("click", reset);
-if ($("dlSingle"))
-  $("dlSingle").addEventListener("click", () => download("single"));
-if ($("dlSheet"))
-  $("dlSheet").addEventListener("click", () => download("sheet"));
-if ($("dlPrint"))
-  $("dlPrint").addEventListener("click", () => download("print"));
+if ($("dlSingle")) $("dlSingle").addEventListener("click", () => download("single"));
+if ($("dlSheet")) $("dlSheet").addEventListener("click", () => download("sheet"));
+if ($("dlPrint")) $("dlPrint").addEventListener("click", () => download("print"));
 
 // Post-download popup
 const downloadModal = $("downloadModal");
@@ -707,11 +645,7 @@ function renderPreview() {
   const display = $("previewCanvas");
   if (!display) return;
   const maxSide = 380;
-  const scale = Math.min(
-    maxSide / rendered.width,
-    maxSide / rendered.height,
-    1.4,
-  );
+  const scale = Math.min(maxSide / rendered.width, maxSide / rendered.height, 1.4);
   display.width = Math.round(rendered.width * scale);
   display.height = Math.round(rendered.height * scale);
   const ctx = display.getContext("2d");
@@ -766,11 +700,7 @@ async function download(kind) {
     const photo = renderPassport(cutout, spec, bgColor, adjust);
     const type = format === "png" ? "image/png" : "image/jpeg";
     const ext = format === "png" ? "png" : "jpg";
-    const blob = await canvasToBlob(
-      photo,
-      type,
-      format === "jpeg" ? 0.95 : undefined,
-    );
+    const blob = await canvasToBlob(photo, type, format === "jpeg" ? 0.95 : undefined);
     const name = `passport-${spec.id}.${ext}`;
     downloadBlob(blob, name);
     recordActivity("single_download");
@@ -779,10 +709,7 @@ async function download(kind) {
     showDownloadModal();
   } catch (err) {
     console.error(err);
-    showError(
-      $("resultError"),
-      err instanceof Error ? err.message : "Could not export the image.",
-    );
+    showError($("resultError"), err instanceof Error ? err.message : "Could not export the image.");
   } finally {
     busy = false;
     if ($("dlSingle")) $("dlSingle").disabled = false;
@@ -793,7 +720,7 @@ async function download(kind) {
 
 // ------- AI Dress Try-On integration -------
 function canvasFromImage(img) {
-  const MAX = 4000;
+  const MAX = 2000;
   const scale = Math.min(1, MAX / Math.max(img.width, img.height));
   const w = Math.max(1, Math.round(img.width * scale));
   const h = Math.max(1, Math.round(img.height * scale));
@@ -805,14 +732,6 @@ function canvasFromImage(img) {
   ctx.drawImage(img, 0, 0, w, h);
   return c;
 }
-
-window.__isEnhanceRunning = false;
-window.__isTryOnRunning = false;
-window.__updateToolButtons = function () {
-  if (typeof window.__updateEnhanceBtn === "function")
-    window.__updateEnhanceBtn();
-  if (typeof window.__updateTryOnBtn === "function") window.__updateTryOnBtn();
-};
 
 window.__tryOn = {
   getPersonDataUrl() {
@@ -841,12 +760,7 @@ window.__tryOn = {
     lastSourceCanvas = source;
     onStage && onStage("Removing background…");
     const mask = await computeMask(source, () => {});
-    cutout = composeCutout(
-      source,
-      mask.maskCanvas,
-      source.width,
-      source.height,
-    );
+    cutout = composeCutout(source, mask.maskCanvas, source.width, source.height);
     originalCutoutCanvas = cutout.canvas;
     backend = mask.backend;
     timings = { inference: mask.inferenceMs, total: 0 };
@@ -862,6 +776,5 @@ window.__tryOn = {
     syncEditorUI();
     applyEditsToCutout();
     renderResult();
-    window.__updateToolButtons();
   },
 };
