@@ -231,55 +231,46 @@
             </div>
           </div>
 
-          <div id="tryOnPanel" class="panel tryOnPanel">
-            <div class="tryOnHead">
-              <span class="tryOnTitle">AI Dress Try-On</span>
-            </div>
-            <div id="tryOnDresses" class="tryOnDresses"></div>
-            <div id="tryOnCustom" class="tryOnCustom hidden">
-              <label class="tryOnUpload">
-                <input id="tryOnCustomFile" type="file" accept="image/*" hidden />
-                <span id="tryOnCustomFileLabel">Upload garment image</span>
-              </label>
-              <img id="tryOnCustomPreview" class="tryOnCustomPreview hidden" alt="Custom garment" />
-              <textarea
-                id="tryOnCustomPrompt"
-                class="tryOnPrompt"
-                rows="2"
-                placeholder="Describe the garment (optional if you uploaded an image)"
-              ></textarea>
-              <div class="tryOnCustomHint muted small">Provide an image, a prompt, or both.</div>
-            </div>
-            <div class="tryOnActionRow">
-              <button id="tryOnGenerate" class="tryOnBtn primary" disabled>Change clothes</button>
-              <button id="tryOnRevert" class="tryOnBtn ghost hidden">Revert</button>
-              <button id="tryOnDownload" class="tryOnBtn ghost hidden">Download</button>
-            </div>
-            <div class="tryOnHint">
-              Cloud AI Processing: Photos are processed securely on cloud AI servers. Initial
-              request may take 30–60s.
-            </div>
-            <div id="tryOnStatus" class="tryOnStatus"></div>
-          </div>
-
-          <div id="enhancePanel" class="panel tryOnPanel enhancePanel">
-            <div class="tryOnHead">
-              <span class="tryOnTitle">AI Enhance</span>
-            </div>
-            <div class="enhanceRow">
-              <div class="enhanceScale" role="radiogroup" aria-label="Upscale factor">
-                <button type="button" class="enhanceScaleBtn active" data-scale="2x">2×</button>
-                <button type="button" class="enhanceScaleBtn" data-scale="4x">4×</button>
+            <div id="tryOnPanel" class="panel tryOnPanel">
+              <div class="tryOnHead">
+                <span class="tryOnTitle">AI Dress Try-On</span>
               </div>
-              <button id="enhanceGenerate" class="tryOnBtn primary" disabled>Enhance photo</button>
-              <button id="enhanceRevert" class="tryOnBtn ghost hidden">Revert</button>
+              <div id="tryOnDresses" class="tryOnDresses"></div>
+              <div id="tryOnCustom" class="tryOnCustom hidden">
+                <label class="tryOnUpload">
+                  <input id="tryOnCustomFile" type="file" accept="image/*" hidden />
+                  <span id="tryOnCustomFileLabel">Upload garment image</span>
+                </label>
+                <img id="tryOnCustomPreview" class="tryOnCustomPreview hidden" alt="Custom garment" />
+                <textarea
+                  id="tryOnCustomPrompt"
+                  class="tryOnPrompt"
+                  rows="2"
+                  placeholder="Describe garment"
+                ></textarea>
+              </div>
+              <div class="tryOnActionRow">
+                <button id="tryOnGenerate" class="tryOnBtn primary" disabled>Change clothes</button>
+                <button id="tryOnRevert" class="tryOnBtn ghost hidden">Revert</button>
+                <button id="tryOnDownload" class="tryOnBtn ghost hidden">Download</button>
+              </div>
+              <div id="tryOnStatus" class="tryOnStatus"></div>
             </div>
-            <div class="tryOnHint">
-              Cloud AI Enhancement: Face-safe super-resolution on secure cloud servers — sharpens
-              detail and restores facial clarity.
+
+            <div id="enhancePanel" class="panel tryOnPanel enhancePanel">
+              <div class="tryOnHead">
+                <span class="tryOnTitle">AI Enhance</span>
+              </div>
+              <div class="enhanceRow">
+                <div class="enhanceScale" role="radiogroup" aria-label="Upscale factor">
+                  <button type="button" class="enhanceScaleBtn active" data-scale="2x">2×</button>
+                  <button type="button" class="enhanceScaleBtn" data-scale="4x">4×</button>
+                </div>
+                <button id="enhanceGenerate" class="tryOnBtn primary" disabled>Enhance photo</button>
+                <button id="enhanceRevert" class="tryOnBtn ghost hidden">Revert</button>
+              </div>
+              <div id="enhanceStatus" class="tryOnStatus"></div>
             </div>
-            <div id="enhanceStatus" class="tryOnStatus"></div>
-          </div>
 
           <div class="panel editorPanel">
             <div class="editorHead">

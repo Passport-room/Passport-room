@@ -1,26 +1,25 @@
 // Virtual try-on proxy — authenticated Hugging Face Space calls with an
-// automatic multi-worker failover chain that LOOPS. If the last worker
-// fails, the chain restarts from the first worker (up to MAX_ROUNDS
-// rounds) so a transient busy state anywhere in the chain still resolves
-// on the next pass.
+// automatic multi-worker failover chain that LOOPS continuously. If a worker
+// is busy or times out, it instantly transfers to the next free space in the
+// chain (up to MAX_ROUNDS passes) until the image is generated.
 //
-// Workers (all public, free-tier, gradio predict API):
-//   1. yisol/IDM-VTON                    (primary — quality reference)
+// High quality, low-traffic Hugging Face spaces:
+//   1. yisol/IDM-VTON                     (primary — high quality reference)
 //   2. Kwai-Kolors/Kolors-Virtual-Try-On  (ZeroGPU, very reliable)
-//   3. levihsu/OOTDiffusion               (high-quality diffusion VTON)
-//   4. franciszzj/Leffa                   (newer VTON, low traffic)
-//   5. zhengchong/CatVTON                 (efficient VTON, backup)
-//
-// Optional env var TRYON_PRIMARY_SPACE lets the user prepend their own
-// duplicated Space without a code change.
+//   3. Nymbo/IDM-VTON                     (low traffic IDM-VTON mirror)
+//   4. franciszzj/Leffa                   (Leffa VTON, efficient)
+//   5. zhengchong/CatVTON                 (CatVTON, fast)
+//   6. wild-minds/IDM-VTON                (low traffic IDM-VTON clone)
+//   7. zero-gpu-explorers/IDM-VTON        (ZeroGPU IDM-VTON mirror)
+//   8. levihsu/OOTDiffusion               (OOTDiffusion VTON backup)
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const PER_ATTEMPT_TIMEOUT_MS = 75_000;
-const MAX_ROUNDS = 2; // loop through the full chain twice before giving up
+const PER_ATTEMPT_TIMEOUT_MS = 30_000; // 30s quick timeout so busy queues skip fast
+const MAX_ROUNDS = 10; // loop through the entire chain 10 times until success
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -92,16 +91,16 @@ async function toFile(blob: Blob, name: string): Promise<File> {
   });
 }
 
-// --- Worker adapters ------------------------------------------------------
+// --- Worker Adapters ---
 
-async function callIdmVton(
-  space: string,
+async function callIdmVtonSpace(
+  spaceName: string,
   personBlob: Blob,
   garmentBlob: Blob,
   description: string,
   hfToken: string | undefined,
 ): Promise<ArrayBuffer> {
-  const client = await Client.connect(space, hfOpts(hfToken));
+  const client = await Client.connect(spaceName, hfOpts(hfToken));
   const personFile = await toFile(personBlob, "person.png");
   const garmentFile = await toFile(garmentBlob, "garment.png");
   const bgData = handle_file(personFile);
@@ -118,7 +117,7 @@ async function callIdmVton(
   });
   const rootHint = client.config?.root;
   const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error(`${space} returned no image URL`);
+  if (!url) throw new Error(`${spaceName} returned no image URL`);
   return fetchImageBuffer(url);
 }
 
@@ -214,11 +213,30 @@ async function callCatVton(
 
 // --- Route ---------------------------------------------------------------
 
+const tryonUsageMap = new Map<string, number[]>();
+
 export const Route = createFileRoute("/api/public/tryon")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
+        const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "user";
+        const now = Date.now();
+        const ONE_HOUR = 60 * 60 * 1000;
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+
+        let history = (tryonUsageMap.get(clientIp) || []).filter((ts) => now - ts < ONE_DAY);
+        const recentHour = history.filter((ts) => now - ts < ONE_HOUR);
+
+        if (recentHour.length >= 1) {
+          const oldest = recentHour[0];
+          const waitMins = Math.ceil((ONE_HOUR - (now - oldest)) / 60000);
+          return json({ error: `Limit reached: Maximum 1 image per hour. Try again in ${waitMins}m.` }, 429);
+        }
+        if (history.length >= 5) {
+          return json({ error: "Limit reached: Maximum 5 images per day." }, 429);
+        }
+
         let form: FormData;
         try {
           form = await request.formData();
@@ -249,16 +267,20 @@ export const Route = createFileRoute("/api/public/tryon")({
         if (customPrimary) {
           chain.push({
             name: `custom:${customPrimary}`,
-            run: () => callIdmVton(customPrimary, person, garment, description, hfToken),
+            run: () => callIdmVtonSpace(customPrimary, person, garment, description, hfToken),
           });
         }
 
+        // Low-traffic & reliable Hugging Face Spaces failover chain
         chain.push(
-          { name: "IDM-VTON",     run: () => callIdmVton("yisol/IDM-VTON", person, garment, description, hfToken) },
-          { name: "Kolors-VTON",  run: () => callKolorsVton(person, garment, hfToken) },
-          { name: "OOTDiffusion", run: () => callOotdiffusion(person, garment, hfToken) },
-          { name: "Leffa",        run: () => callLeffa(person, garment, hfToken) },
-          { name: "CatVTON",      run: () => callCatVton(person, garment, hfToken) },
+          { name: "IDM-VTON",          run: () => callIdmVtonSpace("yisol/IDM-VTON", person, garment, description, hfToken) },
+          { name: "Kolors-VTON",       run: () => callKolorsVton(person, garment, hfToken) },
+          { name: "Nymbo-IDM-VTON",    run: () => callIdmVtonSpace("Nymbo/IDM-VTON", person, garment, description, hfToken) },
+          { name: "Leffa",             run: () => callLeffa(person, garment, hfToken) },
+          { name: "CatVTON",           run: () => callCatVton(person, garment, hfToken) },
+          { name: "WildMinds-VTON",    run: () => callIdmVtonSpace("wild-minds/IDM-VTON", person, garment, description, hfToken) },
+          { name: "ZeroGPU-IDM-VTON", run: () => callIdmVtonSpace("zero-gpu-explorers/IDM-VTON", person, garment, description, hfToken) },
+          { name: "OOTDiffusion",      run: () => callOotdiffusion(person, garment, hfToken) },
         );
 
         for (let round = 1; round <= MAX_ROUNDS; round++) {
@@ -266,6 +288,8 @@ export const Route = createFileRoute("/api/public/tryon")({
             const label = round === 1 ? attempt.name : `${attempt.name} (retry ${round})`;
             try {
               const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, label);
+              history.push(now);
+              tryonUsageMap.set(clientIp, history);
               return new Response(raw, {
                 status: 200,
                 headers: {
@@ -277,7 +301,7 @@ export const Route = createFileRoute("/api/public/tryon")({
               });
             } catch (err) {
               const msg = err instanceof Error ? err.message : String(err);
-              console.warn(`[tryon] ${label} failed:`, msg);
+              console.warn(`[tryon] ${label} busy/failed:`, msg);
               errors.push(`${label}: ${msg}`);
               if (!isRetryable(err)) {
                 return json(
@@ -292,7 +316,7 @@ export const Route = createFileRoute("/api/public/tryon")({
         return json(
           {
             error:
-              "The AI try-on service is busy or unavailable right now. Please try again in a minute.",
+              "The AI try-on servers are currently busy. Retrying automatically...",
             details: errors,
           },
           502,

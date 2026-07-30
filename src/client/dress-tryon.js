@@ -215,52 +215,118 @@ async function callTryOn(personBlob, garmentBlob, description) {
   form.append("garment", garmentBlob, "garment.png");
   form.append("description", description || "a garment");
 
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort("timeout"), TIMEOUT_MS);
-  let res;
-  try {
-    res = await fetch(ENDPOINT, { method: "POST", body: form, signal: ctl.signal });
-  } catch (err) {
-    clearTimeout(t);
-    if (err?.name === "AbortError")
-      throw new Error("Request timed out — the cloud AI server is warming up. Please try again.");
-    throw new Error("Network error contacting the AI service.");
-  }
-  clearTimeout(t);
+  let lastError = null;
+  const maxRetries = 5;
 
-  const ct = (res.headers.get("content-type") || "").toLowerCase();
-  if (!res.ok) {
-    let msg = `Request failed (${res.status})`;
-    if (ct.includes("json")) {
-      try {
-        const j = await res.json();
-        if (j?.error) {
-          msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
-        }
-      } catch {}
-    }
-    throw new Error(msg);
-  }
-  if (!ct.includes("image/")) {
-    let text = "";
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort("timeout"), TIMEOUT_MS);
+    let res;
     try {
-      text = await res.text();
-    } catch {}
-    console.error("TryOn unexpected non-image response:", ct, text);
-    throw new Error("AI service did not return an image. Please try again.");
+      res = await fetch(ENDPOINT, { method: "POST", body: form, signal: ctl.signal });
+      clearTimeout(t);
+    } catch (err) {
+      clearTimeout(t);
+      lastError = err;
+      console.warn(`[tryon-client] attempt ${attempt} failed:`, err?.message || err);
+      setStatus(`Server busy, switching to alternate AI space... (Attempt ${attempt}/${maxRetries})`);
+      await new Promise((r) => setTimeout(r, 1500));
+      continue;
+    }
+
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    if (!res.ok) {
+      let msg = `Request failed (${res.status})`;
+      if (ct.includes("json")) {
+        try {
+          const j = await res.json();
+          if (j?.error) {
+            msg = typeof j.error === "string" ? j.error : j.error.message || JSON.stringify(j.error);
+          }
+        } catch {}
+      }
+      lastError = new Error(msg);
+      setStatus(`Space busy, trying next server... (Attempt ${attempt}/${maxRetries})`);
+      await new Promise((r) => setTimeout(r, 1500));
+      continue;
+    }
+
+    if (!ct.includes("image/")) {
+      let text = "";
+      try {
+        text = await res.text();
+      } catch {}
+      console.error("TryOn unexpected non-image response:", ct, text);
+      lastError = new Error("AI service did not return an image.");
+      await new Promise((r) => setTimeout(r, 1500));
+      continue;
+    }
+
+    return await res.blob();
   }
-  return await res.blob();
+
+  throw lastError || new Error("AI Virtual Try-On is currently busy. Please try again.");
+}
+
+const TRYON_LIMIT_KEY = "tryon_generations_v1";
+
+function checkTryOnRateLimit() {
+  const now = Date.now();
+  const ONE_HOUR = 60 * 60 * 1000;
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+
+  let history = [];
+  try {
+    const raw = localStorage.getItem(TRYON_LIMIT_KEY);
+    if (raw) history = JSON.parse(raw);
+    if (!Array.isArray(history)) history = [];
+  } catch {}
+
+  history = history.filter((ts) => typeof ts === "number" && now - ts < ONE_DAY);
+
+  const inLastHour = history.filter((ts) => now - ts < ONE_HOUR);
+  if (inLastHour.length >= 1) {
+    const oldest = inLastHour[0];
+    const waitMins = Math.ceil((ONE_HOUR - (now - oldest)) / 60000);
+    return {
+      allowed: false,
+      error: `Limit reached: Maximum 1 image per hour. Try again in ${waitMins}m.`,
+    };
+  }
+
+  if (history.length >= 5) {
+    return {
+      allowed: false,
+      error: "Limit reached: Maximum 5 images per day.",
+    };
+  }
+
+  return {
+    allowed: true,
+    recordSuccess: () => {
+      history.push(Date.now());
+      try {
+        localStorage.setItem(TRYON_LIMIT_KEY, JSON.stringify(history));
+      } catch {}
+    },
+  };
 }
 
 async function generate() {
   if (generating || !selected) return;
   if (!window.__tryOn) {
-    setStatus("Editor not ready yet — upload a photo first.", "err");
+    setStatus("Editor not ready.", "err");
     return;
   }
   const personDataUrl = window.__tryOn.getPersonDataUrl();
   if (!personDataUrl) {
-    setStatus("Upload a person photo first.", "err");
+    setStatus("Upload a photo first.", "err");
+    return;
+  }
+
+  const rateLimit = checkTryOnRateLimit();
+  if (!rateLimit.allowed) {
+    setStatus(rateLimit.error, "err");
     return;
   }
 
@@ -270,13 +336,12 @@ async function generate() {
     if (selected.id === "custom") {
       const prompt = customPrompt.trim();
       if (!customBlob && !prompt) {
-        setStatus("Upload a garment image or enter a prompt.", "err");
+        setStatus("Upload a garment image or enter prompt.", "err");
         return;
       }
       if (customBlob) {
         garmentBlob = customBlob;
       } else {
-        // Prompt-only: send a neutral white placeholder; IDM-VTON uses `garment_des` as guidance.
         garmentBlob = await makePlaceholderGarmentBlob();
       }
       if (prompt) description = prompt;
@@ -294,19 +359,7 @@ async function generate() {
   generating = true;
   updateGenerateBtn();
 
-  const progressMsgs = [
-    "Sending photo & garment to cloud AI studio…",
-    "Processing clothing fit & posture…",
-    "Aligning outfit details…",
-    "Giving final touches…",
-    "Polishing new look…",
-  ];
-  let msgIdx = 0;
-  setStatus(progressMsgs[0]);
-  const progressInterval = setInterval(() => {
-    msgIdx = (msgIdx + 1) % progressMsgs.length;
-    setStatus(progressMsgs[msgIdx]);
-  }, 3500);
+  setStatus("Generating try-on…");
 
   try {
     preTryOnSnapshot = personDataUrl;
@@ -315,25 +368,23 @@ async function generate() {
     const restoredDataUrl = await restoreTryOnResultAspect(resultBlob, placement);
     const restoredBlob = await dataUrlToBlob(restoredDataUrl);
     lastResultBlob = restoredBlob;
-    clearInterval(progressInterval);
-    setStatus("Preparing your new photo…");
+    setStatus("Applying photo…");
     await window.__tryOn.applyResult(restoredDataUrl, (m) => setStatus(m));
+    rateLimit.recordSuccess();
     $("tryOnRevert").classList.remove("hidden");
     const dlBtn = $("tryOnDownload");
     if (dlBtn) dlBtn.classList.remove("hidden");
-    setStatus("Outfit applied. Keep editing, cropping or downloading.", "ok");
+    setStatus("Outfit applied.", "ok");
   } catch (e) {
-    clearInterval(progressInterval);
     console.error(e);
     const errMsg =
       e instanceof Error
         ? e.message
         : typeof e === "string"
           ? e
-          : e?.message || "Generation failed. Please try again.";
+          : e?.message || "Generation failed. Try again.";
     setStatus(errMsg, "err");
   } finally {
-    clearInterval(progressInterval);
     generating = false;
     updateGenerateBtn();
   }
