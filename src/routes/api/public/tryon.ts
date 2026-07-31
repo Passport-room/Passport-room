@@ -1,25 +1,15 @@
-// Virtual try-on proxy — authenticated Hugging Face Space calls with an
-// automatic multi-worker failover chain that LOOPS continuously. If a worker
-// is busy or times out, it instantly transfers to the next free space in the
-// chain (up to MAX_ROUNDS passes) until the image is generated.
-//
-// High quality, low-traffic Hugging Face spaces:
-//   1. yisol/IDM-VTON                     (primary — high quality reference)
-//   2. Kwai-Kolors/Kolors-Virtual-Try-On  (ZeroGPU, very reliable)
-//   3. Nymbo/IDM-VTON                     (low traffic IDM-VTON mirror)
-//   4. franciszzj/Leffa                   (Leffa VTON, efficient)
-//   5. zhengchong/CatVTON                 (CatVTON, fast)
-//   6. wild-minds/IDM-VTON                (low traffic IDM-VTON clone)
-//   7. zero-gpu-explorers/IDM-VTON        (ZeroGPU IDM-VTON mirror)
-//   8. levihsu/OOTDiffusion               (OOTDiffusion VTON backup)
+// Virtual try-on proxy — one model per request. The client drives the
+// retry / model-rotation loop and shows a live countdown when a model is
+// busy. Never returns a local composite; on busy returns 202 JSON; on
+// hard failure returns 502 JSON. On success returns the upstream image
+// bytes unchanged so quality/resolution is preserved.
 
 import { createFileRoute } from "@tanstack/react-router";
 import { Client, handle_file } from "@gradio/client";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-const PER_ATTEMPT_TIMEOUT_MS = 30_000; // 30s quick timeout so busy queues skip fast
-const MAX_ROUNDS = 10; // loop through the entire chain 10 times until success
+const PER_ATTEMPT_TIMEOUT_MS = 110_000;
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -28,26 +18,39 @@ const CORS: Record<string, string> = {
   "Access-Control-Max-Age": "86400",
 };
 
-const json = (b: unknown, s = 200) =>
-  new Response(JSON.stringify(b), {
-    status: s,
+// Ordered model pool. First entry is default. Order matters — highest
+// quality first.
+const MODELS = ["idm", "catvton", "kolors", "ootd"] as const;
+type ModelId = (typeof MODELS)[number];
+
+const MODEL_LABELS: Record<ModelId, string> = {
+  idm: "IDM-VTON",
+  catvton: "CatVTON",
+  kolors: "Kolors-VTON",
+  ootd: "OOTDiffusion",
+};
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
     headers: { "Content-Type": "application/json", ...CORS },
   });
+}
 
 function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const t = setTimeout(() => reject(new Error(`${label} timed out`)), ms);
     p.then(
-      (v) => { clearTimeout(t); resolve(v); },
-      (e) => { clearTimeout(t); reject(e); },
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      },
     );
   });
-}
-
-function isRetryable(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
-  if (msg.includes("invalid input") || msg.includes("unsupported file")) return false;
-  return true;
 }
 
 function extractUrl(data: unknown, rootHint?: string): string | undefined {
@@ -72,6 +75,13 @@ function extractUrl(data: unknown, rootHint?: string): string | undefined {
   return visit(data);
 }
 
+function isBusyError(err: unknown): boolean {
+  const msg = (err instanceof Error ? err.message : String(err)) || "";
+  return /429|503|504|queue|busy|loading|gpu|quota|timed out|timeout|unavailable|overloaded|rate.?limit|sleep|starting/i.test(
+    msg,
+  );
+}
+
 async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Fetch generated image failed (${res.status})`);
@@ -81,161 +91,121 @@ async function fetchImageBuffer(url: string): Promise<ArrayBuffer> {
   return out;
 }
 
-type HfAuth = Record<string, never> | undefined;
-const hfOpts = (t: string | undefined): HfAuth =>
-  t ? ({ hf_token: t } as unknown as Record<string, never>) : undefined;
-
-async function toFile(blob: Blob, name: string): Promise<File> {
-  return new File([await blob.arrayBuffer()], name, {
-    type: blob.type || "image/png",
-  });
+async function toFile(b: Blob, name: string): Promise<File> {
+  return new File([await b.arrayBuffer()], name, { type: b.type || "image/png" });
 }
 
-// --- Worker Adapters ---
-
-async function callIdmVtonSpace(
-  spaceName: string,
-  personBlob: Blob,
-  garmentBlob: Blob,
-  description: string,
-  hfToken: string | undefined,
-): Promise<ArrayBuffer> {
-  const client = await Client.connect(spaceName, hfOpts(hfToken));
-  const personFile = await toFile(personBlob, "person.png");
-  const garmentFile = await toFile(garmentBlob, "garment.png");
-  const bgData = handle_file(personFile);
-  const garmData = handle_file(garmentFile);
-
+async function callIdm(person: Blob, garment: Blob, description: string, hf?: string) {
+  const client = await Client.connect(
+    "yisol/IDM-VTON",
+    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+  );
+  const bg = handle_file(await toFile(person, "person.png"));
+  const gm = handle_file(await toFile(garment, "garment.png"));
   const result = await client.predict("/tryon", {
-    dict: { background: bgData, layers: [], composite: bgData },
-    garm_img: garmData,
+    dict: { background: bg, layers: [], composite: bg },
+    garm_img: gm,
     garment_des: description || "a garment",
     is_checked: true,
-    is_checked_crop: false,
-    denoise_steps: 30,
-    seed: 42,
+    is_checked_crop: true,
+    denoise_steps: 50,
+    seed: Math.floor(Math.random() * 1_000_000),
   });
-  const rootHint = client.config?.root;
-  const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error(`${spaceName} returned no image URL`);
+  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  if (!url) throw new Error("IDM-VTON returned no image URL");
   return fetchImageBuffer(url);
 }
 
-async function callKolorsVton(
-  personBlob: Blob,
-  garmentBlob: Blob,
-  hfToken: string | undefined,
-): Promise<ArrayBuffer> {
-  const client = await Client.connect("Kwai-Kolors/Kolors-Virtual-Try-On", hfOpts(hfToken));
-  const personFile = await toFile(personBlob, "person.png");
-  const garmentFile = await toFile(garmentBlob, "garment.png");
-  const result = await client.predict("/tryon", [
-    handle_file(personFile),
-    handle_file(garmentFile),
-    0,
-    true,
-  ]);
-  const rootHint = client.config?.root;
-  const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error("Kolors returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-async function callOotdiffusion(
-  personBlob: Blob,
-  garmentBlob: Blob,
-  hfToken: string | undefined,
-): Promise<ArrayBuffer> {
-  const client = await Client.connect("levihsu/OOTDiffusion", hfOpts(hfToken));
-  const personFile = await toFile(personBlob, "person.png");
-  const garmentFile = await toFile(garmentBlob, "garment.png");
-  const result = await client.predict("/process_hd", [
-    handle_file(personFile),
-    handle_file(garmentFile),
-    1,
-    20,
-    2,
-    -1,
-  ]);
-  const rootHint = client.config?.root;
-  const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error("OOTDiffusion returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-async function callLeffa(
-  personBlob: Blob,
-  garmentBlob: Blob,
-  hfToken: string | undefined,
-): Promise<ArrayBuffer> {
-  const client = await Client.connect("franciszzj/Leffa", hfOpts(hfToken));
-  const personFile = await toFile(personBlob, "person.png");
-  const garmentFile = await toFile(garmentBlob, "garment.png");
-  const result = await client.predict("/leffa_predict_vt", [
-    handle_file(personFile),
-    handle_file(garmentFile),
-    false,
-    30,
-    2.5,
-    42,
-    "viton_hd",
-    "upper_body",
-    false,
-  ]);
-  const rootHint = client.config?.root;
-  const url = extractUrl((result as { data?: unknown }).data, rootHint);
-  if (!url) throw new Error("Leffa returned no image URL");
-  return fetchImageBuffer(url);
-}
-
-async function callCatVton(
-  personBlob: Blob,
-  garmentBlob: Blob,
-  hfToken: string | undefined,
-): Promise<ArrayBuffer> {
-  const client = await Client.connect("zhengchong/CatVTON", hfOpts(hfToken));
-  const personFile = await toFile(personBlob, "person.png");
-  const garmentFile = await toFile(garmentBlob, "garment.png");
+async function callCatVton(person: Blob, garment: Blob, hf?: string) {
+  const client = await Client.connect(
+    "zhengchong/CatVTON",
+    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+  );
+  const p = handle_file(await toFile(person, "person.png"));
+  const g = handle_file(await toFile(garment, "garment.png"));
+  // CatVTON signature: (person, cloth, cloth_type, num_inference_steps, guidance_scale, seed, show_type)
   const result = await client.predict("/submit_function", [
-    handle_file(personFile),
-    handle_file(garmentFile),
+    p,
+    g,
     "upper",
     50,
     2.5,
-    42,
-    true,
+    Math.floor(Math.random() * 1_000_000),
+    "result only",
   ]);
-  const rootHint = client.config?.root;
-  const url = extractUrl((result as { data?: unknown }).data, rootHint);
+  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
   if (!url) throw new Error("CatVTON returned no image URL");
   return fetchImageBuffer(url);
 }
 
-// --- Route ---------------------------------------------------------------
+async function callKolors(person: Blob, garment: Blob, hf?: string) {
+  const client = await Client.connect(
+    "Kwai-Kolors/Kolors-Virtual-Try-On",
+    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+  );
+  const p = handle_file(await toFile(person, "person.png"));
+  const g = handle_file(await toFile(garment, "garment.png"));
+  const result = await client.predict("/tryon", [p, g, 0, true]);
+  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  if (!url) throw new Error("Kolors returned no image URL");
+  return fetchImageBuffer(url);
+}
 
-const tryonUsageMap = new Map<string, number[]>();
+async function callOotd(person: Blob, garment: Blob, hf?: string) {
+  const client = await Client.connect(
+    "levihsu/OOTDiffusion",
+    hf ? ({ hf_token: hf } as unknown as Record<string, never>) : undefined,
+  );
+  const p = handle_file(await toFile(person, "person.png"));
+  const g = handle_file(await toFile(garment, "garment.png"));
+  // Half-body process: (vton_img, garm_img, n_samples, n_steps, image_scale, seed)
+  const result = await client.predict("/process_hd", [
+    p,
+    g,
+    1,
+    30,
+    2.0,
+    Math.floor(Math.random() * 1_000_000),
+  ]);
+  const url = extractUrl((result as { data?: unknown }).data, client.config?.root);
+  if (!url) throw new Error("OOTDiffusion returned no image URL");
+  return fetchImageBuffer(url);
+}
+
+function nextModel(current: ModelId): ModelId | null {
+  const i = MODELS.indexOf(current);
+  return i >= 0 && i < MODELS.length - 1 ? MODELS[i + 1] : null;
+}
+
+async function runModel(
+  model: ModelId,
+  person: Blob,
+  garment: Blob,
+  description: string,
+  hf?: string,
+) {
+  switch (model) {
+    case "idm":
+      return callIdm(person, garment, description, hf);
+    case "catvton":
+      return callCatVton(person, garment, hf);
+    case "kolors":
+      return callKolors(person, garment, hf);
+    case "ootd":
+      return callOotd(person, garment, hf);
+  }
+}
 
 export const Route = createFileRoute("/api/public/tryon")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
       POST: async ({ request }) => {
-        const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "user";
-        const now = Date.now();
-        const ONE_HOUR = 60 * 60 * 1000;
-        const ONE_DAY = 24 * 60 * 60 * 1000;
-
-        let history = (tryonUsageMap.get(clientIp) || []).filter((ts) => now - ts < ONE_DAY);
-        const recentHour = history.filter((ts) => now - ts < ONE_HOUR);
-
-        if (recentHour.length >= 1) {
-          const oldest = recentHour[0];
-          const waitMins = Math.ceil((ONE_HOUR - (now - oldest)) / 60000);
-          return json({ error: `Limit reached: Maximum 1 image per hour. Try again in ${waitMins}m.` }, 429);
-        }
-        if (history.length >= 5) {
-          return json({ error: "Limit reached: Maximum 5 images per day." }, 429);
-        }
+        const url = new URL(request.url);
+        const requested = (url.searchParams.get("model") || "idm").toLowerCase();
+        const model = (MODELS as readonly string[]).includes(requested)
+          ? (requested as ModelId)
+          : "idm";
 
         let form: FormData;
         try {
@@ -251,7 +221,10 @@ export const Route = createFileRoute("/api/public/tryon")({
         if (!(person instanceof File) || !(garment instanceof File)) {
           return json({ error: "Both 'person' and 'garment' image files are required" }, 400);
         }
-        for (const [name, f] of [["person", person], ["garment", garment]] as const) {
+        for (const [name, f] of [
+          ["person", person],
+          ["garment", garment],
+        ] as const) {
           if (f.size === 0) return json({ error: `${name} image is empty` }, 400);
           if (f.size > MAX_BYTES) return json({ error: `${name} image exceeds 12 MB limit` }, 413);
           if (f.type && !ALLOWED_MIME.has(f.type))
@@ -259,68 +232,55 @@ export const Route = createFileRoute("/api/public/tryon")({
         }
 
         const hfToken = process.env.HF_TOKEN;
-        const customPrimary = (process.env.TRYON_PRIMARY_SPACE || "").trim();
-        const errors: string[] = [];
 
-        const chain: Array<{ name: string; run: () => Promise<ArrayBuffer> }> = [];
-
-        if (customPrimary) {
-          chain.push({
-            name: `custom:${customPrimary}`,
-            run: () => callIdmVtonSpace(customPrimary, person, garment, description, hfToken),
+        try {
+          const raw = await withTimeout(
+            runModel(model, person, garment, description, hfToken),
+            PER_ATTEMPT_TIMEOUT_MS,
+            MODEL_LABELS[model],
+          );
+          return new Response(raw, {
+            status: 200,
+            headers: {
+              "Content-Type": "image/png",
+              "Cache-Control": "no-store",
+              "X-Model-Used": MODEL_LABELS[model],
+              ...CORS,
+            },
           });
-        }
-
-        // Low-traffic & reliable Hugging Face Spaces failover chain
-        chain.push(
-          { name: "IDM-VTON",          run: () => callIdmVtonSpace("yisol/IDM-VTON", person, garment, description, hfToken) },
-          { name: "Kolors-VTON",       run: () => callKolorsVton(person, garment, hfToken) },
-          { name: "Nymbo-IDM-VTON",    run: () => callIdmVtonSpace("Nymbo/IDM-VTON", person, garment, description, hfToken) },
-          { name: "Leffa",             run: () => callLeffa(person, garment, hfToken) },
-          { name: "CatVTON",           run: () => callCatVton(person, garment, hfToken) },
-          { name: "WildMinds-VTON",    run: () => callIdmVtonSpace("wild-minds/IDM-VTON", person, garment, description, hfToken) },
-          { name: "ZeroGPU-IDM-VTON", run: () => callIdmVtonSpace("zero-gpu-explorers/IDM-VTON", person, garment, description, hfToken) },
-          { name: "OOTDiffusion",      run: () => callOotdiffusion(person, garment, hfToken) },
-        );
-
-        for (let round = 1; round <= MAX_ROUNDS; round++) {
-          for (const attempt of chain) {
-            const label = round === 1 ? attempt.name : `${attempt.name} (retry ${round})`;
-            try {
-              const raw = await withTimeout(attempt.run(), PER_ATTEMPT_TIMEOUT_MS, label);
-              history.push(now);
-              tryonUsageMap.set(clientIp, history);
-              return new Response(raw, {
-                status: 200,
-                headers: {
-                  "Content-Type": "image/png",
-                  "Cache-Control": "no-store",
-                  "X-Worker": label,
-                  ...CORS,
-                },
-              });
-            } catch (err) {
-              const msg = err instanceof Error ? err.message : String(err);
-              console.warn(`[tryon] ${label} busy/failed:`, msg);
-              errors.push(`${label}: ${msg}`);
-              if (!isRetryable(err)) {
-                return json(
-                  { error: "The uploaded image was rejected by the AI service.", details: errors },
-                  400,
-                );
-              }
-            }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.warn(`[tryon:${model}] failed:`, msg);
+          const nxt = nextModel(model);
+          if (isBusyError(err) && nxt) {
+            return json(
+              {
+                busy: true,
+                model,
+                modelLabel: MODEL_LABELS[model],
+                nextModel: nxt,
+                nextModelLabel: MODEL_LABELS[nxt],
+                waitMs: 5000,
+                detail: msg,
+              },
+              202,
+            );
           }
+          // No more models — hard failure the UI must surface.
+          return json(
+            {
+              error: nxt
+                ? `AI try-on model ${MODEL_LABELS[model]} failed.`
+                : "All AI try-on models are currently unavailable. Please try again shortly.",
+              model,
+              modelLabel: MODEL_LABELS[model],
+              nextModel: nxt,
+              nextModelLabel: nxt ? MODEL_LABELS[nxt] : null,
+              detail: msg,
+            },
+            nxt ? 502 : 503,
+          );
         }
-
-        return json(
-          {
-            error:
-              "The AI try-on servers are currently busy. Retrying automatically...",
-            details: errors,
-          },
-          502,
-        );
       },
     },
   },

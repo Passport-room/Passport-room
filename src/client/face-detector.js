@@ -39,19 +39,15 @@ export function detectFaceInCanvas(sourceCanvas, maskCanvas) {
     maxSampleX = 0;
 
   for (let y = 0; y < sampleH; y++) {
-    let rowAlphaCount = 0;
     for (let x = 0; x < sampleW; x++) {
       const idx = (y * sampleW + x) * 4;
       const alpha = maskData ? maskData[idx + 3] : data[idx + 3];
-      if (alpha > 15) {
-        rowAlphaCount++;
+      if (alpha > 80) {
+        if (headTopSampleY === -1) headTopSampleY = y;
+        headBottomSampleY = y;
         if (x < minSampleX) minSampleX = x;
         if (x > maxSampleX) maxSampleX = x;
       }
-    }
-    if (rowAlphaCount >= 2) {
-      if (headTopSampleY === -1) headTopSampleY = y;
-      headBottomSampleY = y;
     }
   }
 
