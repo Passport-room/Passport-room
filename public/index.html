@@ -186,11 +186,7 @@
             <p class="muted small">Fine-tune framing, adjust, pick a background, then download.</p>
           </div>
           <div class="resultHeadButtons">
-            <button
-              id="retryBtn"
-              class="btn ghost"
-              title="Re-process current photo with AI improvements"
-            >
+            <button id="retryBtn" class="btn ghost" title="Re-process current photo with AI improvements">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -199,7 +195,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
               </svg>
               Retry
             </button>
@@ -231,46 +227,54 @@
             </div>
           </div>
 
-            <div id="tryOnPanel" class="panel tryOnPanel">
-              <div class="tryOnHead">
-                <span class="tryOnTitle">AI Dress Try-On</span>
-              </div>
-              <div id="tryOnDresses" class="tryOnDresses"></div>
-              <div id="tryOnCustom" class="tryOnCustom hidden">
-                <label class="tryOnUpload">
-                  <input id="tryOnCustomFile" type="file" accept="image/*" hidden />
-                  <span id="tryOnCustomFileLabel">Upload garment image</span>
-                </label>
-                <img id="tryOnCustomPreview" class="tryOnCustomPreview hidden" alt="Custom garment" />
-                <textarea
-                  id="tryOnCustomPrompt"
-                  class="tryOnPrompt"
-                  rows="2"
-                  placeholder="Describe garment"
-                ></textarea>
-              </div>
-              <div class="tryOnActionRow">
-                <button id="tryOnGenerate" class="tryOnBtn primary" disabled>Change clothes</button>
-                <button id="tryOnRevert" class="tryOnBtn ghost hidden">Revert</button>
-                <button id="tryOnDownload" class="tryOnBtn ghost hidden">Download</button>
-              </div>
-              <div id="tryOnStatus" class="tryOnStatus"></div>
+          <div id="tryOnPanel" class="panel tryOnPanel">
+            <div class="tryOnHead">
+              <span class="tryOnTitle">AI Dress Try-On</span>
             </div>
+            <div id="tryOnDresses" class="tryOnDresses"></div>
+            <div id="tryOnCustom" class="tryOnCustom hidden">
+              <label class="tryOnUpload">
+                <input id="tryOnCustomFile" type="file" accept="image/*" hidden />
+                <span id="tryOnCustomFileLabel">Upload garment image</span>
+              </label>
+              <img id="tryOnCustomPreview" class="tryOnCustomPreview hidden" alt="Custom garment" />
+              <textarea
+                id="tryOnCustomPrompt"
+                class="tryOnPrompt"
+                rows="2"
+                placeholder="Describe the garment (optional if you uploaded an image)"
+              ></textarea>
+              <div class="tryOnCustomHint muted small">Provide an image, a prompt, or both.</div>
+            </div>
+            <div class="tryOnActionRow">
+              <button id="tryOnGenerate" class="tryOnBtn primary" disabled>Change clothes</button>
+              <button id="tryOnRevert" class="tryOnBtn ghost hidden">Revert</button>
+              <button id="tryOnRetry" class="tryOnBtn ghost hidden">Retry</button>
+            </div>
+            <div class="tryOnHint">
+              Cloud AI Processing: Photos are processed securely on cloud AI servers. Initial request may take 30–60s.
+            </div>
+            <div id="tryOnStatus" class="tryOnStatus"></div>
+          </div>
 
-            <div id="enhancePanel" class="panel tryOnPanel enhancePanel">
-              <div class="tryOnHead">
-                <span class="tryOnTitle">AI Enhance</span>
-              </div>
-              <div class="enhanceRow">
-                <div class="enhanceScale" role="radiogroup" aria-label="Upscale factor">
-                  <button type="button" class="enhanceScaleBtn active" data-scale="2x">2×</button>
-                  <button type="button" class="enhanceScaleBtn" data-scale="4x">4×</button>
-                </div>
-                <button id="enhanceGenerate" class="tryOnBtn primary" disabled>Enhance photo</button>
-                <button id="enhanceRevert" class="tryOnBtn ghost hidden">Revert</button>
-              </div>
-              <div id="enhanceStatus" class="tryOnStatus"></div>
+          <div id="enhancePanel" class="panel tryOnPanel enhancePanel">
+            <div class="tryOnHead">
+              <span class="tryOnTitle">AI Enhance</span>
             </div>
+            <div class="enhanceRow">
+              <div class="enhanceScale" role="radiogroup" aria-label="Upscale factor">
+                <button type="button" class="enhanceScaleBtn active" data-scale="2x">2×</button>
+                <button type="button" class="enhanceScaleBtn" data-scale="4x">4×</button>
+              </div>
+              <button id="enhanceGenerate" class="tryOnBtn primary" disabled>Enhance photo</button>
+              <button id="enhanceRevert" class="tryOnBtn ghost hidden">Revert</button>
+              <button id="enhanceRetry" class="tryOnBtn ghost hidden">Retry</button>
+            </div>
+            <div class="tryOnHint">
+              Cloud AI Enhancement: Face-safe super-resolution on secure cloud servers — sharpens detail and restores facial clarity.
+            </div>
+            <div id="enhanceStatus" class="tryOnStatus"></div>
+          </div>
 
           <div class="panel editorPanel">
             <div class="editorHead">
@@ -687,19 +691,10 @@
       <div id="downloadModal" class="modalOverlay hidden">
         <div class="modalBox">
           <div class="modalIcon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 3v12" />
-              <path d="m7 10 5 5 5-5" />
-              <path d="M4 21h16" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12"/>
+              <path d="m7 10 5 5 5-5"/>
+              <path d="M4 21h16"/>
             </svg>
           </div>
           <div class="modalTitle">Your image is downloading…</div>
@@ -740,18 +735,9 @@
 
         <div class="drawerUserSnippet">
           <div class="snippetAvatar">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
           <div>
@@ -763,102 +749,51 @@
         <nav class="drawerNav">
           <button class="drawerNavItem" data-menu-action="new">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
-                />
-                <circle cx="12" cy="13" r="3" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                <circle cx="12" cy="13" r="3"/>
               </svg>
             </span>
             <span>New Passport Photo</span>
           </button>
           <button class="drawerNavItem" data-menu-action="specs">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                <path
-                  d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
-                />
-                <path d="M12 11h4" />
-                <path d="M12 16h4" />
-                <path d="M8 11h.01" />
-                <path d="M8 16h.01" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <path d="M12 11h4"/>
+                <path d="M12 16h4"/>
+                <path d="M8 11h.01"/>
+                <path d="M8 16h.01"/>
               </svg>
             </span>
             <span>Passport Size Specs</span>
           </button>
           <button class="drawerNavItem" data-menu-action="history">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
               </svg>
             </span>
             <span>My Saved Photos</span>
           </button>
           <button class="drawerNavItem" data-menu-action="account">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
               </svg>
             </span>
             <span>My Account &amp; Profile</span>
           </button>
           <button class="drawerNavItem" data-menu-action="howItWorks">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M9 18h6" />
-                <path d="M10 22h4" />
-                <path
-                  d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"
-                />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18h6"/>
+                <path d="M10 22h4"/>
+                <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
               </svg>
             </span>
             <span>How It Works</span>
@@ -866,57 +801,30 @@
           <div class="drawerNavDivider"></div>
           <button class="drawerNavItem" data-menu-action="faq">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
             </span>
             <span>Help &amp; FAQ</span>
           </button>
           <button class="drawerNavItem" data-menu-action="privacy">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
             </span>
             <span>Privacy Policy</span>
           </button>
           <button class="drawerNavItem" data-menu-action="tos">
             <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
               </svg>
             </span>
             <span>Terms of Service</span>
@@ -925,19 +833,9 @@
 
         <div class="drawerFooter">
           <div class="privacyPill">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="display: inline-block; vertical-align: -1px; margin-right: 4px"
-            >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:4px;">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
             <span>100% On-Device AI • No Data Transferred</span>
           </div>
@@ -1104,20 +1002,7 @@
           </header>
           <div class="presetsSearchRow">
             <div class="presetSearchWrapper">
-              <svg
-                class="presetSearchIcon"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <svg class="presetSearchIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
                 type="text"
                 id="presetSearchInput"
@@ -1157,10 +1042,7 @@
               <input id="historyAutoSaveToggle" type="checkbox" checked />
               <span class="historySettingText">
                 <strong>Save created photos to history</strong>
-                <span class="muted small displayBlock"
-                  >Store photo history locally on this device. Disabling saves memory &amp; disk
-                  space.</span
-                >
+                <span class="muted small displayBlock">Store photo history locally on this device. Disabling saves memory &amp; disk space.</span>
               </span>
             </label>
           </div>
@@ -1174,18 +1056,7 @@
           <header class="appModalHeader">
             <div class="noticeHeaderTitle">
               <div class="noticeHeaderIcon">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               </div>
               <div>
                 <h2 class="appModalTitle">Save Created Photos to History?</h2>
@@ -1195,38 +1066,19 @@
           </header>
           <div class="noticeModalBody">
             <p class="noticeBodyMsg">
-              Would you like Cubit.pics to automatically save your created photos locally in your
-              browser history?
+              Would you like Cubit.pics to automatically save your created photos locally in your browser history?
             </p>
             <div class="noticeWarningCard">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="noticeWarnIcon"
-              >
-                <path
-                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="noticeWarnIcon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               <div class="noticeWarnText">
-                <strong>Important Storage Note:</strong> Saving many high-resolution photos locally
-                can accumulate data and may slow down your browser or computer over time. You can
-                change this setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
+                <strong>Important Storage Note:</strong> Saving many high-resolution photos locally can accumulate data and may slow down your browser or computer over time. You can change this setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
               </div>
             </div>
             <label class="noticeCheckboxOption">
               <input id="noticeSaveCheckbox" type="checkbox" checked />
               <span><strong>Yes, save my created photos in local history</strong></span>
             </label>
-            <button id="noticeConfirmBtn" class="btn primary fullWidth noticeBtn">
-              Confirm &amp; Continue
-            </button>
+            <button id="noticeConfirmBtn" class="btn primary fullWidth noticeBtn">Confirm &amp; Continue</button>
           </div>
         </div>
       </div>
@@ -1592,48 +1444,29 @@
           </p>
 
           <div class="aboutDemoBox">
-            <img
-              src="assets/how-it-works.png"
-              alt="Before vs After Demonstration"
-              class="aboutDemoImg"
-            />
-            <div class="aboutDemoCaption">
-              <strong>Before vs. After:</strong> Instant on-device background removal &amp; AI
-              formal dress try-on
-            </div>
+            <img src="assets/how-it-works.png" alt="Before vs After Demonstration" class="aboutDemoImg" />
+            <div class="aboutDemoCaption"><strong>Before vs. After:</strong> Instant on-device background removal &amp; AI formal dress try-on</div>
           </div>
 
           <p class="aboutText">
             Behind the scenes we combine a modern neural background-removal pipeline with an
-            edge-aware compositor and a color-managed rendering engine. That means clean hair edges,
-            accurate skin tones, and print-ready output at the exact millimeter and DPI
-            specifications used by governments around the world — US, Schengen, UK, Canada, India,
-            China, Australia, Japan and many more presets are built in.
+            edge-aware compositor and a color-managed rendering engine. That means clean hair
+            edges, accurate skin tones, and print-ready output at the exact millimeter and DPI
+            specifications used by governments around the world — US, Schengen, UK, Canada,
+            India, China, Australia, Japan and many more presets are built in.
           </p>
 
           <p class="aboutText">
             You stay in full creative control. Adjust framing with live compliance guides, tune
-            brightness, contrast, exposure, shadows, highlights, clarity and noise, pick a compliant
-            white or off-white background (or any custom color), and export as JPEG or PNG. Need a
-            physical copy? Generate a perfectly tiled 4×6″ print sheet ready for home printers or
-            any photo kiosk — all in seconds, all on your device.
+            brightness, contrast, exposure, shadows, highlights, clarity and noise, pick a
+            compliant white or off-white background (or any custom color), and export as JPEG
+            or PNG. Need a physical copy? Generate a perfectly tiled 4×6″ print sheet ready for
+            home printers or any photo kiosk — all in seconds, all on your device.
           </p>
 
           <div class="freeBadge">
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="display: inline-block; vertical-align: -2px; margin-right: 5px"
-            >
-              <path
-                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-              />
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-2px; margin-right:5px;">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             100% FREE — All Features Are Completely Free Forever
           </div>
@@ -1641,40 +1474,16 @@
           <ul class="aboutList">
             <li>
               <span class="aboutIcon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
               </span>
               <div>
                 <div class="aboutItemT">On-device AI background removal</div>
-                <div class="aboutItemS">
-                  Private by design — your image never leaves this device.
-                </div>
+                <div class="aboutItemS">Private by design — your image never leaves this device.</div>
               </div>
             </li>
             <li>
               <span class="aboutIcon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M4 4h6v6H4z" />
-                  <path d="M14 14h6v6h-6z" />
-                  <path d="M14 4h6v6h-6z" opacity=".6" />
-                  <path d="M4 14h6v6H4z" opacity=".6" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4z"/><path d="M14 14h6v6h-6z"/><path d="M14 4h6v6h-6z" opacity=".6"/><path d="M4 14h6v6H4z" opacity=".6"/></svg>
               </span>
               <div>
                 <div class="aboutItemT">Adjustable framing, zoom &amp; rotation</div>
@@ -1683,40 +1492,16 @@
             </li>
             <li>
               <span class="aboutIcon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M2 12h20" />
-                  <path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
               </span>
               <div>
                 <div class="aboutItemT">Multiple passport &amp; visa presets</div>
-                <div class="aboutItemS">
-                  US, Schengen, UK, India, Canada, China, Australia and more.
-                </div>
+                <div class="aboutItemS">US, Schengen, UK, India, Canada, China, Australia and more.</div>
               </div>
             </li>
             <li>
               <span class="aboutIcon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M12 3v12" />
-                  <path d="m7 10 5 5 5-5" />
-                  <path d="M4 21h16" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
               </span>
               <div>
                 <div class="aboutItemT">Download as JPEG or PNG</div>
@@ -1725,24 +1510,11 @@
             </li>
             <li>
               <span class="aboutIcon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect x="6" y="9" width="12" height="9" rx="1" />
-                  <path d="M8 9V5h8v4" />
-                  <path d="M6 14H4v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3h-2" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="9" width="12" height="9" rx="1"/><path d="M8 9V5h8v4"/><path d="M6 14H4v-3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3h-2"/></svg>
               </span>
               <div>
                 <div class="aboutItemT">4×6″ print sheet option</div>
-                <div class="aboutItemS">
-                  Auto-tiled layout for one-click home or kiosk printing.
-                </div>
+                <div class="aboutItemS">Auto-tiled layout for one-click home or kiosk printing.</div>
               </div>
             </li>
           </ul>
@@ -1753,56 +1525,22 @@
           <div class="homeFooterHeader">CONTACT US</div>
           <div class="homeFooterContacts">
             <div class="homeFooterItem">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
-              >
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:4px;">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
               </svg>
               Dhaka, Bangladesh
             </div>
             <div class="homeFooterItem">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
-              >
-                <path
-                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:4px;">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
               </svg>
               +880 1XXX-XXXXXX
             </div>
             <div class="homeFooterItem">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="display: inline-block; vertical-align: -1px; margin-right: 4px"
-              >
-                <path
-                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                />
-                <polyline points="22,6 12,13 2,6" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:-1px; margin-right:4px;">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
               </svg>
               contact@cubit.pics
             </div>
