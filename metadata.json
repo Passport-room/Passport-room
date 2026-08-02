@@ -1,6 +1,0 @@
-{
-  "name": "AI Photo Studio",
-  "description": "On-device AI background removal, virtual dress try-on, and HD photo enhancement.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
