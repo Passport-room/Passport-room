@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "asset_id": "bc35001f-ade4-45a8-bfda-7da56a04a446",
+  "project_id": "71f92b26-8a97-412e-a313-138eef4cbe8d",
+  "url": "https://huggingface.co/Chroma111/general-models/resolve/main/models/codeformer_fp16.onnx",
+  "r2_key": "a/v1/71f92b26-8a97-412e-a313-138eef4cbe8d/bc35001f-ade4-45a8-bfda-7da56a04a446/codeformer_fp16.onnx",
+  "original_filename": "codeformer_fp16.onnx",
+  "size": 188577164,
+  "content_type": "application/octet-stream",
+  "created_at": "2026-08-04T04:14:08Z"
+}
