@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy — Cubit.pics</title>
+    <meta
+      name="description"
+      content="How Cubit.pics handles your photos: all image processing runs in your browser, no photo is uploaded, and this policy lists every network request the app makes."
+    />
+    <link rel="canonical" href="https://cubit.pics/privacy-policy" />
+    <meta property="og:site_name" content="Cubit.pics" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cubit.pics/privacy-policy" />
+    <meta property="og:title" content="Privacy Policy — Cubit.pics" />
+    <meta
+      property="og:description"
+      content="How Cubit.pics handles your photos: all image processing runs in your browser, no photo is uploaded, and this policy lists every network request the app makes."
+    />
+    <meta property="og:image" content="https://cubit.pics/assets/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Privacy Policy — Cubit.pics" />
+    <meta
+      name="twitter:description"
+      content="How Cubit.pics handles your photos: all image processing runs in your browser, no photo is uploaded, and this policy lists every network request the app makes."
+    />
+    <meta name="twitter:image" content="https://cubit.pics/assets/og-image.png" />
+    <meta name="author" content="Cubit.pics" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/page.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://cubit.pics/" },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Privacy Policy",
+            "item": "https://cubit.pics/privacy-policy"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="pgNav" aria-label="Primary">
+      <div class="pgNavInner">
+        <a href="/"><img src="/logo.png" alt="Cubit.pics" width="120" height="28" /></a>
+        <div class="pgNavLinks">
+          <a href="/">Photo maker</a>
+          <a href="/features">Features</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pgWrap">
+      <p class="pgCrumbs"><a href="/">Home</a> › Privacy Policy</p>
+      <h1>Privacy Policy</h1>
+      <p class="pgMeta">Last updated: 7 August 2026</p>
+      <p class="pgLead">
+        This policy describes what Cubit.pics does with your photos and your data. It was written
+        against the actual behaviour of the code that runs this site, not from a template.
+      </p>
+
+      <h2>1. Your photos are processed on your device</h2>
+      <p>
+        Every image operation in Cubit.pics — background removal, face detection, face enhance,
+        cropping to a passport or visa size, colour and exposure adjustments, the outfit overlay,
+        print-sheet layout and export — runs inside your web browser on the device you are using.
+        The app has no photo upload endpoint. We never receive, see, store, transmit or back up the
+        photo you open in the tool, and no human at Cubit.pics can look at it. If you close the tab
+        without downloading, the image is simply gone.
+      </p>
+
+      <h2>2. Network requests the app does make</h2>
+      <p>
+        The AI features need model files, and those are downloaded to your browser the first time
+        you use each feature, then cached on your device for later visits. Your photo is not part of
+        these requests; they are ordinary file downloads. The files are fetched from:
+      </p>
+      <ul>
+        <li>
+          <strong>huggingface.co</strong> — the MODNet background-segmentation model, the YOLOFace
+          face-detection model and the GPEN-BFR-256 face-restoration model.
+        </li>
+        <li>
+          <strong>cdn.jsdelivr.net</strong> — the onnxruntime-web runtime and WebAssembly binaries
+          that execute those models, and the three.js library used by the decorative animation.
+        </li>
+        <li><strong>fonts.googleapis.com / fonts.gstatic.com</strong> — the site's web fonts.</li>
+      </ul>
+      <p>
+        As with any web request, those third parties can see your IP address and browser user agent
+        when a file is fetched. They receive no image data. Their own privacy terms apply to those
+        requests.
+      </p>
+
+      <h2>3. Data stored in your browser</h2>
+      <p>
+        Cubit.pics stores a few things locally so the app is usable across visits: your profile name
+        and avatar if you set one, your editor preferences and last-used adjustment settings,
+        whether you opted in to saving photo history, and — if you did opt in — the recent photos
+        themselves. This is kept in your browser's localStorage and IndexedDB on that device only.
+        It is not an account on our servers, it is not synchronised between devices, and we cannot
+        read it. Clearing your browser's site data for cubit.pics permanently deletes all of it, and
+        saved photo history can be switched off or emptied inside the app at any time.
+      </p>
+
+      <h2>4. Cookies and analytics</h2>
+      <p>
+        Cubit.pics does not set tracking cookies of its own and does not run a first-party analytics
+        product. The browser storage described in section 3 is functional, not analytical. If we add
+        advertising or analytics in future, this section will be updated before it goes live and
+        will name the provider.
+      </p>
+
+      <h2>5. Advertising</h2>
+      <p>
+        We intend to display advertising on this site through Google AdSense. When that is active,
+        Google and its partners may use cookies or device identifiers to serve and measure ads, and
+        may personalise them based on your prior visits to this and other sites. You can review and
+        control this at
+        <a href="https://www.google.com/settings/ads" rel="nofollow noopener">Google Ads Settings</a>
+        and read Google's practices at
+        <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow noopener"
+          >How Google uses information from sites that use its services</a
+        >. Advertising never has access to your photo, because your photo never leaves your browser.
+      </p>
+
+      <h2>6. Children</h2>
+      <p>
+        Cubit.pics is a general-purpose utility and is not directed at children under 13. Because we
+        collect no personal data on our servers, we hold no children's data either. A parent or
+        guardian is welcome to use the tool to produce a child's passport photo, and that photo is
+        handled exactly as described in section 1.
+      </p>
+
+      <h2>7. Your rights and how to exercise them</h2>
+      <p>
+        Data protection rights such as access, correction, deletion and portability apply to data a
+        company holds about you. Cubit.pics holds no such data: there is no user database, no photo
+        storage and no server-side profile. The data the app creates lives on your device, so you
+        can exercise deletion directly by clearing site data in your browser. If you have a question
+        or a formal request anyway, write to
+        <a href="mailto:support@cubit.pics">support@cubit.pics</a> and we will answer within 30
+        days.
+      </p>
+
+      <h2>8. Security</h2>
+      <p>
+        The site is served over HTTPS. Because processing is local, the usual risk of a server
+        breach exposing customer photos does not exist here. The practical security boundary is your
+        own device and browser, so keep them updated and be careful on shared computers where saved
+        photo history would remain in that browser profile.
+      </p>
+
+      <h2>9. Changes to this policy</h2>
+      <p>
+        If the app's data behaviour changes — for example if a future feature needs a server — this
+        page will be updated with a new "last updated" date and the change will be described plainly
+        rather than buried.
+      </p>
+
+      <h2>10. Contact</h2>
+      <p>
+        Cubit.pics, Dhaka, Bangladesh. Email
+        <a href="mailto:support@cubit.pics">support@cubit.pics</a> for any privacy question or data
+        request.
+      </p>
+    </main>
+
+    <footer class="pgFooter">
+      <nav aria-label="Footer">
+        <a href="/">Passport photo maker</a>
+        <a href="/features">Features</a>
+        <a href="/about">About</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </nav>
+      <div>© 2026 Cubit.pics · Private, on-device passport photos.</div>
+    </footer>
+  </body>
+</html>
