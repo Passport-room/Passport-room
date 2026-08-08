@@ -1,12 +1,12 @@
-# Cubit.pics
+# Passport Room
 
-> Cubit.pics is a free online passport and visa photo maker. Every image
+> Passport Room is a free online passport and visa photo maker. Every image
 > operation runs inside the visitor's web browser, so photos are never
 > uploaded to a server. No account, no watermark, no export limit.
 
-Site: https://cubit.pics
-Contact: support@cubit.pics
-Operator: Cubit.pics, an independent team based in Dhaka, Bangladesh.
+Site: https://passport-room.com
+Contact: support@passport-room.com
+Operator: Passport Room, an independent team based in Dhaka, Bangladesh.
 Cost: free. Signup: not required. Watermark: none.
 
 ## What it does
@@ -19,7 +19,7 @@ sheet. Processing happens on the user's own device.
 ## Privacy summary
 
 Photos are processed locally in the browser and are never transmitted to
-Cubit.pics or to any third party. The app has no photo upload endpoint. The only
+Passport Room or to any third party. The app has no photo upload endpoint. The only
 network requests are one-time downloads of AI model files from huggingface.co,
 the onnxruntime-web runtime and three.js from cdn.jsdelivr.net, and web fonts
 from Google Fonts; none of these requests contain image data. Profile settings
@@ -59,15 +59,15 @@ IndexedDB on the user's device only.
 Matching a published size specification does not guarantee that a passport
 office, embassy or licensing authority will accept a photo. Those bodies also
 judge lighting, expression, eyewear, head coverings and how recent the photo is.
-Cubit.pics is independent and is not affiliated with any government or passport
+Passport Room is independent and is not affiliated with any government or passport
 agency.
 
 ## Key pages
 
-- https://cubit.pics/ — the passport photo maker, plus a how-to, a country size
+- https://passport-room.com/ — the passport photo maker, plus a how-to, a country size
   table and the FAQ
-- https://cubit.pics/features — every feature described in detail
-- https://cubit.pics/about — who runs Cubit.pics and why
-- https://cubit.pics/privacy-policy — full data handling disclosure
-- https://cubit.pics/terms-of-service — acceptable use and liability
-- https://cubit.pics/contact — support@cubit.pics
+- https://passport-room.com/features — every feature described in detail
+- https://passport-room.com/about — who runs Passport Room and why
+- https://passport-room.com/privacy-policy — full data handling disclosure
+- https://passport-room.com/terms-of-service — acceptable use and liability
+- https://passport-room.com/contact — support@passport-room.com

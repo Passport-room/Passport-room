@@ -1,6 +1,6 @@
 {
-  "name": "Cubit.pics — Passport Photo Maker",
-  "short_name": "Cubit.pics",
+  "name": "Passport Room — Passport Photo Maker",
+  "short_name": "Passport Room",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#150a2c",

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-const TITLE = "Cubit.pics — AI Passport Photo Maker, Try-On & HD Enhance";
+const TITLE = "Passport Room — AI Passport Photo Maker, Try-On & HD Enhance";
 const DESCRIPTION =
   "Make print-ready passport & visa photos in seconds. On-device AI background removal, outfit try-on, face enhancement and a maximum-density A4 print sheet.";
 
@@ -36,7 +36,7 @@ function Index() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <p>Loading Cubit.pics studio…</p>
+      <p>Loading Passport Room studio…</p>
     </div>
   );
 }

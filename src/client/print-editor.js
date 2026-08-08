@@ -632,6 +632,43 @@ export function renderFullSheetCanvas() {
   return canvas;
 }
 
+// Pre-print popup: shows an ad, then opens the existing print tab on click.
+let pendingPrintBlob = null;
+let printAdModalWired = false;
+
+function hidePrintAdModal() {
+  const modal = $("printAdModal");
+  if (modal) modal.classList.add("hidden");
+  pendingPrintBlob = null;
+}
+
+function showPrintAdModal(blob) {
+  const modal = $("printAdModal");
+  if (!modal) {
+    openPrintTab(blob);
+    return;
+  }
+  pendingPrintBlob = blob;
+  modal.classList.remove("hidden");
+
+  if (!printAdModalWired) {
+    printAdModalWired = true;
+    const printBtn = $("printAdModalPrint");
+    if (printBtn)
+      printBtn.addEventListener("click", () => {
+        const b = pendingPrintBlob;
+        hidePrintAdModal();
+        if (b) openPrintTab(b);
+      });
+    [$("printAdModalCancel"), $("printAdModalClose")].forEach((el) => {
+      if (el) el.addEventListener("click", hidePrintAdModal);
+    });
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) hidePrintAdModal();
+    });
+  }
+}
+
 let exporting = false;
 async function exportFullSheet(mode) {
   if (exporting || !state.spec || !state.cutout) return;
@@ -645,7 +682,7 @@ async function exportFullSheet(mode) {
     const blob = await canvasToBlob(fullCanvas, "image/png");
 
     if (mode === "print") {
-      openPrintTab(blob);
+      showPrintAdModal(blob);
     } else {
       downloadBlob(blob, "passport-A4-sheet.png");
       closePrintEditor();

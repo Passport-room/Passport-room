@@ -4078,15 +4078,41 @@ select:focus {
   flex: 1;
 }
 @media (max-width: 900px) {
+  /* Mobile: let the whole editor scroll and keep the full canvas visible. */
+  .dressEditorBox {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
   .dressEditorBody {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 12px;
+    gap: 12px;
+  }
+  .dressEditorStageWrap {
+    overflow: visible;
+    height: auto;
+    min-height: 0;
+    padding: 10px;
+  }
+  .dressEditorStage {
+    max-height: none;
   }
   .dressEditorBase {
-    max-height: 45vh;
+    max-height: 52vh;
+    max-width: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+  .dressEditorSide {
+    overflow: visible;
+    min-height: 0;
   }
 }
+
 
 /* --- Print editor: custom photo size controls --- */
 .printSizeGroup {
@@ -4378,7 +4404,7 @@ select:focus {
 
 
 /* =========================================================
-   Cubit.pics — fixed AdSense side rails for AI loading screen
+   Passport Room — fixed AdSense side rails for AI loading screen
    ========================================================= */
 .cubit-side-ad {
   position: fixed;
@@ -4430,7 +4456,7 @@ select:focus {
 }
 
 
-/* Cubit.pics download popup AdSense + close control */
+/* Passport Room download popup AdSense + close control */
 .cubit-download-ad {
   width: min(100%, 420px);
   margin: 18px auto 0;

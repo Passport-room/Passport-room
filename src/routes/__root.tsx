@@ -73,18 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Cubit.pics" },
+      { title: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room" },
       {
         name: "description",
         content:
           "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no upload, no account, no watermark.",
       },
-      { name: "author", content: "Cubit.pics" },
-      { property: "og:site_name", content: "Cubit.pics" },
+      { name: "author", content: "Passport Room" },
+      { property: "og:site_name", content: "Passport Room" },
       { property: "og:locale", content: "en_US" },
       {
         property: "og:title",
-        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Cubit.pics",
+        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room",
       },
       {
         property: "og:description",
@@ -92,11 +92,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no upload, no account, no watermark.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cubit.pics/" },
+      { property: "og:url", content: "https://passport-room.com/" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Cubit.pics",
+        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room",
       },
       {
         name: "twitter:description",
@@ -105,11 +105,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content: "https://cubit.pics/assets/og-image.png",
+        content: "https://passport-room.com/assets/og-image.png",
       },
       {
         name: "twitter:image",
-        content: "https://cubit.pics/assets/og-image.png",
+        content: "https://passport-room.com/assets/og-image.png",
       },
     ],
     links: [
