@@ -12,7 +12,8 @@ export async function initCrystal(canvas, box) {
     alpha: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  const small = Math.min(window.innerWidth, window.innerHeight) < 700;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, small ? 1.25 : 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
@@ -35,7 +36,7 @@ export async function initCrystal(canvas, box) {
   const geometry = new THREE.IcosahedronGeometry(1.2, 0);
   const core = new THREE.Mesh(
     geometry,
-    new THREE.MeshStandardMaterial({ color: 0x101015, metalness: 0.75, roughness: 0.42 }),
+    new THREE.MeshStandardMaterial({ color: 0x1a1030, metalness: 0.7, roughness: 0.35 }),
   );
   core.scale.setScalar(0.935);
   group.add(core);
@@ -43,9 +44,9 @@ export async function initCrystal(canvas, box) {
   const shell = new THREE.Mesh(
     geometry,
     new THREE.MeshStandardMaterial({
-      color: 0x7a58ff,
+      color: 0x9b6bff,
       transparent: true,
-      opacity: 0.42,
+      opacity: 0.55,
       metalness: 0.18,
       roughness: 0.16,
     }),
@@ -54,15 +55,15 @@ export async function initCrystal(canvas, box) {
 
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geometry),
-    new THREE.LineBasicMaterial({ color: 0xbda7ff, transparent: true, opacity: 0.62 }),
+    new THREE.LineBasicMaterial({ color: 0xe4d8ff, transparent: true, opacity: 0.95 }),
   );
   group.add(edges);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.78));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.95));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.6);
   keyLight.position.set(3, 4, 5);
   scene.add(keyLight);
-  const rimLight = new THREE.DirectionalLight(0x8b5cf6, 0.45);
+  const rimLight = new THREE.DirectionalLight(0x8b5cf6, 0.75);
   rimLight.position.set(-2, 1, -3);
   scene.add(rimLight);
 

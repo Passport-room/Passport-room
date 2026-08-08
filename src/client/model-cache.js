@@ -106,29 +106,76 @@ export async function getModelBytes(key, url, onProgress) {
     return bytes;
   }
 
-  const res = await fetch(url);
-  if (!res.ok || !res.body) throw new Error(`Model download failed (${res.status})`);
-  const total = Number(res.headers.get("content-length")) || 0;
-  const reader = res.body.getReader();
-  const chunks = [];
-  let loaded = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    onProgress && onProgress({ stage: "download", loaded, total, cached: false });
-  }
-  const bytes = new Uint8Array(loaded);
-  let offset = 0;
-  for (const c of chunks) {
-    bytes.set(c, offset);
-    offset += c.length;
-  }
+  const bytes = await downloadWithRetry(url, onProgress);
   memoryCache.set(key, bytes);
   idbPut(key, bytes);
   return bytes;
 }
+
+const NETWORK_MESSAGE =
+  "Couldn't download the AI model. Check your internet connection (or disable a VPN / data saver) and try again — it only downloads once.";
+
+/**
+ * Downloads model bytes with progress, retrying transient mobile network drops.
+ * Falls back to a buffered (non-streaming) read when the browser refuses to
+ * expose a readable body, which some mobile Chrome data-saver setups do.
+ */
+async function downloadWithRetry(url, onProgress, attempts = 3) {
+  let lastError = null;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      const res = await fetch(url, {
+        mode: "cors",
+        credentials: "omit",
+        redirect: "follow",
+        cache: "default",
+      });
+      if (!res.ok) throw new Error(`Model download failed (HTTP ${res.status})`);
+
+      const total = Number(res.headers.get("content-length")) || 0;
+
+      if (!res.body || typeof res.body.getReader !== "function") {
+        const buf = await res.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        onProgress &&
+          onProgress({ stage: "download", loaded: bytes.length, total: bytes.length, cached: false });
+        return bytes;
+      }
+
+      const reader = res.body.getReader();
+      const chunks = [];
+      let loaded = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        onProgress && onProgress({ stage: "download", loaded, total, cached: false });
+      }
+      if (total && loaded < total) throw new Error("Model download was interrupted.");
+
+      const bytes = new Uint8Array(loaded);
+      let offset = 0;
+      for (const c of chunks) {
+        bytes.set(c, offset);
+        offset += c.length;
+      }
+      return bytes;
+    } catch (err) {
+      lastError = err;
+      // "Failed to fetch" / TypeError == network, CORS or connection drop.
+      const isNetwork = err instanceof TypeError || /failed to fetch|interrupted|network/i.test(err?.message || "");
+      if (!isNetwork || attempt === attempts - 1) break;
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
+  }
+  const isNetwork =
+    lastError instanceof TypeError ||
+    /failed to fetch|interrupted|network|load failed/i.test(lastError?.message || "");
+  throw new Error(isNetwork ? NETWORK_MESSAGE : lastError?.message || NETWORK_MESSAGE);
+}
+
+
 
 /** Creates an onnxruntime-web session, preferring WebGPU and falling back to WASM. */
 export async function createSession(bytes) {

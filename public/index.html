@@ -49,7 +49,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=833f10752e" />
+    <link rel="stylesheet" href="style.css?v=ba20bfaffc" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -388,9 +388,6 @@
                data-ad-slot="7440735228"
                data-ad-format="auto"
                data-full-width-responsive="true"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
         </aside>
 
         <aside class="cubit-side-ad cubit-side-ad-right" aria-label="Advertisement">
@@ -401,9 +398,6 @@
                data-ad-slot="7440735228"
                data-ad-format="auto"
                data-full-width-responsive="true"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
         </aside>
 
         <div class="loader">
@@ -412,6 +406,17 @@
         </div>
         <div id="procTitle" class="procTitle">Warming up the AI…</div>
         <div id="procSub" class="procSub">Preparing your photo studio.</div>
+
+        <!-- Mobile/tablet ad below the loading animation (side rails are desktop-only). -->
+        <aside class="cubit-proc-ad" aria-label="Advertisement">
+          <div class="cubit-ad-label">Advertisement</div>
+          <ins class="adsbygoogle"
+               style="display:block;width:100%;min-height:250px"
+               data-ad-client="ca-pub-9159038506014039"
+               data-ad-slot="7440735228"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </aside>
       </section>
 
       <section id="resultView" class="view hidden">
@@ -963,9 +968,6 @@
        data-ad-slot="8446429209"
        data-ad-format="auto"
        data-full-width-responsive="true"></ins>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
 </div>
 
           <p class="modalSub muted small">Check your device's downloads folder for the file.</p>
@@ -1000,9 +1002,6 @@
               data-ad-format="auto"
               data-full-width-responsive="true"
             ></ins>
-            <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
           </div>
 
           <p class="modalSub muted small">A new tab is opened for printing your sheet.</p>
@@ -2114,7 +2113,10 @@
 
           <div class="aboutDemoBox">
             <img
-              src="assets/how-it-works.png"
+              src="assets/how-it-works.jpg"
+              loading="lazy"
+              width="1280"
+              height="720"
               alt="Before vs After Demonstration"
               class="aboutDemoImg"
             />
@@ -2341,6 +2343,38 @@
         if (yr) yr.textContent = new Date().getFullYear();
       })();
     </script>
-    <script type="module" src="assets/app.min.js?v=f31913fd24"></script>
+    <script>
+      /* Mount AdSense slots only once their container is actually visible and has
+         a non-zero width. Pushing a slot inside a hidden view or modal is what
+         produced "adsbygoogle.push() error: No slot size for availableWidth=0". */
+      (function () {
+        const mount = (el) => {
+          if (el.dataset.crMounted === "1") return;
+          if (!el.isConnected || el.clientWidth < 20) return;
+          el.dataset.crMounted = "1";
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {
+            el.dataset.crMounted = "";
+          }
+        };
+        const sweep = () => document.querySelectorAll("ins.adsbygoogle").forEach(mount);
+        const start = () => {
+          sweep();
+          if (typeof ResizeObserver !== "undefined") {
+            const ro = new ResizeObserver((entries) => {
+              for (const e of entries) mount(e.target);
+            });
+            document.querySelectorAll("ins.adsbygoogle").forEach((el) => ro.observe(el));
+          }
+          window.addEventListener("resize", sweep, { passive: true });
+          document.addEventListener("click", () => setTimeout(sweep, 250), true);
+        };
+        if (document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", start);
+        else start();
+      })();
+    </script>
+    <script type="module" src="assets/app.min.js?v=b3c4f33baf"></script>
   </body>
 </html>

@@ -155,18 +155,23 @@ function setPhase(p) {
   }
 }
 
-// Crystal (only on landing, desktop/tablet only — skipped on small screens to
-// avoid loading three.js and running WebGL on low-end mobile devices.)
+// Crystal (landing hero). Rendered on phones too — the scene is tiny and the
+// renderer caps its pixel ratio — but skipped when WebGL is unavailable or the
+// device reports very little memory.
 let crystalTeardown = null;
 let crystalLoading = false;
-const CRYSTAL_MIN_WIDTH = 900;
 function crystalAllowed() {
-  const narrow = window.matchMedia(`(max-width: ${CRYSTAL_MIN_WIDTH - 1}px)`).matches;
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
   const lowMem =
-    typeof navigator !== "undefined" && navigator.deviceMemory && navigator.deviceMemory < 4;
-  return !narrow && !coarse && !lowMem;
+    typeof navigator !== "undefined" && navigator.deviceMemory && navigator.deviceMemory < 2;
+  if (lowMem) return false;
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
 }
+
 async function startCrystal() {
   if (crystalLoading || crystalTeardown) return;
   if (!crystalAllowed()) return;
