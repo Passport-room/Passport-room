@@ -1,31 +1,19 @@
-// AI Enhance — GPEN face restoration, no cloud queue, no "busy" errors.
+// AI Enhance — UI controller for the GPEN-BFR-256 face restoration pipeline.
 //
-// Uses GPEN-BFR-256 through onnxruntime-web (WebGPU with WASM fallback), the
-// same on-device strategy as background removal. The model downloads once,
-// is saved on the device under "makepics-gpen-bfr-256-v1" and is found there
-// automatically on every later visit.
+// All image work lives in face-restore.js. This file only drives the panel:
+// model download progress, the strength control, running the restore and
+// applying / reverting the result.
 
-import { enhanceFace, loadFaceModel, isFaceModelSaved } from "./face-enhance.js";
+import { restoreFace, loadFaceModel, isFaceModelSaved } from "./face-restore.js";
 import { loadFaceDetector } from "./face-detector.js";
-import { computeMask } from "./background-removal.js";
 
 const MODEL_MB = 75.8;
 
-// Natural keeps the face almost exactly as shot; Strong genuinely does more
-// work — more unsharp detail recovery and more skin smoothing — instead of
-// just blending the same restoration at a higher opacity.
-const PRESETS = {
-  // underEye is deliberately gentle: a strong lift reads as two bright dots
-  // beside the eyes. It is a subtle shadow lift, never a patch.
-  natural: { strength: 0.72, sharpen: 0.35, softSkin: 0.25, underEye: 0.3 },
-  strong: { strength: 0.95, sharpen: 0.85, softSkin: 0.6, underEye: 0.45 },
-};
-
-// Kept for backward compatibility with anything reading the old shape.
-export const STRENGTH = { natural: PRESETS.natural.strength, strong: PRESETS.strong.strength };
+// Two identity-safe levels — both restore, neither beautifies.
+const PRESETS = { natural: 0.78, strong: 1.0 };
 
 let level = "natural";
-let softSkinOverride = null; // set once the user touches the slider
+let strengthOverride = null;
 let busy = false;
 let preSnapshot = null;
 
@@ -40,12 +28,8 @@ function setStatus(msg, kind = "") {
 
 /* ---------------- model setup animation ---------------- */
 
-function setupBox() {
-  return $("enhanceSetup");
-}
-
 function showSetup(title, sub, pct) {
-  const box = setupBox();
+  const box = $("enhanceSetup");
   if (!box) return;
   box.classList.remove("hidden");
   box.classList.add("active");
@@ -55,17 +39,16 @@ function showSetup(title, sub, pct) {
   const pctEl = $("enhanceSetupPct");
   if (t) t.textContent = title;
   if (s) s.textContent = sub;
+  const known = typeof pct === "number" && isFinite(pct);
   if (bar) {
-    const known = typeof pct === "number" && isFinite(pct);
     bar.classList.toggle("indeterminate", !known);
     bar.style.width = known ? `${Math.max(2, Math.min(100, pct))}%` : "100%";
   }
-  if (pctEl)
-    pctEl.textContent = typeof pct === "number" && isFinite(pct) ? `${Math.round(pct)}%` : "";
+  if (pctEl) pctEl.textContent = known ? `${Math.round(pct)}%` : "";
 }
 
 function hideSetup(delay = 700) {
-  const box = setupBox();
+  const box = $("enhanceSetup");
   if (!box) return;
   setTimeout(() => {
     box.classList.remove("active");
@@ -80,39 +63,34 @@ function onModelProgress(p) {
       return;
     }
     const total = p.total || MODEL_MB * 1024 * 1024;
-    const pct = (p.loaded / total) * 100;
-    const mb = (p.loaded / 1048576).toFixed(1);
     showSetup(
       "Setting up the AI enhancer",
-      `Downloading the face model — ${mb} MB of ${MODEL_MB} MB. This happens only once.`,
-      pct,
+      `Downloading the face model — ${(p.loaded / 1048576).toFixed(1)} MB of ${MODEL_MB} MB. This happens only once.`,
+      (p.loaded / total) * 100,
     );
   } else if (p.stage === "compile") {
-    showSetup("Preparing the AI model", "Warming up the enhancement engine…", null);
+    showSetup("Preparing the AI model", "Warming up the restoration engine…", null);
   } else if (p.stage === "ready") {
     showSetup("AI enhancer ready", "Ready to enhance — instant from now on.", 100);
   } else if (p.stage === "detect") {
     showSetup("Finding the face", "Locating eyes, nose and mouth…", null);
   } else if (p.stage === "run") {
-    showSetup("Enhancing the face", "Restoring detail, clearing spots and blur…", null);
-  } else if (p.stage === "soften") {
-    showSetup("Softening skin", "Edge-preserving smoothing — features stay sharp…", null);
-  } else if (p.stage === "sharpen") {
-    showSetup("Adding clarity", "Sharpening the upscaled face to match your photo size…", null);
+    showSetup("Restoring the face", "Recovering real detail in eyes, skin and features…", null);
+  } else if (p.stage === "composite") {
+    showSetup("Blending", "Merging the restored face into your photo…", null);
   }
 }
 
-/* ---------------- buttons ---------------- */
+/* ---------------- controls ---------------- */
 
-function currentSoftSkin() {
-  if (softSkinOverride !== null) return softSkinOverride;
-  return PRESETS[level].softSkin;
+function currentStrength() {
+  return strengthOverride !== null ? strengthOverride : PRESETS[level];
 }
 
-function syncSoftSkinUI() {
-  const slider = $("enhanceSoftSkin");
-  const label = $("enhanceSoftSkinValue");
-  const v = currentSoftSkin();
+function syncStrengthUI() {
+  const slider = $("enhanceStrength");
+  const label = $("enhanceStrengthValue");
+  const v = currentStrength();
   if (slider) slider.value = String(Math.round(v * 100));
   if (label) label.textContent = `${Math.round(v * 100)}%`;
 }
@@ -120,8 +98,7 @@ function syncSoftSkinUI() {
 function updateBtn() {
   const btn = $("enhanceGenerate");
   if (!btn) return;
-  const ready = !busy && !!window.__tryOn?.getPersonDataUrl?.();
-  btn.disabled = !ready;
+  btn.disabled = busy || !window.__tryOn?.getPersonDataUrl?.();
   btn.textContent = busy ? "Enhancing…" : "Enhance face";
 }
 
@@ -140,23 +117,17 @@ async function loadImage(dataUrl) {
   return c;
 }
 
-/** Revert is only offered while the pre-enhance snapshot is still the photo
- *  that this enhance produced. Once another tool creates a newer image the
- *  snapshot is dropped and the button greys out. */
 function setRevertState() {
   window.__editHistory?.setRevertEnabled?.($("enhanceRevert"), !!preSnapshot);
 }
 
-/** Another feature produced a newer image — this enhance is no longer undoable. */
 function invalidateRevert() {
   preSnapshot = null;
   setRevertState();
 }
 
-/**
- * @param {string|null} baseDataUrl  When given, enhancement runs from this
- *   exact photo instead of the current (possibly already enhanced) one.
- */
+/* ---------------- run ---------------- */
+
 async function enhance(baseDataUrl = null) {
   if (busy) return;
   if (!window.__tryOn) {
@@ -174,71 +145,57 @@ async function enhance(baseDataUrl = null) {
   setStatus("Setting up the AI…");
 
   try {
-    // Keep the FIRST pre-enhance photo as the one true original, so Revert
-    // always goes back to it rather than to a previous enhanced result.
     if (!baseDataUrl) preSnapshot = personDataUrl;
     const source = await loadImage(personDataUrl);
 
     const saved = await isFaceModelSaved();
     showSetup(
       saved ? "Loading the AI model" : "Setting up the AI enhancer",
-      saved
-        ? "Already prepared — no download needed."
-        : `First run only — fetching ${MODEL_MB} MB.`,
+      saved ? "Already prepared — no download needed." : `First run only — fetching ${MODEL_MB} MB.`,
       saved ? 100 : 0,
     );
     await loadFaceModel(onModelProgress);
 
-    // Person mask (MODNet, already on-device) pinpoints the head so the
-    // enhancer touches the face and nothing else.
-    let maskCanvas = null;
-    try {
-      setStatus("Locating the face…");
-      maskCanvas = (await computeMask(source, () => {})).maskCanvas;
-    } catch {
-      maskCanvas = null;
-    }
-
-    // Small face detector (real landmarks) — also cached on this device.
+    // Landmark detector (small, cached on-device like the restorer).
     try {
       await loadFaceDetector(onModelProgress);
     } catch (err) {
-      console.warn("Face detector unavailable, using fallback detection", err);
+      console.warn("Face detector unavailable, using estimated landmarks", err);
     }
 
-    setStatus("Enhancing the face…");
-    const preset = PRESETS[level];
-    const { canvas, backend, faceFound, faceSource, upscaleRatio } = await enhanceFace(
+    setStatus("Restoring the face…");
+    const result = await restoreFace(
       source,
-      {
-        strength: preset.strength,
-        sharpen: preset.sharpen,
-        underEye: preset.underEye,
-        softSkin: currentSoftSkin(),
-        maskCanvas,
-      },
+      { strength: currentStrength() },
       onModelProgress,
     );
     hideSetup();
 
+    if (!result.restored) {
+      setStatus(
+        result.reason === "model-failed"
+          ? "The AI couldn't restore this face — try a photo where the face is clearer."
+          : "No usable face found in this photo.",
+        "err",
+      );
+      preSnapshot = baseDataUrl ? preSnapshot : null;
+      setRevertState();
+      return;
+    }
+
     setStatus("Applying the enhanced photo…");
-    // A new image is about to become the working photo: every other feature's
-    // revert snapshot is now stale and must be dropped.
     window.__editHistory?.claim?.("enhance");
-    await window.__tryOn.applyResult(canvas.toDataURL("image/png"), (m) => setStatus(m));
+    await window.__tryOn.applyResult(result.canvas.toDataURL("image/png"), (m) => setStatus(m));
 
     setRevertState();
-    const detail = [
-      `Face enhanced (${backend === "webgpu" ? "WebGPU" : "CPU"})`,
-      faceFound
-        ? faceSource === "onnx"
-          ? " — landmarks detected"
-          : " — approximate face area"
-        : " — no face detected, enhanced the centre area",
-      upscaleRatio > 1.05 ? `, sharpened for ${upscaleRatio.toFixed(1)}x upscale` : "",
-      `. ${level === "strong" ? "Strong" : "Natural"} level, soft skin ${Math.round(currentSoftSkin() * 100)}%.`,
-    ].join("");
-    setStatus(detail, "ok");
+    setStatus(
+      [
+        `Face restored (${result.backend === "webgpu" ? "WebGPU" : "CPU"})`,
+        result.landmarksExact ? " — aligned on detected landmarks" : " — approximate face area",
+        `. ${level === "strong" ? "Strong" : "Natural"} level, blend ${Math.round(result.blend * 100)}%.`,
+      ].join(""),
+      "ok",
+    );
   } catch (e) {
     hideSetup(0);
     console.error(e);
@@ -267,18 +224,15 @@ async function revert() {
   }
 }
 
-/** Called when a brand-new photo is loaded: drop every enhance result so the
- *  previous face-enhancement can never reappear on the new image. The
- *  downloaded model stays cached on the device. */
 function resetSession() {
   preSnapshot = null;
   busy = false;
-  softSkinOverride = null;
+  strengthOverride = null;
   level = "natural";
   document
     .querySelectorAll(".enhanceScaleBtn")
     .forEach((b) => b.classList.toggle("active", b.dataset.level !== "strong"));
-  syncSoftSkinUI();
+  syncStrengthUI();
   hideSetup(0);
   setStatus("");
   setRevertState();
@@ -289,29 +243,29 @@ function bind() {
   document.querySelectorAll(".enhanceScaleBtn").forEach((b) => {
     b.addEventListener("click", () => {
       level = b.dataset.level === "strong" ? "strong" : "natural";
-      softSkinOverride = null; // each level has its own default amount
+      strengthOverride = null;
       document
         .querySelectorAll(".enhanceScaleBtn")
         .forEach((x) => x.classList.toggle("active", x === b));
-      syncSoftSkinUI();
+      syncStrengthUI();
     });
   });
 
-  const soft = $("enhanceSoftSkin");
-  if (soft) {
-    soft.addEventListener("input", () => {
-      softSkinOverride = Math.max(0, Math.min(1, Number(soft.value) / 100));
-      const label = $("enhanceSoftSkinValue");
-      if (label) label.textContent = `${Math.round(softSkinOverride * 100)}%`;
+  const slider = $("enhanceStrength");
+  if (slider) {
+    slider.addEventListener("input", () => {
+      strengthOverride = Math.max(0.25, Math.min(1, Number(slider.value) / 100));
+      const label = $("enhanceStrengthValue");
+      if (label) label.textContent = `${Math.round(strengthOverride * 100)}%`;
     });
   }
-  syncSoftSkinUI();
+  syncStrengthUI();
+
   const gen = $("enhanceGenerate");
   const rev = $("enhanceRevert");
   if (gen) gen.onclick = () => enhance();
   if (rev) rev.onclick = revert;
 
-  // Tell returning visitors the model is already on their device.
   isFaceModelSaved()
     .then((saved) => {
       if (saved) setStatus("AI model ready — enhancing is instant.", "ok");

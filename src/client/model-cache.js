@@ -8,6 +8,10 @@
 //   makepics-modnet-portrait-v1   -> MODNet portrait matting (background remove)
 //   makepics-gpen-bfr-256-v1      -> GPEN-BFR-256 face restoration (AI enhance)
 //   makepics-yoloface-8n-v1       -> YOLO-Face 8n detector + 5 landmarks (face find)
+//
+// CRASH-CRITICAL FILE: read crash-guard.js before changing anything here.
+
+import { canUseWebGPU, markStart, markDone } from "./crash-guard.js";
 
 const IDB_NAME = "makepics-models";
 const IDB_STORE = "onnx";
@@ -15,9 +19,13 @@ const IDB_VERSION = 1;
 
 export const MODEL_KEYS = {
   MODNET: "makepics-modnet-portrait-v1",
+  // fp32 copy of the same matting model, used by the CPU/WASM backend because
+  // the fp16 graph is unstable there (see crash-guard.js).
+  MODNET_FP32: "makepics-modnet-portrait-fp32-v1",
   GPEN: "makepics-gpen-bfr-256-v1",
   FACE_DETECT: "makepics-yoloface-8n-v1",
 };
+
 
 // Older builds stored MODNet under this key — reuse it instead of re-downloading.
 const LEGACY_KEYS = {
@@ -175,10 +183,25 @@ async function downloadWithRetry(url, onProgress, attempts = 3) {
   throw new Error(isNetwork ? NETWORK_MESSAGE : lastError?.message || NETWORK_MESSAGE);
 }
 
+/**
+ * Frees the in-memory copy of a model's bytes once a session owns them.
+ * IndexedDB still has the model, so nothing is re-downloaded — this only stops
+ * 25-90 MB of duplicated buffers from sitting in RAM and crashing the tab.
+ * See crash-guard.js rule R5.
+ */
+export function releaseModelBytes(key) {
+  memoryCache.delete(key);
+}
 
-
-/** Creates an onnxruntime-web session, preferring WebGPU and falling back to WASM. */
-export async function createSession(bytes) {
+/**
+ * Creates an onnxruntime-web session.
+ *
+ * CRASH-CRITICAL (see crash-guard.js): WebGPU is only attempted when the crash
+ * guard allows it, session creation is bracketed by crash breadcrumbs, and the
+ * WASM fallback must always stay in place. Do not "simplify" this function.
+ */
+export async function createSession(bytes, opts = {}) {
+  const { allowWebGPU = true } = opts;
   const ort = await import("onnxruntime-web/webgpu");
   ort.env.wasm.wasmPaths = ORT_WASM_PATH;
   const hc = (typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 1;
@@ -186,24 +209,34 @@ export async function createSession(bytes) {
 
   let session = null;
   let backend = "wasm";
-  const hasWebGPU = typeof navigator !== "undefined" && "gpu" in navigator;
-  if (hasWebGPU) {
+  const useWebGPU = allowWebGPU && (await canUseWebGPU());
+  if (useWebGPU) {
+    markStart();
     try {
       session = await ort.InferenceSession.create(bytes, {
         executionProviders: ["webgpu"],
         graphOptimizationLevel: "all",
       });
       backend = "webgpu";
-    } catch {
+    } catch (err) {
+      console.warn("[model-cache] WebGPU session failed, using CPU instead:", err);
       session = null;
+    } finally {
+      markDone();
     }
   }
   if (!session) {
-    session = await ort.InferenceSession.create(bytes, {
-      executionProviders: ["wasm"],
-      graphOptimizationLevel: "all",
-    });
+    markStart();
+    try {
+      session = await ort.InferenceSession.create(bytes, {
+        executionProviders: ["wasm"],
+        graphOptimizationLevel: "all",
+      });
+    } finally {
+      markDone();
+    }
     backend = "wasm";
   }
   return { ort, session, backend };
 }
+

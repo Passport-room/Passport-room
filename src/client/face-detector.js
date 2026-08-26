@@ -12,6 +12,7 @@
 // existing callers (passport-render.js).
 
 import { MODEL_KEYS, getModelBytes, createSession, isModelSaved } from "./model-cache.js";
+import { markStart, markDone } from "./crash-guard.js";
 
 const DETECT_MODEL_URL =
   "https://huggingface.co/facefusion/models-3.0.0/resolve/main/yoloface_8n.onnx";
@@ -79,9 +80,17 @@ async function runDetector(source) {
     f[2 * area + i] = data[i * 4 + 2] / 255;
   }
   const inputName = session.inputNames[0];
-  const out = await session.run({
-    [inputName]: new ort.Tensor("float32", f, [1, 3, NET, NET]),
-  });
+  // Rule R1 (crash-guard.js): bracket every GPU/WASM run with breadcrumbs so
+  // a tab crash here is remembered instead of repeating silently.
+  let out;
+  markStart();
+  try {
+    out = await session.run({
+      [inputName]: new ort.Tensor("float32", f, [1, 3, NET, NET]),
+    });
+  } finally {
+    markDone();
+  }
   const tensor = out[session.outputNames[0]];
   const [, rows, anchors] = tensor.dims; // rows = 20
   const pred = tensor.data;

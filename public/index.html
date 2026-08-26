@@ -498,22 +498,22 @@
               <button id="enhanceRevert" class="tryOnBtn ghost" disabled aria-disabled="true">Revert</button>
             </div>
             <div class="enhanceSoftRow">
-              <label class="enhanceSoftLabel" for="enhanceSoftSkin">
-                Soft skin
-                <span id="enhanceSoftSkinValue" class="enhanceSoftValue">25%</span>
+              <label class="enhanceSoftLabel" for="enhanceStrength">
+                Restoration strength
+                <span id="enhanceStrengthValue" class="enhanceSoftValue">78%</span>
               </label>
               <input
-                id="enhanceSoftSkin"
+                id="enhanceStrength"
                 class="enhanceSoftSlider"
                 type="range"
-                min="0"
+                min="25"
                 max="100"
                 step="5"
-                value="25"
-                aria-label="Soft skin amount"
+                value="78"
+                aria-label="Restoration strength"
               />
               <span class="enhanceSoftHint"
-                >Edge-preserving — eyes, lips and brows stay sharp.</span
+                >Identity-safe — restores real detail, never reshapes your face.</span
               >
             </div>
             <div id="enhanceSetup" class="enhanceSetup hidden">
@@ -534,8 +534,8 @@
               </div>
             </div>
             <div class="tryOnHint">
-              Clears blur, noise and dark under-eye spots on the face only — your real features and
-              skin tone stay intact. The AI model is prepared once, then every later enhance is
+              Restores real detail in the face only — eyes, skin texture, glasses and your
+              actual features stay exactly yours. The AI model is prepared once, then every later enhance is
               instant.
             </div>
             <div id="enhanceStatus" class="tryOnStatus"></div>
@@ -2375,6 +2375,6 @@
         else start();
       })();
     </script>
-    <script type="module" src="assets/app.min.js?v=b3c4f33baf"></script>
+    <script type="module" src="assets/app.min.js?v=220d6324fa"></script>
   </body>
 </html>
