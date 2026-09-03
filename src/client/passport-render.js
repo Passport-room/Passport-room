@@ -1,6 +1,7 @@
 // Compositing pipeline: source + soft mask -> framed passport photo + print sheet.
 import { specPixels } from "./passport-specs.js";
 import { detectFaceInCanvas } from "./face-detector.js";
+import { trackPhotoCreated } from "./tracking.js";
 
 export const DEFAULT_ADJUST = { zoom: 0.8, offsetX: 0, offsetY: 0 };
 
@@ -184,6 +185,12 @@ export function canvasToBlob(canvas, type, quality) {
 }
 
 export function downloadBlob(blob, filename) {
+  // Single tracking hook for every successful photo/sheet export.
+  try {
+    trackPhotoCreated();
+  } catch {
+    /* tracking must never break a download */
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
