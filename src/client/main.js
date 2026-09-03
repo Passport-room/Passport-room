@@ -4,3 +4,4 @@ import "./app.js";
 import "./print-editor.js";
 import "./dress-tryon.js";
 import "./enhance.js";
+import "./tracking.js";
