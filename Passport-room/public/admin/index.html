@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin Panel — Passport Room</title>
+    <link rel="icon" href="/favicon.ico" />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --card: #141b32;
+        --line: #232e4f;
+        --fg: #eef2ff;
+        --mut: #93a1c4;
+        --acc: #4f8dff;
+        --on: #22c55e;
+        --off: #64748b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 64px; }
+      header {
+        display: flex; flex-wrap: wrap; gap: 12px;
+        align-items: center; justify-content: space-between; margin-bottom: 20px;
+      }
+      h1 { font-size: 20px; margin: 0; }
+      .who { color: var(--mut); font-size: 13px; }
+      button {
+        background: var(--acc); color: #fff; border: 0; border-radius: 10px;
+        padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
+      }
+      button.ghost { background: transparent; border: 1px solid var(--line); color: var(--fg); }
+      button:disabled { opacity: .6; }
+      .stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+      .stat span { display: block; color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+      .stat strong { font-size: 30px; font-weight: 700; }
+      .live { color: var(--on); }
+      .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin-top: 22px; overflow: hidden; }
+      .panel-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+      input[type="search"], input[type="email"], input[type="password"] {
+        background: #0d1striped; background: #0d132a; border: 1px solid var(--line); color: var(--fg);
+        border-radius: 10px; padding: 10px 12px; font-size: 14px; width: 100%;
+      }
+      .panel-head input { max-width: 260px; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+      th { color: var(--mut); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+      td.empty { text-align: center; color: var(--mut); }
+      .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+      .dot.on { background: var(--on); box-shadow: 0 0 0 4px rgba(34,197,94,.18); }
+      .dot.off { background: var(--off); }
+      .scroll { overflow-x: auto; }
+      .err { background: #3b1220; border: 1px solid #7f1d1d; color: #fecaca; padding: 10px 12px; border-radius: 10px; margin-top: 12px; font-size: 13px; }
+      .login { max-width: 380px; margin: 12vh auto; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+      .login h1 { margin-bottom: 4px; }
+      .login p { color: var(--mut); font-size: 13px; margin-top: 0; }
+      .login label { display: block; font-size: 13px; color: var(--mut); margin: 14px 0 6px; }
+      .login button { width: 100%; margin-top: 18px; }
+      @media (max-width: 720px) {
+        thead { display: none; }
+        tr { display: block; border-bottom: 1px solid var(--line); padding: 8px 0; }
+        td { display: flex; justify-content: space-between; gap: 16px; border: 0; padding: 6px 16px; white-space: normal; }
+        td::before { content: attr(data-label); color: var(--mut); font-size: 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <section id="login-view" hidden>
+      <div class="login">
+        <h1>Admin Panel</h1>
+        <p>Passport Room — staff access only.</p>
+        <form id="login-form">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required />
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required />
+          <button id="login-btn" type="submit">Sign in</button>
+          <div class="err" id="login-error" hidden></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="panel-view" hidden>
+      <div class="wrap">
+        <header>
+          <div>
+            <h1>Customer Analytics <span class="live">● live</span></h1>
+            <div class="who">Signed in as <span id="admin-email"></span></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="/index.html"><button class="ghost" type="button">Back to site</button></a>
+            <button class="ghost" id="logout" type="button">Sign out</button>
+          </div>
+        </header>
+
+        <div class="stats">
+          <div class="stat"><span>Lifetime customers</span><strong id="stat-lifetime">0</strong></div>
+          <div class="stat"><span>Online now</span><strong id="stat-online" class="live">0</strong></div>
+          <div class="stat"><span>Today's visitors</span><strong id="stat-today">0</strong></div>
+          <div class="stat"><span>Mobile</span><strong id="stat-mobile">0</strong></div>
+          <div class="stat"><span>Desktop</span><strong id="stat-desktop">0</strong></div>
+        </div>
+
+        <div class="err" id="live-error" hidden></div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <strong id="row-count">0 customers</strong>
+            <input id="search" type="search" placeholder="Search id, device, OS, browser…" />
+          </div>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th><th>Customer ID</th><th>Device</th><th>OS</th>
+                  <th>Browser</th><th>Visits</th><th>First visit</th><th>Last visit</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="/assets/admin.min.js?v=6925c49a46"></script>
+  </body>
+</html>
