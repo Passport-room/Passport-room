@@ -1,28 +1,21 @@
-// Anonymous customer tracking + true real-time presence.
-// Single source of truth: Firebase Realtime Database (project passport-48389).
+// Anonymous visitor tracking (Lovable Cloud).
 //
-// Customers never log in. Each browser gets a persistent sequential id
-// (CUS-000001, CUS-000002, ...) allocated with a Realtime Database
-// transaction, stored in localStorage. Only device metadata and timestamps
-// are collected — no name, phone, email or location.
-import { db } from "./firebase.js";
-import {
-  ref,
-  get,
-  set,
-  update,
-  onValue,
-  onDisconnect,
-  runTransaction,
-  serverTimestamp,
-} from "firebase/database";
+// A random id is stored in localStorage the first time the studio is opened and
+// never changes. The server assigns a permanent customer number for that id and
+// always returns the same one, so a returning visitor is never counted as new.
+//
+// Nothing is written from the browser directly: the page only posts to our own
+// /api/public/track endpoint, which does the database work. That means the
+// number cannot be edited by the visitor and no one can read other people's data.
+//
+// Collected: device type, browser, OS, screen size, visit count, time on page.
+// Never collected: name, email, phone, location or photos.
 
-const ID_KEY = "pr_customer_id";
-const LEGACY_ID_KEY = "pr_device_id";
-const VISIT_KEY = "pr_last_visit_at";
-const VISIT_WINDOW_MS = 30 * 60 * 1000;
+const ID_KEY = "pr_device_id";
+const CODE_KEY = "pr_customer_code";
+const ENDPOINT = "/api/public/track";
 
-function safeStorage(fn, fallback = null) {
+function safe(fn, fallback = null) {
   try {
     return fn();
   } catch {
@@ -30,15 +23,27 @@ function safeStorage(fn, fallback = null) {
   }
 }
 
-function pad(n) {
-  return "CUS-" + String(n).padStart(6, "0");
+export function getDeviceId() {
+  let id = safe(() => localStorage.getItem(ID_KEY));
+  if (!id) {
+    id =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : "dev_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+    safe(() => localStorage.setItem(ID_KEY, id));
+  }
+  return id;
+}
+
+/** The permanent number, once the server has told us what it is. */
+export function getCustomerCode() {
+  return safe(() => localStorage.getItem(CODE_KEY));
 }
 
 function detect() {
   const ua = navigator.userAgent || "";
   const isTablet = /iPad|Tablet/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua));
   const isMobile = /Android|iPhone|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
-  const deviceType = isTablet ? "tablet" : isMobile ? "mobile" : "desktop";
 
   let browser = "Other";
   if (/Edg\//i.test(ua)) browser = "Edge";
@@ -53,125 +58,76 @@ function detect() {
   else if (/Android/i.test(ua)) os = "Android";
   else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
   else if (/Mac OS X/i.test(ua)) os = "macOS";
-  else if (/CrOS/i.test(ua)) os = "ChromeOS";
   else if (/Linux/i.test(ua)) os = "Linux";
 
-  return { deviceType, browser, os, userAgent: ua.slice(0, 400) };
-}
-
-function warn(step, error) {
-  console.warn(`[tracking] ${step} failed:`, error?.message || error);
-  if (typeof window !== "undefined") window.__prTrackingLastError = { step, error };
-}
-
-/** Allocates the next sequential customer id via an atomic transaction. */
-async function allocateCustomerId() {
-  const result = await runTransaction(ref(db, "counters/customerSeq"), (current) =>
-    (typeof current === "number" ? current : 0) + 1,
-  );
-  const next = result.snapshot.val();
-  return pad(typeof next === "number" && next > 0 ? next : Date.now() % 1000000);
-}
-
-async function getOrCreateCustomerId() {
-  let id = safeStorage(() => localStorage.getItem(ID_KEY));
-  if (id && /^CUS-\d{6}$/.test(id)) return id;
-  id = await allocateCustomerId();
-  safeStorage(() => localStorage.setItem(ID_KEY, id));
-  safeStorage(() => localStorage.removeItem(LEGACY_ID_KEY));
-  return id;
-}
-
-let currentId = null;
-
-/** Registers the visit and wires real-time presence with onDisconnect(). */
-async function start() {
-  const customerId = await getOrCreateCustomerId();
-  currentId = customerId;
-  const info = detect();
-  const customerRef = ref(db, `customers/${customerId}`);
-
-  const last = Number(safeStorage(() => localStorage.getItem(VISIT_KEY)) || 0);
-  const isNewVisit = Date.now() - last > VISIT_WINDOW_MS;
-  if (isNewVisit) safeStorage(() => localStorage.setItem(VISIT_KEY, String(Date.now())));
-
-  const snap = await get(customerRef);
-  if (!snap.exists()) {
-    await set(customerRef, {
-      id: customerId,
-      firstVisit: serverTimestamp(),
-      lastVisit: serverTimestamp(),
-      visitCount: 1,
-      deviceType: info.deviceType,
-      os: info.os,
-      browser: info.browser,
-      userAgent: info.userAgent,
-    });
-  } else {
-    const patch = {
-      lastVisit: serverTimestamp(),
-      deviceType: info.deviceType,
-      os: info.os,
-      browser: info.browser,
-      userAgent: info.userAgent,
-    };
-    if (isNewVisit) patch.visitCount = (Number(snap.val().visitCount) || 0) + 1;
-    await update(customerRef, patch);
-  }
-
-  // ---- True real-time presence -------------------------------------------
-  const statusRef = ref(db, `status/${customerId}`);
-  onValue(ref(db, ".info/connected"), (s) => {
-    if (s.val() !== true) return;
-    onDisconnect(statusRef)
-      .set({ online: false, lastChanged: serverTimestamp(), deviceType: info.deviceType })
-      .then(() =>
-        set(statusRef, {
-          online: true,
-          lastChanged: serverTimestamp(),
-          deviceType: info.deviceType,
-        }),
-      )
-      .catch((e) => warn("presence", e));
-  });
-
-  // Best-effort offline flag for mobile tab switching / page unload.
-  const goOffline = () => {
-    if (document.visibilityState === "hidden") {
-      void set(statusRef, {
-        online: false,
-        lastChanged: serverTimestamp(),
-        deviceType: info.deviceType,
-      }).catch(() => {});
-    } else {
-      void set(statusRef, {
-        online: true,
-        lastChanged: serverTimestamp(),
-        deviceType: info.deviceType,
-      }).catch(() => {});
-    }
+  return {
+    device_type: isTablet ? "tablet" : isMobile ? "mobile" : "desktop",
+    browser,
+    os,
+    screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
   };
-  document.addEventListener("visibilitychange", goOffline);
-
-  return customerId;
 }
 
-export function getCustomerId() {
-  return currentId || safeStorage(() => localStorage.getItem(ID_KEY));
+function paintCode(code) {
+  if (!code) return;
+  safe(() => localStorage.setItem(CODE_KEY, code));
+  document.querySelectorAll("[data-customer-code]").forEach((el) => {
+    el.textContent = code;
+  });
 }
 
-/** Called from the shared download helper. Counts exported photos. */
-export function trackPhotoCreated() {
-  const id = getCustomerId();
-  if (!id) return;
-  runTransaction(ref(db, `customers/${id}/photosCreated`), (c) =>
-    (typeof c === "number" ? c : 0) + 1,
-  ).catch((e) => warn("photo count", e));
+async function send(event, durationMs = 0, keepalive = false) {
+  const body = JSON.stringify({
+    device_id: getDeviceId(),
+    ...detect(),
+    event,
+    duration_ms: Math.round(durationMs),
+  });
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body,
+      keepalive,
+    });
+    const data = await res.json().catch(() => null);
+    if (data?.customer_code) paintCode(data.customer_code);
+    return data;
+  } catch (err) {
+    console.warn("[tracking] failed:", err?.message || err);
+    return null;
+  }
+}
+
+let startedAt = Date.now();
+let reported = false;
+
+function reportTime() {
+  if (reported) return;
+  const spent = Date.now() - startedAt;
+  if (spent < 2000) return;
+  reported = true;
+  void send("time", spent, true);
 }
 
 if (typeof window !== "undefined") {
-  window.__prTracking = { getCustomerId, trackPhotoCreated };
-  start()
-    .then((id) => console.info("[tracking] active as", id))
-    .catch((e) => warn("start", e));
+  paintCode(getCustomerCode());
+  void send("visit");
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") reportTime();
+    else if (reported) {
+      startedAt = Date.now();
+      reported = false;
+    }
+  });
+  window.addEventListener("pagehide", reportTime);
+
+  window.__prTracking = { getDeviceId, getCustomerCode, send };
 }
+
+/**
+ * Kept for the download helper. Photo creation is a local-only statistic now —
+ * the cloud only stores visits, time spent, browser and device.
+ */
+export function trackPhotoCreated() {}

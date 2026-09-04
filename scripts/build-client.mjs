@@ -1,5 +1,4 @@
-// Bundles src/client/main.js into public/assets/app.min.js and the admin panel
-// into public/assets/admin.min.js.
+// Bundles src/client/main.js into public/assets/app.min.js.
 // "three" and "onnxruntime-web/webgpu" stay external so the browser's
 // importmap (in public/index.html) resolves them from the CDN at runtime.
 import { build } from "esbuild";
@@ -12,7 +11,7 @@ const outdir = resolve(root, "public/assets");
 
 mkdirSync(outdir, { recursive: true });
 // Clean previous outputs (main bundle + any split chunks).
-for (const f of ["app.min.js", "admin.min.js"]) {
+for (const f of ["app.min.js"]) {
   const p = resolve(outdir, f);
   if (existsSync(p)) rmSync(p, { force: true });
 }
@@ -30,26 +29,11 @@ await build({
   sourcemap: false,
   legalComments: "none",
   treeShaking: true,
-  external: ["three", "onnxruntime-web/webgpu"],
+  external: ["three", "onnxruntime-web/webgpu", "@supabase/supabase-js"],
   logLevel: "info",
 });
 
-await build({
-  entryPoints: [resolve(root, "src/client/admin.js")],
-  outdir,
-  entryNames: "admin.min",
-  bundle: true,
-  format: "esm",
-  target: "es2020",
-  minify: true,
-  splitting: false,
-  sourcemap: false,
-  legalComments: "none",
-  treeShaking: true,
-  logLevel: "info",
-});
-
-console.log("[build-client] bundled -> public/assets/app.min.js + admin.min.js");
+console.log("[build-client] bundled -> public/assets/app.min.js");
 
 /* Cache-busting: stamp the bundle and stylesheet URLs in public/index.html with
    a content hash so previews and published sites never serve a stale build. */
@@ -69,16 +53,5 @@ if (cssHash) {
   html = html.replace(/href="style\.css(?:\?v=[^"]*)?"/g, `href="style.css?v=${cssHash}"`);
 }
 writeFileSync(htmlPath, html);
-
-const adminHtmlPath = resolve(root, "public/admin/index.html");
-if (existsSync(adminHtmlPath)) {
-  const adminHash = hashOf(resolve(outdir, "admin.min.js"));
-  let adminHtml = readFileSync(adminHtmlPath, "utf8");
-  adminHtml = adminHtml.replace(
-    /src="\/assets\/admin\.min\.js(?:\?v=[^"]*)?"/g,
-    `src="/assets/admin.min.js?v=${adminHash}"`,
-  );
-  writeFileSync(adminHtmlPath, adminHtml);
-}
 
 console.log(`[build-client] cache-busted index.html (app=${appHash}, css=${cssHash})`);
