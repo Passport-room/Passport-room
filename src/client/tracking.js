@@ -1,19 +1,20 @@
 // Anonymous visitor tracking (Lovable Cloud).
 //
 // A random id is stored in localStorage the first time the studio is opened and
-// never changes. The server assigns a permanent customer number for that id and
+// never changes. The cloud assigns a permanent customer number for that id and
 // always returns the same one, so a returning visitor is never counted as new.
 //
-// Nothing is written from the browser directly: the page only posts to our own
-// /api/public/track endpoint, which does the database work. That means the
-// number cannot be edited by the visitor and no one can read other people's data.
+// The page talks to the cloud directly through a protected database routine
+// (`track_visit`). Nothing here depends on the hosting provider, so the same
+// files work on Lovable, GitHub + Vercel, Netlify or any static host.
 //
 // Collected: device type, browser, OS, screen size, visit count, time on page.
 // Never collected: name, email, phone, location or photos.
 
+import { callCloud } from "./cloud-config.js";
+
 const ID_KEY = "pr_device_id";
 const CODE_KEY = "pr_customer_code";
-const ENDPOINT = "/api/public/track";
 
 function safe(fn, fallback = null) {
   try {
@@ -35,7 +36,7 @@ export function getDeviceId() {
   return id;
 }
 
-/** The permanent number, once the server has told us what it is. */
+/** The permanent number, once the cloud has told us what it is. */
 export function getCustomerCode() {
   return safe(() => localStorage.getItem(CODE_KEY));
 }
@@ -77,22 +78,24 @@ function paintCode(code) {
 }
 
 async function send(event, durationMs = 0, keepalive = false) {
-  const body = JSON.stringify({
-    device_id: getDeviceId(),
-    ...detect(),
-    event,
-    duration_ms: Math.round(durationMs),
-  });
+  const info = detect();
   try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body,
-      keepalive,
-    });
-    const data = await res.json().catch(() => null);
-    if (data?.customer_code) paintCode(data.customer_code);
-    return data;
+    const rows = await callCloud(
+      "track_visit",
+      {
+        p_device_id: getDeviceId(),
+        p_device_type: info.device_type,
+        p_browser: info.browser,
+        p_os: info.os,
+        p_screen: info.screen,
+        p_event: event,
+        p_duration_ms: Math.round(durationMs),
+      },
+      { keepalive },
+    );
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    if (row?.customer_code) paintCode(row.customer_code);
+    return row ?? null;
   } catch (err) {
     console.warn("[tracking] failed:", err?.message || err);
     return null;

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getAdminStats, type AdminResult } from "@/lib/admin.functions";
+import { loadVisitors, type VisitorRow } from "@/lib/cloud";
 
 const TITLE = "Passport Room Admin — Visitor Numbers & Usage";
 const DESCRIPTION =
@@ -31,22 +30,32 @@ function fmtTime(ms: number) {
 }
 
 function Admin() {
-  const load = useServerFn(getAdminStats);
   const [password, setPassword] = useState("");
-  const [state, setState] = useState<AdminResult | null>(null);
+  const [visitors, setVisitors] = useState<VisitorRow[] | null>(null);
+  const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    setError(false);
     try {
-      setState(await load({ data: { password } }));
+      setVisitors(await loadVisitors(password));
+    } catch {
+      setError(true);
+      setVisitors(null);
     } finally {
       setBusy(false);
     }
   }
 
-  if (!state?.ok) {
+  const totals = {
+    users: visitors?.length ?? 0,
+    visits: visitors?.reduce((s, v) => s + v.visit_count, 0) ?? 0,
+    ms: visitors?.reduce((s, v) => s + v.total_ms, 0) ?? 0,
+  };
+
+  if (!visitors) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-4">
         <form
@@ -65,7 +74,7 @@ function Admin() {
             autoComplete="current-password"
             className="mt-4 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
           />
-          {state && !state.ok && (
+          {error && (
             <p className="mt-2 text-sm text-destructive">Wrong secret. Try again.</p>
           )}
           <button
@@ -86,9 +95,9 @@ function Admin() {
         <h1 className="text-2xl font-semibold text-foreground">Visitor tracking</h1>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
-            ["Unique users", String(state.totalVisitors)],
-            ["Home visits", String(state.totalVisits)],
-            ["Total time", fmtTime(state.totalMs)],
+            ["Unique users", String(totals.users)],
+            ["Home visits", String(totals.visits)],
+            ["Total time", fmtTime(totals.ms)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl border border-border bg-card p-4">
               <div className="text-2xl font-semibold text-card-foreground">{value}</div>
@@ -109,7 +118,7 @@ function Admin() {
               </tr>
             </thead>
             <tbody>
-              {state.visitors.map((v) => (
+              {visitors.map((v) => (
                 <tr key={v.customer_code} className="border-t border-border text-card-foreground">
                   <td className="whitespace-nowrap px-3 py-2 font-mono">{v.customer_code}</td>
                   <td className="px-3 py-2">{v.visit_count}</td>
@@ -122,7 +131,7 @@ function Admin() {
                   </td>
                 </tr>
               ))}
-              {state.visitors.length === 0 && (
+              {visitors.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-3 py-6 text-center text-muted-foreground">
                     No visitors recorded yet.
