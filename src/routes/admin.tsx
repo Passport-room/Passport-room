@@ -33,17 +33,27 @@ function Admin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visitors, setVisitors] = useState<VisitorRow[] | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const FRIENDLY: Record<string, string> = {
+    EMAIL_NOT_FOUND: "No admin account exists with that email yet — create it in Firebase Authentication → Users.",
+    INVALID_PASSWORD: "Wrong password.",
+    INVALID_LOGIN_CREDENTIALS: "Wrong email or password.",
+    OPERATION_NOT_ALLOWED: "Email/Password sign-in isn't enabled yet — turn it on in Firebase Authentication → Sign-in method.",
+    USER_DISABLED: "This admin account has been disabled in Firebase Authentication.",
+    TOO_MANY_ATTEMPTS_TRY_LATER: "Too many attempts — wait a few minutes and try again.",
+  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setError(false);
+    setError(null);
     try {
       setVisitors(await loadVisitors(email, password));
-    } catch {
-      setError(true);
+    } catch (err) {
+      const raw = err instanceof Error ? err.message : String(err);
+      setError(FRIENDLY[raw] || raw);
       setVisitors(null);
     } finally {
       setBusy(false);
@@ -84,7 +94,7 @@ function Admin() {
             autoComplete="current-password"
             className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
           />
-          {error && <p className="mt-2 text-sm text-destructive">Wrong email or password. Try again.</p>}
+          {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
           <button
             type="submit"
             disabled={busy || !email || !password}

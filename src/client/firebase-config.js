@@ -61,13 +61,20 @@ function shape(data) {
 let session = typeof window !== "undefined" ? loadSession() : null;
 let pending = null;
 
+async function firebaseErrorMessage(res, fallback) {
+  const body = await res.json().catch(() => null);
+  return body?.error?.message || fallback;
+}
+
 async function signInAnonymously() {
   const res = await fetch(`${IDENTITY}/accounts:signUp?key=${FIREBASE_CONFIG.apiKey}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ returnSecureToken: true }),
   });
-  if (!res.ok) throw new Error(`anonymous sign-in failed (${res.status})`);
+  if (!res.ok) {
+    throw new Error(await firebaseErrorMessage(res, `anonymous sign-in failed (${res.status})`));
+  }
   return saveSession(shape(await res.json()));
 }
 
@@ -77,7 +84,9 @@ async function refreshSession(refreshToken) {
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken }),
   });
-  if (!res.ok) throw new Error(`token refresh failed (${res.status})`);
+  if (!res.ok) {
+    throw new Error(await firebaseErrorMessage(res, `token refresh failed (${res.status})`));
+  }
   return saveSession(shape(await res.json()));
 }
 

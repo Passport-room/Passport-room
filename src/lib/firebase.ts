@@ -33,9 +33,12 @@ export async function signInAdmin(email: string, password: string): Promise<stri
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ email, password, returnSecureToken: true }),
   });
-  if (!res.ok) throw new Error("unauthorized");
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+    throw new Error(body?.error?.message || `sign-in failed (${res.status})`);
+  }
   const data = (await res.json()) as { idToken?: string };
-  if (!data.idToken) throw new Error("unauthorized");
+  if (!data.idToken) throw new Error("sign-in failed (no token returned)");
   return data.idToken;
 }
 
@@ -45,7 +48,13 @@ export async function loadVisitors(email: string, password: string): Promise<Vis
   const res = await fetch(
     `${DB_URL}/customers.json?auth=${encodeURIComponent(idToken)}&orderBy=%22lastVisit%22`,
   );
-  if (!res.ok) throw new Error("unauthorized");
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(
+      body?.error ||
+        `Signed in, but the database rejected the read (${res.status}). Check that the database rules were published and that the admin email in the rules matches exactly.`,
+    );
+  }
   const data = (await res.json()) as Record<string, RawVisitor> | null;
   if (!data) return [];
   return Object.entries(data)
