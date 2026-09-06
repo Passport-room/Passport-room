@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { loadVisitors, type VisitorRow } from "@/lib/cloud";
+import { loadVisitors, type VisitorRow } from "@/lib/firebase";
 
 const TITLE = "Passport Room Admin — Visitor Numbers & Usage";
 const DESCRIPTION =
-  "Password-protected admin panel showing every visitor's permanent customer number, visit count, total time spent, browser and device.";
+  "Password-protected admin panel showing every visitor's permanent customer number, visits, total time spent, photos made, country, browser and device.";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -51,8 +51,9 @@ function Admin() {
 
   const totals = {
     users: visitors?.length ?? 0,
-    visits: visitors?.reduce((s, v) => s + v.visit_count, 0) ?? 0,
-    ms: visitors?.reduce((s, v) => s + v.total_ms, 0) ?? 0,
+    visits: visitors?.reduce((s, v) => s + v.visitCount, 0) ?? 0,
+    photos: visitors?.reduce((s, v) => s + v.photoCount, 0) ?? 0,
+    ms: visitors?.reduce((s, v) => s + v.totalMs, 0) ?? 0,
   };
 
   if (!visitors) {
@@ -74,9 +75,7 @@ function Admin() {
             autoComplete="current-password"
             className="mt-4 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
           />
-          {error && (
-            <p className="mt-2 text-sm text-destructive">Wrong secret. Try again.</p>
-          )}
+          {error && <p className="mt-2 text-sm text-destructive">Wrong secret. Try again.</p>}
           <button
             type="submit"
             disabled={busy || !password}
@@ -91,12 +90,13 @@ function Admin() {
 
   return (
     <main className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-6xl">
         <h1 className="text-2xl font-semibold text-foreground">Visitor tracking</h1>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             ["Unique users", String(totals.users)],
             ["Home visits", String(totals.visits)],
+            ["Photos made", String(totals.photos)],
             ["Total time", fmtTime(totals.ms)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-xl border border-border bg-card p-4">
@@ -110,7 +110,17 @@ function Admin() {
           <table className="w-full text-left text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                {["Number", "Visits", "Time spent", "Browser", "Device", "OS", "Last seen"].map((h) => (
+                {[
+                  "Number",
+                  "Country",
+                  "Visits",
+                  "Photos",
+                  "Time spent",
+                  "Browser",
+                  "Device",
+                  "OS",
+                  "Last seen",
+                ].map((h) => (
                   <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">
                     {h}
                   </th>
@@ -119,21 +129,23 @@ function Admin() {
             </thead>
             <tbody>
               {visitors.map((v) => (
-                <tr key={v.customer_code} className="border-t border-border text-card-foreground">
-                  <td className="whitespace-nowrap px-3 py-2 font-mono">{v.customer_code}</td>
-                  <td className="px-3 py-2">{v.visit_count}</td>
-                  <td className="whitespace-nowrap px-3 py-2">{fmtTime(v.total_ms)}</td>
+                <tr key={v.id} className="border-t border-border text-card-foreground">
+                  <td className="whitespace-nowrap px-3 py-2 font-mono">{v.id}</td>
+                  <td className="whitespace-nowrap px-3 py-2">{v.country ?? "—"}</td>
+                  <td className="px-3 py-2">{v.visitCount}</td>
+                  <td className="px-3 py-2">{v.photoCount}</td>
+                  <td className="whitespace-nowrap px-3 py-2">{fmtTime(v.totalMs)}</td>
                   <td className="px-3 py-2">{v.browser ?? "—"}</td>
-                  <td className="px-3 py-2">{v.device_type ?? "—"}</td>
+                  <td className="px-3 py-2">{v.deviceType ?? "—"}</td>
                   <td className="px-3 py-2">{v.os ?? "—"}</td>
                   <td className="whitespace-nowrap px-3 py-2 text-muted-foreground">
-                    {new Date(v.last_seen_at).toLocaleString()}
+                    {v.lastVisit ? new Date(v.lastVisit).toLocaleString() : "—"}
                   </td>
                 </tr>
               ))}
               {visitors.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-3 py-6 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-3 py-6 text-center text-muted-foreground">
                     No visitors recorded yet.
                   </td>
                 </tr>

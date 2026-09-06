@@ -19,7 +19,10 @@ sheet. Processing happens on the user's own device.
 ## Privacy summary
 
 Photos are processed locally in the browser and are never transmitted to
-Passport Room or to any third party. The app has no photo upload endpoint. The only
+Passport Room or to any third party. Anonymous usage statistics (a permanent
+visitor number, device type, browser, operating system, screen size, country,
+visit count, time spent and number of photos made) are stored in a Firebase
+Realtime Database; they contain no name, email, phone or photo data. The app has no photo upload endpoint. The only
 network requests are one-time downloads of AI model files from huggingface.co,
 the onnxruntime-web runtime and three.js from cdn.jsdelivr.net, and web fonts
 from Google Fonts; none of these requests contain image data. Profile settings

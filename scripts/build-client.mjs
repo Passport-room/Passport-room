@@ -29,7 +29,7 @@ await build({
   sourcemap: false,
   legalComments: "none",
   treeShaking: true,
-  external: ["three", "onnxruntime-web/webgpu", "@supabase/supabase-js"],
+  external: ["three", "onnxruntime-web/webgpu"],
   logLevel: "info",
 });
 
