@@ -1,18 +1,18 @@
-// Anonymous visitor tracking (Firebase Realtime Database).
+// Anonymous visitor tracking (Firebase Authentication + Realtime Database).
 //
-// A random device id is stored in localStorage the first time the studio is
-// opened and never changes. The first visit takes the next number from a
-// counter in the database, so every visitor keeps one fixed number forever and
-// a returning visitor is never counted as new.
+// The studio signs in anonymously with Firebase on load, so every visitor has a
+// real Firebase user (uid) that survives reloads. That uid is the visitor's
+// database key — customers/{uid} is the single source of truth. The first visit
+// takes the next number from a counter in the database, so every visitor keeps
+// one fixed number forever and a returning visitor is never counted as new.
 //
-// Stored per visitor: fixed number, device type, browser, operating system,
-// screen size, user agent, country, number of visits, total time spent and how
-// many photos they made.
+// Stored per visitor: fixed number, uid, device type, browser, operating
+// system, screen size, user agent, country, number of visits, total time spent
+// and how many photos they made.
 // Never stored: name, email, phone, exact address or photos.
 
-import { dbGet, dbPut, dbPatch } from "./firebase-config.js";
+import { dbGet, dbPut, dbPatch, ensureAuth, getUid, getCachedUid } from "./firebase-config.js";
 
-const ID_KEY = "pr_device_id";
 const CODE_KEY = "pr_customer_code";
 const VISITS_KEY = "pr_visit_count";
 const MS_KEY = "pr_total_ms";
@@ -30,16 +30,9 @@ function safe(fn, fallback = null) {
 const readNum = (k) => Number(safe(() => localStorage.getItem(k)) || 0) || 0;
 const writeNum = (k, v) => safe(() => localStorage.setItem(k, String(v)));
 
-export function getDeviceId() {
-  let id = safe(() => localStorage.getItem(ID_KEY));
-  if (!id) {
-    id =
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : "dev_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
-    safe(() => localStorage.setItem(ID_KEY, id));
-  }
-  return id;
+/** The Firebase Auth uid of this visitor (signs in on first call). */
+export async function getUserId() {
+  return await getUid();
 }
 
 /** The permanent number, once it has been assigned. */
@@ -102,6 +95,13 @@ function paintCode(code) {
   });
 }
 
+function paintUid(uid) {
+  if (!uid) return;
+  document.querySelectorAll("[data-customer-uid]").forEach((el) => {
+    el.textContent = uid;
+  });
+}
+
 const pad = (n) => "CUS-" + String(n).padStart(6, "0");
 
 /** Takes the next free number from the shared counter (safe against races). */
@@ -116,14 +116,10 @@ async function allocateCode() {
   throw new Error("could not assign a customer number");
 }
 
-/** Finds this device's existing number, or creates its record once. */
-async function ensureCustomer(info, geo) {
-  const deviceId = getDeviceId();
-  let code = getCustomerCode();
-
-  if (!code) {
-    code = await dbGet(`devices/${deviceId}`);
-  }
+/** Finds this visitor's existing number, or creates their record once. */
+async function ensureCustomer(uid, info, geo) {
+  const existing = await dbGet(`customers/${uid}/id`);
+  let code = typeof existing === "string" ? existing : null;
 
   if (!code) {
     code = await allocateCode();
@@ -131,9 +127,9 @@ async function ensureCustomer(info, geo) {
     writeNum(VISITS_KEY, 0);
     writeNum(MS_KEY, 0);
     writeNum(PHOTOS_KEY, 0);
-    await dbPut(`customers/${code}`, {
+    await dbPut(`customers/${uid}`, {
       id: code,
-      deviceId,
+      uid,
       ...info,
       ...geo,
       visitCount: 0,
@@ -142,39 +138,41 @@ async function ensureCustomer(info, geo) {
       firstVisit: now,
       lastVisit: now,
     });
-    await dbPut(`devices/${deviceId}`, code);
   }
 
   paintCode(code);
   return code;
 }
 
-let currentCode = null;
+let currentUid = null;
 
 async function pushVisit() {
+  const { localId: uid } = await ensureAuth();
+  currentUid = uid;
+  paintUid(uid);
+
   const info = detect();
   const geo = await getCountry();
-  const code = await ensureCustomer(info, geo);
-  currentCode = code;
+  await ensureCustomer(uid, info, geo);
 
   const visits = readNum(VISITS_KEY) + 1;
   writeNum(VISITS_KEY, visits);
 
-  await dbPatch(`customers/${code}`, {
+  await dbPatch(`customers/${uid}`, {
     ...info,
     ...geo,
     visitCount: visits,
     lastVisit: Date.now(),
   });
-  return code;
+  return uid;
 }
 
 async function pushTime(ms) {
-  if (!currentCode) return;
+  if (!currentUid) return;
   const total = readNum(MS_KEY) + Math.round(ms);
   writeNum(MS_KEY, total);
   await dbPatch(
-    `customers/${currentCode}`,
+    `customers/${currentUid}`,
     { totalMs: total, lastVisit: Date.now() },
     { keepalive: true },
   );
@@ -193,6 +191,7 @@ function reportTime() {
 
 if (typeof window !== "undefined") {
   paintCode(getCustomerCode());
+  paintUid(getCachedUid());
   pushVisit().catch((err) => console.warn("[tracking] failed:", err?.message || err));
 
   document.addEventListener("visibilitychange", () => {
@@ -204,14 +203,14 @@ if (typeof window !== "undefined") {
   });
   window.addEventListener("pagehide", reportTime);
 
-  window.__prTracking = { getDeviceId, getCustomerCode, pushVisit };
+  window.__prTracking = { getUserId, getCustomerCode, pushVisit };
 }
 
 /** Called after every successful photo or print-sheet export. */
 export function trackPhotoCreated() {
   const photos = readNum(PHOTOS_KEY) + 1;
   writeNum(PHOTOS_KEY, photos);
-  const code = currentCode || getCustomerCode();
-  if (!code) return;
-  dbPatch(`customers/${code}`, { photoCount: photos, lastVisit: Date.now() }).catch(() => {});
+  const uid = currentUid || getCachedUid();
+  if (!uid) return;
+  dbPatch(`customers/${uid}`, { photoCount: photos, lastVisit: Date.now() }).catch(() => {});
 }

@@ -1,9 +1,13 @@
 // Admin-panel access to the Firebase Realtime Database.
 //
-// Visitor records cannot be read by the public web key (see firebase-rules.json).
-// The admin panel unlocks them with the database secret typed into the form,
-// which is sent as `?auth=...` — nothing is stored in the code or on the host.
+// Visitor records cannot be read anonymously (see firebase-rules.json): only the
+// admin account's email may read them. The panel signs in with Firebase
+// Email/Password (Identity Toolkit REST API) and sends the resulting ID token as
+// `?auth=...` — no database secret exists in the code or on the host.
 export const DB_URL = "https://passport-48389-default-rtdb.firebaseio.com";
+
+const API_KEY = "AIzaSyBwTzFmMTHEfdX0ZqqXNP29EcQoLud1hrM";
+const IDENTITY = "https://identitytoolkit.googleapis.com/v1";
 
 export type VisitorRow = {
   id: string;
@@ -22,10 +26,24 @@ export type VisitorRow = {
 
 type RawVisitor = Partial<VisitorRow> & { id?: string };
 
-/** Loads the visitor list. Rejects when the secret is wrong. */
-export async function loadVisitors(secret: string): Promise<VisitorRow[]> {
+/** Signs the admin in with email + password and returns a Firebase ID token. */
+export async function signInAdmin(email: string, password: string): Promise<string> {
+  const res = await fetch(`${IDENTITY}/accounts:signInWithPassword?key=${API_KEY}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email, password, returnSecureToken: true }),
+  });
+  if (!res.ok) throw new Error("unauthorized");
+  const data = (await res.json()) as { idToken?: string };
+  if (!data.idToken) throw new Error("unauthorized");
+  return data.idToken;
+}
+
+/** Loads the visitor list. Rejects when the sign-in details are wrong. */
+export async function loadVisitors(email: string, password: string): Promise<VisitorRow[]> {
+  const idToken = await signInAdmin(email, password);
   const res = await fetch(
-    `${DB_URL}/customers.json?auth=${encodeURIComponent(secret)}&orderBy=%22lastVisit%22`,
+    `${DB_URL}/customers.json?auth=${encodeURIComponent(idToken)}&orderBy=%22lastVisit%22`,
   );
   if (!res.ok) throw new Error("unauthorized");
   const data = (await res.json()) as Record<string, RawVisitor> | null;
