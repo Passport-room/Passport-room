@@ -5,22 +5,29 @@
 
     "counters": {
       "customerNumber": {
-        ".read": "auth != null",
-        ".write": "auth != null && newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+        ".read": true,
+        ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+      }
+    },
+
+    "devices": {
+      "$deviceId": {
+        ".read": true,
+        ".write": "!data.exists() && newData.isString() && newData.val().length <= 20"
       }
     },
 
     "customers": {
-      ".read": "auth != null && auth.token.email === 'nexohubyt@gmail.com'",
+      ".read": false,
       ".indexOn": "lastVisit",
 
-      "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid && newData.exists()",
+      "$customerId": {
+        ".read": false,
+        ".write": "newData.exists()",
         ".validate": "newData.hasChildren(['id', 'visitCount', 'lastVisit'])",
 
         "id": { ".validate": "newData.isString()" },
-        "uid": { ".validate": "newData.isString() && newData.val() === $uid" },
+        "deviceId": { ".validate": "newData.isString()" },
         "browser": { ".validate": "newData.isString() && newData.val().length <= 40" },
         "deviceType": { ".validate": "newData.isString() && newData.val().length <= 20" },
         "os": { ".validate": "newData.isString() && newData.val().length <= 40" },

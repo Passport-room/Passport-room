@@ -30,30 +30,19 @@ function fmtTime(ms: number) {
 }
 
 function Admin() {
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visitors, setVisitors] = useState<VisitorRow[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
-
-  const FRIENDLY: Record<string, string> = {
-    EMAIL_NOT_FOUND: "No admin account exists with that email yet — create it in Firebase Authentication → Users.",
-    INVALID_PASSWORD: "Wrong password.",
-    INVALID_LOGIN_CREDENTIALS: "Wrong email or password.",
-    OPERATION_NOT_ALLOWED: "Email/Password sign-in isn't enabled yet — turn it on in Firebase Authentication → Sign-in method.",
-    USER_DISABLED: "This admin account has been disabled in Firebase Authentication.",
-    TOO_MANY_ATTEMPTS_TRY_LATER: "Too many attempts — wait a few minutes and try again.",
-  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setError(null);
+    setError(false);
     try {
-      setVisitors(await loadVisitors(email, password));
-    } catch (err) {
-      const raw = err instanceof Error ? err.message : String(err);
-      setError(FRIENDLY[raw] || raw);
+      setVisitors(await loadVisitors(password));
+    } catch {
+      setError(true);
       setVisitors(null);
     } finally {
       setBusy(false);
@@ -76,28 +65,20 @@ function Admin() {
         >
           <h1 className="text-xl font-semibold text-card-foreground">Admin panel</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sign in with your admin account to see visitor numbers and usage.
+            Enter your admin secret to see visitor numbers and usage.
           </p>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Admin email"
-            autoComplete="username"
-            className="mt-4 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
-          />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            placeholder="Admin secret"
             autoComplete="current-password"
-            className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+            className="mt-4 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
           />
-          {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+          {error && <p className="mt-2 text-sm text-destructive">Wrong secret. Try again.</p>}
           <button
             type="submit"
-            disabled={busy || !email || !password}
+            disabled={busy || !password}
             className="mt-4 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
             {busy ? "Checking…" : "Unlock"}
