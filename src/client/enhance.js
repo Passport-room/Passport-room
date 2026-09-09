@@ -186,6 +186,7 @@ async function enhance(baseDataUrl = null) {
     setStatus("Applying the enhanced photo…");
     window.__editHistory?.claim?.("enhance");
     await window.__tryOn.applyResult(result.canvas.toDataURL("image/png"), (m) => setStatus(m));
+    window.__prTracking?.trackPhotoCreated?.("enhance");
 
     setRevertState();
     setStatus(

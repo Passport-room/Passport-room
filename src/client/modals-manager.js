@@ -226,6 +226,17 @@ export function updateHeaderProfileWidget(acc = loadAccount()) {
   if (subEl) subEl.textContent = `${acc.stats.photosProcessed || 0} photos created`;
 }
 
+if (typeof window !== "undefined") {
+  window.addEventListener("pr-account-updated", (e) => {
+    try {
+      updateHeaderProfileWidget(e.detail || loadAccount());
+      renderMenuDrawerHeader();
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
 function renderMenuDrawerHeader() {
   const acc = loadAccount();
   const menuName = $("menuDrawerUserName");

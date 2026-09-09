@@ -481,6 +481,7 @@ async function handleFile(file) {
     );
     cutout = composeCutout(source, mask.maskCanvas, source.width, source.height);
     originalCutoutCanvas = cutout.canvas;
+    window.__prTracking?.trackPhotoCreated?.("bgremove");
     setCachedMask(mask.maskCanvas); // computed once per uploaded photo
     backend = mask.backend;
     timings = { inference: mask.inferenceMs, total: performance.now() - t0 };

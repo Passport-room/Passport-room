@@ -184,10 +184,10 @@ export function canvasToBlob(canvas, type, quality) {
   });
 }
 
-export function downloadBlob(blob, filename) {
+export function downloadBlob(blob, filename, kind = "single") {
   // Single tracking hook for every successful photo/sheet export.
   try {
-    trackPhotoCreated();
+    trackPhotoCreated(kind);
   } catch {
     /* tracking must never break a download */
   }

@@ -445,6 +445,7 @@ async function applyEdit() {
     await window.__tryOn.applyResult(dataUrl, (m) => setStatus(m), baseDims);
     setRevertState();
     setStatus("Outfit applied. Open the editor again to adjust it.", "ok");
+    window.__prTracking?.trackPhotoCreated?.("dress");
     showToast("Outfit applied", "success");
   } catch (e) {
     setStatus(e?.message || "Could not apply the garment.", "err");

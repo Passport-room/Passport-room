@@ -680,7 +680,7 @@ async function exportFullSheet(mode) {
     if (mode === "print") {
       showPrintAdModal(blob);
     } else {
-      downloadBlob(blob, "passport-A4-sheet.png");
+      downloadBlob(blob, "passport-A4-sheet.png", "sheet");
       closePrintEditor();
       const downloadModal = $("downloadModal");
       if (downloadModal) downloadModal.classList.remove("hidden");

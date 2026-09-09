@@ -1,16 +1,19 @@
 // Local Account & Settings Engine (localStorage & IndexedDB fallback)
 
+import { getVisitorCode, onVisitorCode } from "./tracking.js";
+
 const ACCOUNT_KEY = "cubit_account_v2";
 const HISTORY_KEY = "cubit_history_v2";
 
 export function getDefaultAccount() {
   const randomId = Math.floor(1000 + Math.random() * 9000);
   const now = new Date();
+  const code = getVisitorCode();
   const dateStr = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   return {
     id: `usr_${randomId}`,
-    displayName: `Passport Creator #${randomId}`,
+    displayName: code || "Passport Room visitor",
     avatar: null, // null means use default generated initials avatar
     avatarColor: "#6366f1",
     createdDate: dateStr,
@@ -31,6 +34,18 @@ export function getDefaultAccount() {
   };
 }
 
+const AUTO_NAME = /^(Passport Creator #\d+|Passport Room visitor|PR-[0-9A-Z]{6}|CUS-\d{6})$/;
+
+/** The code from the tracking module is the single source of truth. */
+function syncName(acc) {
+  const code = getVisitorCode();
+  if (code && (!acc.displayName || AUTO_NAME.test(acc.displayName)) && acc.displayName !== code) {
+    acc.displayName = code;
+    return true;
+  }
+  return false;
+}
+
 export function loadAccount() {
   try {
     const raw = localStorage.getItem(ACCOUNT_KEY);
@@ -43,6 +58,7 @@ export function loadAccount() {
     // Ensure stats structure exists
     if (!acc.stats) acc.stats = getDefaultAccount().stats;
     if (!acc.settings) acc.settings = getDefaultAccount().settings;
+    if (syncName(acc)) saveAccount(acc);
     return acc;
   } catch (err) {
     console.warn("Failed to load account from localStorage:", err);
@@ -144,3 +160,16 @@ export function clearAllLocalData() {
     console.error("Error clearing data:", e);
   }
 }
+
+
+// When the permanent code arrives from Firebase, adopt it as the profile name
+// so the profile icon and the admin list can never disagree.
+onVisitorCode(() => {
+  try {
+    const acc = loadAccount();
+    if (syncName(acc)) saveAccount(acc);
+    window.dispatchEvent(new CustomEvent("pr-account-updated", { detail: acc }));
+  } catch {
+    /* the profile name is cosmetic — never break the studio */
+  }
+});

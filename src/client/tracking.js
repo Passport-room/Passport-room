@@ -1,23 +1,35 @@
-// Anonymous visitor tracking (Firebase Realtime Database).
+// Visitor tracking (Firebase Anonymous Auth + Realtime Database).
 //
-// A random device id is stored in localStorage the first time the studio is
-// opened and never changes. The first visit takes the next number from a
-// counter in the database, so every visitor keeps one fixed number forever and
-// a returning visitor is never counted as new.
+// Identity: on first open the studio signs in anonymously. Firebase issues a
+// UID that survives reloads, browser restarts and a cleared site storage, and
+// every write is signed with that visitor's own token.
 //
-// Stored per visitor: fixed number, device type, browser, operating system,
-// screen size, user agent, country, number of visits, total time spent and how
-// many photos they made.
+// Visible number: a short code (e.g. PR-8F3K2A) derived from the UID and
+// claimed once in the database, so two visitors can never share one code.
+// There is no shared counter, so nothing can race or skip a number.
+//
+// Totals (visits, photos, time) are raised with database transactions, so they
+// can only go up and are never overwritten by a number kept on the device.
+//
+// Stored per visitor: code, device type, browser, system, screen, language,
+// time zone, country, visits, photos per tool and total time.
 // Never stored: name, email, phone, exact address or photos.
 
-import { dbGet, dbPut, dbPatch } from "./firebase-config.js";
+import { getFirebase, ensureAnonymousUser } from "./firebase-config.js";
+import {
+  ref,
+  get,
+  update,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/database";
 
-const ID_KEY = "pr_device_id";
-const CODE_KEY = "pr_customer_code";
-const VISITS_KEY = "pr_visit_count";
-const MS_KEY = "pr_total_ms";
-const PHOTOS_KEY = "pr_photo_count";
+const OLD_ID_KEY = "pr_device_id";
+const OLD_CODE_KEY = "pr_customer_code";
+const CODE_KEY = "pr_visitor_code";
 const GEO_KEY = "pr_geo";
+
+const PHOTO_KINDS = ["single", "sheet", "dress", "enhance", "bgremove"];
 
 function safe(fn, fallback = null) {
   try {
@@ -27,24 +39,20 @@ function safe(fn, fallback = null) {
   }
 }
 
-const readNum = (k) => Number(safe(() => localStorage.getItem(k)) || 0) || 0;
-const writeNum = (k, v) => safe(() => localStorage.setItem(k, String(v)));
+/* ------------------------------------------------------------------ */
+/* Device fingerprint (non-identifying)                                */
+/* ------------------------------------------------------------------ */
 
 export function getDeviceId() {
-  let id = safe(() => localStorage.getItem(ID_KEY));
+  let id = safe(() => localStorage.getItem(OLD_ID_KEY));
   if (!id) {
     id =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
         : "dev_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
-    safe(() => localStorage.setItem(ID_KEY, id));
+    safe(() => localStorage.setItem(OLD_ID_KEY, id));
   }
   return id;
-}
-
-/** The permanent number, once it has been assigned. */
-export function getCustomerCode() {
-  return safe(() => localStorage.getItem(CODE_KEY));
 }
 
 function detect() {
@@ -72,6 +80,8 @@ function detect() {
     browser,
     os,
     screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
+    language: (navigator.language || "").slice(0, 20),
+    timeZone: safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone, "") || "",
     userAgent: ua.slice(0, 300),
   };
 }
@@ -94,124 +104,233 @@ async function getCountry() {
   return { country: "Unknown", countryCode: "" };
 }
 
+/* ------------------------------------------------------------------ */
+/* The visible code                                                     */
+/* ------------------------------------------------------------------ */
+
+// No 0/O/1/I so a code can be read out loud without confusion.
+const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+function codeCandidate(uid, salt) {
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
+  const input = `${uid}#${salt}`;
+  for (let i = 0; i < input.length; i++) {
+    h1 = Math.imul(h1 ^ input.charCodeAt(i), 16777619) >>> 0;
+    h2 = Math.imul(h2 + input.charCodeAt(i) + i, 2246822519) >>> 0;
+  }
+  let out = "";
+  let a = h1;
+  let b = h2;
+  for (let i = 0; i < 6; i++) {
+    out += ALPHABET[(i < 3 ? a : b) & 31];
+    if (i < 3) a >>>= 5;
+    else b >>>= 5;
+  }
+  return "PR-" + out;
+}
+
+/** The permanent code, once it has been assigned. */
+export function getVisitorCode() {
+  return safe(() => localStorage.getItem(CODE_KEY)) || safe(() => localStorage.getItem(OLD_CODE_KEY));
+}
+
+/** Kept for older imports. */
+export const getCustomerCode = getVisitorCode;
+
+const listeners = new Set();
+
+/** Called whenever the code becomes known or changes. */
+export function onVisitorCode(fn) {
+  listeners.add(fn);
+  const code = getVisitorCode();
+  if (code) safe(() => fn(code));
+  return () => listeners.delete(fn);
+}
+
 function paintCode(code) {
   if (!code) return;
   safe(() => localStorage.setItem(CODE_KEY, code));
-  document.querySelectorAll("[data-customer-code]").forEach((el) => {
-    el.textContent = code;
-  });
+  safe(() =>
+    document.querySelectorAll("[data-customer-code]").forEach((el) => {
+      el.textContent = code;
+    }),
+  );
+  listeners.forEach((fn) => safe(() => fn(code)));
 }
 
-const pad = (n) => "CUS-" + String(n).padStart(6, "0");
+/** Claims a code for this uid, trying the next candidate when one is taken. */
+async function claimCode(db, uid, preferred) {
+  const tryClaim = async (code) => {
+    const res = await runTransaction(ref(db, `codes/${code}`), (current) =>
+      current === null || current === uid ? uid : undefined,
+    );
+    return res.committed && res.snapshot.val() === uid;
+  };
 
-/** Takes the next free number from the shared counter (safe against races). */
-async function allocateCode() {
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const { value, etag } = await dbGet("counters/customerNumber", { etag: true });
-    const next = (Number(value) || 0) + 1;
-    const result = await dbPut("counters/customerNumber", next, { ifMatch: etag });
-    if (result.ok) return pad(next);
-    await new Promise((r) => setTimeout(r, 60 + Math.random() * 200));
+  if (preferred && (await tryClaim(preferred))) return preferred;
+
+  for (let salt = 0; salt < 25; salt++) {
+    const code = codeCandidate(uid, salt);
+    if (await tryClaim(code)) return code;
   }
-  throw new Error("could not assign a customer number");
+  return null;
 }
 
-/** Finds this device's existing number, or creates its record once. */
-async function ensureCustomer(info, geo) {
+/* ------------------------------------------------------------------ */
+/* Visitor record                                                       */
+/* ------------------------------------------------------------------ */
+
+let ready = null; // resolves to { db, uid } or null when tracking is off
+
+async function bump(db, uid, field, amount) {
+  if (!amount) return;
+  await runTransaction(ref(db, `users/${uid}/${field}`), (v) => (Number(v) || 0) + amount);
+}
+
+/** Moves an old device-based record onto the new Firebase identity, once. */
+async function carryOver(db, uid, deviceId) {
+  const legacyCode =
+    (await get(ref(db, `devices/${deviceId}`)).then((s) => s.val())) ||
+    safe(() => localStorage.getItem(OLD_CODE_KEY));
+  if (!legacyCode || typeof legacyCode !== "string" || !legacyCode.startsWith("CUS-")) return null;
+
+  const old = await get(ref(db, `customers/${legacyCode}`))
+    .then((s) => s.val())
+    .catch(() => null);
+
+  return {
+    code: legacyCode,
+    migratedFrom: legacyCode,
+    visits: Number(old?.visitCount) || 0,
+    totalMs: Number(old?.totalMs) || 0,
+    photosTotal: Number(old?.photoCount) || 0,
+  };
+}
+
+async function startTracking() {
+  const user = await ensureAnonymousUser();
+  if (!user) return null; // anonymous sign-in off or offline — stay silent
+
+  const { db } = getFirebase();
+  const uid = user.uid;
   const deviceId = getDeviceId();
-  let code = getCustomerCode();
+  const info = detect();
+
+  const existing = await get(ref(db, `users/${uid}`))
+    .then((s) => s.val())
+    .catch(() => null);
+
+  let code = existing?.code || null;
+  let seed = null;
 
   if (!code) {
-    code = await dbGet(`devices/${deviceId}`);
+    seed = await carryOver(db, uid, deviceId).catch(() => null);
+    code = await claimCode(db, uid, seed?.code || codeCandidate(uid, 0));
+    if (!code) return null;
   }
 
-  if (!code) {
-    code = await allocateCode();
-    const now = Date.now();
-    writeNum(VISITS_KEY, 0);
-    writeNum(MS_KEY, 0);
-    writeNum(PHOTOS_KEY, 0);
-    await dbPut(`customers/${code}`, {
-      id: code,
-      deviceId,
-      ...info,
-      ...geo,
-      visitCount: 0,
-      photoCount: 0,
-      totalMs: 0,
-      firstVisit: now,
-      lastVisit: now,
-    });
-    await dbPut(`devices/${deviceId}`, code);
+  const base = {
+    code,
+    ...info,
+    lastSeenAt: serverTimestamp(),
+    [`deviceIds/${deviceId}`]: true,
+  };
+  if (!existing) {
+    base.createdAt = serverTimestamp();
+    base.visits = seed?.visits || 0;
+    base.totalMs = seed?.totalMs || 0;
+    base["photos/total"] = seed?.photosTotal || 0;
+    for (const kind of PHOTO_KINDS) base[`photos/${kind}`] = 0;
+    if (seed?.migratedFrom) base.migratedFrom = seed.migratedFrom;
   }
+
+  const geo = await getCountry();
+  Object.assign(base, geo);
+
+  await update(ref(db, `users/${uid}`), base);
+  await runTransaction(ref(db, `devices/${deviceId}`), () => uid).catch(() => {});
 
   paintCode(code);
-  return code;
+  await bump(db, uid, "visits", 1);
+
+  return { db, uid };
 }
 
-let currentCode = null;
+/* ------------------------------------------------------------------ */
+/* Time spent — per-session heartbeat while the page is visible         */
+/* ------------------------------------------------------------------ */
 
-async function pushVisit() {
-  const info = detect();
-  const geo = await getCountry();
-  const code = await ensureCustomer(info, geo);
-  currentCode = code;
+const HEARTBEAT_MS = 15000;
+let activeSince = null;
+let heartbeat = null;
 
-  const visits = readNum(VISITS_KEY) + 1;
-  writeNum(VISITS_KEY, visits);
+async function flushTime() {
+  if (activeSince === null) return;
+  const spent = Date.now() - activeSince;
+  activeSince = Date.now();
+  if (spent < 1000) return;
+  const ctx = await ready;
+  if (!ctx) return;
+  await bump(ctx.db, ctx.uid, "totalMs", Math.min(spent, 10 * 60 * 1000)).catch(() => {});
+  await update(ref(ctx.db, `users/${ctx.uid}`), { lastSeenAt: serverTimestamp() }).catch(() => {});
+}
 
-  await dbPatch(`customers/${code}`, {
-    ...info,
-    ...geo,
-    visitCount: visits,
-    lastVisit: Date.now(),
+function startClock() {
+  if (heartbeat) return;
+  activeSince = Date.now();
+  heartbeat = setInterval(() => {
+    flushTime().catch(() => {});
+  }, HEARTBEAT_MS);
+}
+
+function stopClock() {
+  if (heartbeat) {
+    clearInterval(heartbeat);
+    heartbeat = null;
+  }
+  flushTime().catch(() => {});
+  activeSince = null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Photo counting                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Called once per completed export or tool run.
+ * kind: "single" | "sheet" | "dress" | "enhance" | "bgremove"
+ */
+export function trackPhotoCreated(kind = "single") {
+  const type = PHOTO_KINDS.includes(kind) ? kind : "single";
+  (async () => {
+    const ctx = await ready;
+    if (!ctx) return;
+    await bump(ctx.db, ctx.uid, `photos/${type}`, 1);
+    await bump(ctx.db, ctx.uid, "photos/total", 1);
+    await update(ref(ctx.db, `users/${ctx.uid}`), { lastSeenAt: serverTimestamp() });
+  })().catch(() => {
+    /* tracking must never surface an error to the visitor */
   });
-  return code;
 }
 
-async function pushTime(ms) {
-  if (!currentCode) return;
-  const total = readNum(MS_KEY) + Math.round(ms);
-  writeNum(MS_KEY, total);
-  await dbPatch(
-    `customers/${currentCode}`,
-    { totalMs: total, lastVisit: Date.now() },
-    { keepalive: true },
-  );
-}
-
-let startedAt = Date.now();
-let reported = false;
-
-function reportTime() {
-  if (reported) return;
-  const spent = Date.now() - startedAt;
-  if (spent < 2000) return;
-  reported = true;
-  pushTime(spent).catch(() => {});
-}
+/* ------------------------------------------------------------------ */
+/* Boot                                                                 */
+/* ------------------------------------------------------------------ */
 
 if (typeof window !== "undefined") {
-  paintCode(getCustomerCode());
-  pushVisit().catch((err) => console.warn("[tracking] failed:", err?.message || err));
+  paintCode(getVisitorCode());
+
+  ready = startTracking().catch(() => null);
+  ready.then((ctx) => {
+    if (ctx && document.visibilityState !== "hidden") startClock();
+  });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") reportTime();
-    else if (reported) {
-      startedAt = Date.now();
-      reported = false;
-    }
+    if (document.visibilityState === "hidden") stopClock();
+    else startClock();
   });
-  window.addEventListener("pagehide", reportTime);
+  window.addEventListener("pagehide", stopClock);
 
-  window.__prTracking = { getDeviceId, getCustomerCode, pushVisit };
-}
-
-/** Called after every successful photo or print-sheet export. */
-export function trackPhotoCreated() {
-  const photos = readNum(PHOTOS_KEY) + 1;
-  writeNum(PHOTOS_KEY, photos);
-  const code = currentCode || getCustomerCode();
-  if (!code) return;
-  dbPatch(`customers/${code}`, { photoCount: photos, lastVisit: Date.now() }).catch(() => {});
+  window.__prTracking = { getVisitorCode, getDeviceId, onVisitorCode, trackPhotoCreated };
 }
