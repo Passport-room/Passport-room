@@ -21,7 +21,6 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  overflow-x: hidden;
 }
 body {
   background: var(--bg);
@@ -314,6 +313,7 @@ h3 {
   max-width: 520px;
 }
 .drop {
+  margin-top: 6px;
   border: 2px dashed oklch(0.62 0.26 305 / 0.5);
   border-radius: 20px;
   background: oklch(0.19 0.055 300 / 0.4);
@@ -4420,25 +4420,19 @@ select:focus {
 
 
 /* =========================================================
-   Passport Room — fixed AdSense side rails for AI loading screen
+   Passport Room — Adsterra 320x50 banner slots
    ========================================================= */
-.cubit-side-ad {
-  position: fixed;
-  top: 180px;
-  width: 150px;
-  height: 600px;
-  z-index: 20;
-  overflow: hidden;
+.pr-ad {
+  width: 100%;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
-  pointer-events: auto;
+  overflow: hidden;
 }
 
-.cubit-side-ad-left {
-  left: max(8px, calc(50% - 675px));
-}
-
-.cubit-side-ad-right {
-  right: max(8px, calc(50% - 675px));
+.pr-ad-slot {
+  min-height: 50px;
 }
 
 .cubit-ad-label {
@@ -4448,105 +4442,26 @@ select:focus {
   opacity: 0.65;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
-/* Keep side ads completely out of the layout on smaller screens. */
-@media (max-width: 1199px) {
-  .cubit-side-ad {
-    display: none !important;
-  }
+/* Banner above the upload box: clear space on both sides so it never sits
+   flush against the feature cards or the drop zone. */
+.pr-ad-hero {
+  margin-top: 22px;
+  margin-bottom: 26px;
 }
 
-/* On shorter desktop screens, keep the ad rail within the viewport. */
-@media (min-width: 1200px) and (max-height: 760px) {
-  .cubit-side-ad {
-    top: 150px;
-    height: min(500px, calc(100vh - 170px));
-  }
-
-  .cubit-side-ad ins {
-    min-height: 0 !important;
-    height: 100% !important;
-  }
+/* Banner under the AI loading animation. */
+.pr-ad-proc {
+  margin-top: 26px;
+  margin-bottom: 26px;
 }
 
-
-/* Passport Room download popup AdSense + close control */
-.cubit-download-ad {
-  width: min(100%, 420px);
-  margin: 18px auto 0;
-  text-align: center;
-  overflow: hidden;
-}
-
-.cubit-download-ad .cubit-ad-label {
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 14px;
-  opacity: .65;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  margin-bottom: 3px;
-}
-
-.cubit-download-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(0,0,0,.08);
-  color: inherit;
-  font-size: 25px;
-  line-height: 34px;
-  text-align: center;
-  cursor: pointer;
-  z-index: 60;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-}
-
-.cubit-download-modal-close:hover {
-  background: rgba(0,0,0,.15);
-}
-
-.cubit-fallback-close {
-  display: none;
-}
-
-@media (max-width: 520px) {
-  .cubit-download-ad {
-    width: 100%;
-    margin-top: 14px;
-  }
-
-  .cubit-download-modal-close {
-    top: 7px;
-    right: 7px;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    font-size: 22px;
-  }
-}
-
-/* Mobile/tablet ad shown under the AI loading animation */
-.cubit-proc-ad {
-  width: min(100%, 468px);
-  margin: 6px auto 0;
-  text-align: center;
-  overflow: hidden;
-}
-@media (min-width: 1200px) {
-  .cubit-proc-ad {
-    display: none !important;
-  }
+/* Banner inside the download / print popups. */
+.pr-ad-modal {
+  margin-top: 18px;
+  margin-bottom: 18px;
 }
 
 /* ------------------------------------------------------------------
