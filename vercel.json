@@ -1,7 +1,7 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": ".vercel/output",
+  
   "installCommand": "npm install",
   "headers": [
     {
@@ -16,7 +16,7 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         {
           "key": "Permissions-Policy",
-          "value": "geolocation=(), microphone=(), payment=(self "https://buy.paddle.com" "https://sandbox-buy.paddle.com"), usb=(), interest-cohort=()"
+          "value": "geolocation=(), microphone=(), payment=(self \"https://buy.paddle.com\" \"https://sandbox-buy.paddle.com\"), usb=(), interest-cohort=()"
         },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
         { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" },
