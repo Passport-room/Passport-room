@@ -1,1 +1,1 @@
-google.com, pub-9159038506014039, DIRECT, f08c47fec0942fa0
+# Adsterra does not require an ads.txt entry for this placement.

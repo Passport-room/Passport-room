@@ -11,6 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as PaymentRouteImport } from './routes/payment'
+import { Route as ApiPublicMembershipRouteImport } from './routes/api/public/membership'
+import { Route as ApiPublicMembershipRestoreRouteImport } from './routes/api/public/membership.restore'
+import { Route as ApiPublicPaddleConfigRouteImport } from './routes/api/public/paddle/config'
+import { Route as ApiPublicPaddleWebhookRouteImport } from './routes/api/public/paddle/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +27,98 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicMembershipRoute = ApiPublicMembershipRouteImport.update({
+  id: '/api/public/membership',
+  path: '/api/public/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicMembershipRestoreRoute =
+  ApiPublicMembershipRestoreRouteImport.update({
+    id: '/restore',
+    path: '/restore',
+    getParentRoute: () => ApiPublicMembershipRoute,
+  } as any)
+const ApiPublicPaddleConfigRoute = ApiPublicPaddleConfigRouteImport.update({
+  id: '/api/public/paddle/config',
+  path: '/api/public/paddle/config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaddleWebhookRoute = ApiPublicPaddleWebhookRouteImport.update({
+  id: '/api/public/paddle/webhook',
+  path: '/api/public/paddle/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/payment': typeof PaymentRoute
+  '/api/public/membership': typeof ApiPublicMembershipRouteWithChildren
+  '/api/public/membership/restore': typeof ApiPublicMembershipRestoreRoute
+  '/api/public/paddle/config': typeof ApiPublicPaddleConfigRoute
+  '/api/public/paddle/webhook': typeof ApiPublicPaddleWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/payment': typeof PaymentRoute
+  '/api/public/membership': typeof ApiPublicMembershipRouteWithChildren
+  '/api/public/membership/restore': typeof ApiPublicMembershipRestoreRoute
+  '/api/public/paddle/config': typeof ApiPublicPaddleConfigRoute
+  '/api/public/paddle/webhook': typeof ApiPublicPaddleWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/payment': typeof PaymentRoute
+  '/api/public/membership': typeof ApiPublicMembershipRouteWithChildren
+  '/api/public/membership/restore': typeof ApiPublicMembershipRestoreRoute
+  '/api/public/paddle/config': typeof ApiPublicPaddleConfigRoute
+  '/api/public/paddle/webhook': typeof ApiPublicPaddleWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/payment'
+    | '/api/public/membership'
+    | '/api/public/membership/restore'
+    | '/api/public/paddle/config'
+    | '/api/public/paddle/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin'
-  id: '__root__' | '/' | '/admin'
+  to:
+    | '/'
+    | '/admin'
+    | '/payment'
+    | '/api/public/membership'
+    | '/api/public/membership/restore'
+    | '/api/public/paddle/config'
+    | '/api/public/paddle/webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/payment'
+    | '/api/public/membership'
+    | '/api/public/membership/restore'
+    | '/api/public/paddle/config'
+    | '/api/public/paddle/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  PaymentRoute: typeof PaymentRoute
+  ApiPublicMembershipRoute: typeof ApiPublicMembershipRouteWithChildren
+  ApiPublicPaddleConfigRoute: typeof ApiPublicPaddleConfigRoute
+  ApiPublicPaddleWebhookRoute: typeof ApiPublicPaddleWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +137,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/membership': {
+      id: '/api/public/membership'
+      path: '/api/public/membership'
+      fullPath: '/api/public/membership'
+      preLoaderRoute: typeof ApiPublicMembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/membership/restore': {
+      id: '/api/public/membership/restore'
+      path: '/restore'
+      fullPath: '/api/public/membership/restore'
+      preLoaderRoute: typeof ApiPublicMembershipRestoreRouteImport
+      parentRoute: typeof ApiPublicMembershipRoute
+    }
+    '/api/public/paddle/config': {
+      id: '/api/public/paddle/config'
+      path: '/api/public/paddle/config'
+      fullPath: '/api/public/paddle/config'
+      preLoaderRoute: typeof ApiPublicPaddleConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paddle/webhook': {
+      id: '/api/public/paddle/webhook'
+      path: '/api/public/paddle/webhook'
+      fullPath: '/api/public/paddle/webhook'
+      preLoaderRoute: typeof ApiPublicPaddleWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface ApiPublicMembershipRouteChildren {
+  ApiPublicMembershipRestoreRoute: typeof ApiPublicMembershipRestoreRoute
+}
+
+const ApiPublicMembershipRouteChildren: ApiPublicMembershipRouteChildren = {
+  ApiPublicMembershipRestoreRoute: ApiPublicMembershipRestoreRoute,
+}
+
+const ApiPublicMembershipRouteWithChildren =
+  ApiPublicMembershipRoute._addFileChildren(ApiPublicMembershipRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  PaymentRoute: PaymentRoute,
+  ApiPublicMembershipRoute: ApiPublicMembershipRouteWithChildren,
+  ApiPublicPaddleConfigRoute: ApiPublicPaddleConfigRoute,
+  ApiPublicPaddleWebhookRoute: ApiPublicPaddleWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

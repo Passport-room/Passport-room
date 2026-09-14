@@ -5,3 +5,4 @@ import "./print-editor.js";
 import "./dress-tryon.js";
 import "./enhance.js";
 import "./tracking.js";
+import "./membership-boot.js";

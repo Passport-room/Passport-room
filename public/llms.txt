@@ -7,7 +7,9 @@
 Site: https://passport-room.com
 Contact: support@passport-room.com
 Operator: Passport Room, an independent team based in Dhaka, Bangladesh.
-Cost: free. Signup: not required. Watermark: none.
+Cost: free for 3 photos per day. Optional Pro pass: one payment of US$0.99 for 30
+days of unlimited, ad-free exports (not a subscription). Paddle.com is the
+Merchant of Record for all orders. Signup: not required. Watermark: none.
 
 ## What it does
 
@@ -70,6 +72,8 @@ agency.
 - https://passport-room.com/ — the passport photo maker, plus a how-to, a country size
   table and the FAQ
 - https://passport-room.com/features — every feature described in detail
+- https://passport-room.com/pricing — free plan and the $0.99 30-day Pro pass
+- https://passport-room.com/refund-policy — 14-day money-back guarantee
 - https://passport-room.com/about — who runs Passport Room and why
 - https://passport-room.com/privacy-policy — full data handling disclosure
 - https://passport-room.com/terms-of-service — acceptable use and liability
