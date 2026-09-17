@@ -30,6 +30,8 @@ export const EMPTY_STATE: MembershipState = {
 
 export type PaddleConfig = {
   configured: boolean;
+  /** Names (never values) of payment settings still missing on the server. */
+  missing?: string[];
   environment: "sandbox" | "production";
   clientToken: string | null;
   priceId: string | null;

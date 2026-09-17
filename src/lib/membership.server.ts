@@ -79,6 +79,37 @@ async function dbPut(p: string, value: unknown): Promise<void> {
   if (!res.ok) throw new Error(`database write failed (${res.status})`);
 }
 
+/**
+ * Atomic-ish claim of a Paddle transaction id so a retried (or replayed)
+ * webhook delivery can never grant a second 30-day period.
+ * Firebase REST supports conditional creation through `PUT` on a child with
+ * `?print=silent`, so we read-then-write and treat an existing record as
+ * "already processed".
+ */
+function transactionKey(transactionId: string): string {
+  return transactionId.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 64);
+}
+
+/** Frees a claim when activation failed, so Paddle's retry can succeed. */
+export async function releaseTransaction(transactionId: string): Promise<void> {
+  const key = transactionKey(transactionId);
+  if (!key) return;
+  try {
+    await fetch(path(`paddleTransactions/${key}`), { method: "DELETE" });
+  } catch {
+    /* best effort */
+  }
+}
+
+export async function claimTransaction(transactionId: string): Promise<boolean> {
+  const key = transactionKey(transactionId);
+  if (!key) return true;
+  const existing = await dbGet<{ processedAt?: number }>(`paddleTransactions/${key}`);
+  if (existing && existing.processedAt) return false;
+  await dbPut(`paddleTransactions/${key}`, { processedAt: Date.now() });
+  return true;
+}
+
 /** Stable, non-reversible key for an email address. */
 export function emailKeyOf(email: string): string {
   return createHash("sha256").update(email.trim().toLowerCase()).digest("hex").slice(0, 40);
@@ -209,6 +240,30 @@ export async function restoreMembership(
 }
 
 /* ---------------------------------- Paddle --------------------------------- */
+
+/** The one price the app sells ($0.99 / 30 days). Must be a `pri_...` id. */
+export function expectedPriceId(): string | null {
+  const id = (process.env["PADDLE_PRICE_ID"] ?? "").trim();
+  return id.startsWith("pri_") ? id : null;
+}
+
+/**
+ * Which payment settings are present. Returns names only — never values — so
+ * it is safe to surface in a diagnostic response.
+ */
+export function paddleReadiness(): { configured: boolean; missing: string[] } {
+  const missing: string[] = [];
+  if (!(process.env["PADDLE_CLIENT_TOKEN"] ?? "").trim()) missing.push("PADDLE_CLIENT_TOKEN");
+  if (!expectedPriceId()) missing.push("PADDLE_PRICE_ID");
+  if (!(process.env["PADDLE_API_KEY"] ?? "").trim()) missing.push("PADDLE_API_KEY");
+  if (!(process.env["PADDLE_WEBHOOK_SECRET"] ?? "").trim()) missing.push("PADDLE_WEBHOOK_SECRET");
+  if (!(process.env["FIREBASE_DB_SECRET"] ?? "").trim()) missing.push("FIREBASE_DB_SECRET");
+  // Checkout itself only needs the browser token + price id; the rest are
+  // required for the payment to be *honoured*, so they are reported too.
+  const checkoutReady =
+    !missing.includes("PADDLE_CLIENT_TOKEN") && !missing.includes("PADDLE_PRICE_ID");
+  return { configured: checkoutReady, missing };
+}
 
 export function paddleEnvironment(): "sandbox" | "production" {
   return process.env["PADDLE_ENVIRONMENT"] === "production" ? "production" : "sandbox";

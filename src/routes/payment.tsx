@@ -112,7 +112,11 @@ function PaymentPage() {
     setError(null);
     setMessage(null);
     if (!config?.configured) {
-      setError("Payments are not switched on yet. Please try again a little later.");
+      setError(
+        config?.missing?.length
+          ? `Payments are not switched on yet (missing: ${config.missing.join(", ")}). Please try again a little later.`
+          : "Payments are not switched on yet. Please try again a little later.",
+      );
       return;
     }
     setBusy(true);
