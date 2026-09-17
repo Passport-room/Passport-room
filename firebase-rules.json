@@ -3,6 +3,24 @@
     ".read": false,
     ".write": false,
 
+    "reviews": {
+      ".read": true,
+      ".indexOn": "ts",
+
+      "$reviewId": {
+        ".write": "!data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['uid', 'name', 'rating', 'text', 'ts'])",
+
+        "uid": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "name": { ".validate": "newData.isString() && newData.val().length <= 60" },
+        "color": { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "rating": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 5" },
+        "text": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300" },
+        "ts": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    },
+
     "counters": {
       "customerNumber": {
         ".read": true,

@@ -47,7 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=cdfe7c5f22" />
+    <link rel="stylesheet" href="style.css?v=c60b8d8657" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -379,6 +379,50 @@
             </div>
           </div>
           <div id="uploadError" class="err hidden"></div>
+
+          <!-- Community reviews chat -->
+          <section id="reviewBox" class="rvBox" aria-label="User reviews">
+            <div class="rvTop">
+              <div>
+                <h2 class="rvTitle">Reviews &amp; chat</h2>
+                <div class="rvSub muted small">See what others say, then rate us</div>
+              </div>
+              <div id="rvSummary" class="rvSummary"></div>
+            </div>
+            <div id="rvList" class="rvList" role="log" aria-live="polite"></div>
+            <div class="rvCompose">
+              <div class="rvComposeTop">
+                <div id="rvRate" class="rvRate" role="radiogroup" aria-label="Your rating"></div>
+                <span id="rvWho" class="rvWho muted small"></span>
+              </div>
+              <div class="rvRow">
+                <textarea
+                  id="rvInput"
+                  class="rvInput"
+                  rows="1"
+                  placeholder="Write your review…"
+                ></textarea>
+                <button id="rvSend" class="rvSend" type="button" aria-label="Post review">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m22 2-7 20-4-9-9-4z" />
+                    <path d="M22 2 11 13" />
+                  </svg>
+                </button>
+              </div>
+              <div class="rvFoot">
+                <span id="rvCount" class="muted small">0/300</span>
+                <span class="muted small">Be kind — reviews are public</span>
+              </div>
+              <div id="rvError" class="err hidden"></div>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -2438,6 +2482,6 @@
         else start();
       })();
     </script>
-    <script type="module" src="assets/app.min.js?v=69cdfd4fa1"></script>
+    <script type="module" src="assets/app.min.js?v=09d548ce9a"></script>
   </body>
 </html>
