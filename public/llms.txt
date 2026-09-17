@@ -2,11 +2,11 @@
 
 > Passport Room is a free online passport and visa photo maker. Every image
 > operation runs inside the visitor's web browser, so photos are never
-> uploaded to a server. No account, no watermark, no export limit.
+> uploaded to a server. No account and no watermark. Free plan: 3 finished photos per day; optional Pro pass (one-off US$0.99) gives 30 days of unlimited, ad-free exports.
 
 Site: https://passport-room.com
-Contact: support@passport-room.com
-Operator: Passport Room, an independent team based in Dhaka, Bangladesh.
+Contact: support.passport.room@gmail.com
+Operator: Passport Room, an independent team based in Jamalpur, Dhaka, Bangladesh.
 Cost: free for 3 photos per day. Optional Pro pass: one payment of US$0.99 for 30
 days of unlimited, ad-free exports (not a subscription). Paddle.com is the
 Merchant of Record for all orders. Signup: not required. Watermark: none.
@@ -77,4 +77,4 @@ agency.
 - https://passport-room.com/about — who runs Passport Room and why
 - https://passport-room.com/privacy-policy — full data handling disclosure
 - https://passport-room.com/terms-of-service — acceptable use and liability
-- https://passport-room.com/contact — support@passport-room.com
+- https://passport-room.com/contact — support.passport.room@gmail.com

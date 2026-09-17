@@ -19,9 +19,9 @@ import {
   type PaddleConfig,
 } from "@/lib/membership-client";
 
-const TITLE = "Donate a little to feel the unlimited — Passport Room Pro";
+const TITLE = "Passport Room Pro — US$0.99 for 30 days of unlimited photos";
 const DESCRIPTION =
-  "Free: 3 passport photos every day. Pro: one $0.99 payment gives 30 days of unlimited photo generation with no ads and no credits.";
+  "Free: 3 passport photos every day. Pro: one US$0.99 payment gives 30 days of unlimited, ad-free photo exports. Not a subscription, nothing renews. Sold by Paddle.com as Merchant of Record.";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({
@@ -274,9 +274,35 @@ function PaymentPage() {
           </form>
         </section>
 
-        <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-5 text-muted-foreground">
-          Secure payment by Paddle. Pro unlocks automatically after payment. Your photos always stay on your device.
-        </p>
+        <section className="mx-auto mt-8 max-w-3xl rounded-xl border border-border bg-card p-4 text-xs leading-5 text-muted-foreground">
+          <p>
+            <strong className="text-foreground">What you are buying:</strong> Passport Room Pro, a
+            digital 30-day access pass to this browser-based passport photo maker. One-off payment of
+            US$0.99 &mdash; it is not a subscription, nothing renews automatically and there is
+            nothing to cancel. Access starts immediately after payment and ends 30 days later, when
+            your account simply returns to the free plan (3 photos a day).
+          </p>
+          <p className="mt-3">
+            <strong className="text-foreground">Who charges you:</strong> our order process is
+            conducted by our online reseller <strong className="text-foreground">Paddle.com</strong>,
+            which is the Merchant of Record for this order. Paddle handles payment, applicable sales
+            tax or VAT, your invoice and billing support, and appears on your card statement.
+            Passport Room never receives or stores your card details. Prices are in US dollars; any
+            tax that applies in your country is calculated at checkout.
+          </p>
+          <p className="mt-3">
+            <strong className="text-foreground">Refunds:</strong> 14-day money-back guarantee &mdash;
+            email{" "}
+            <a className="underline" href="mailto:support@passport-room.com">support@passport-room.com</a>{" "}
+            and we reply within 2 business days. By paying you agree to our{" "}
+            <a className="underline" href="/terms-of-service">Terms of Service</a>,{" "}
+            <a className="underline" href="/refund-policy">Refund Policy</a>,{" "}
+            <a className="underline" href="/privacy-policy">Privacy Policy</a> and Paddle&rsquo;s{" "}
+            <a className="underline" href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener">buyer terms</a>.
+            Business and contact details are on our{" "}
+            <a className="underline" href="/contact#business-details">contact page</a>.
+          </p>
+        </section>
       </div>
     </main>
   );
