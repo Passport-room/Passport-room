@@ -1,7 +1,6 @@
 import { PASSPORT_SPECS, BACKGROUND_OPTIONS } from "./passport-specs.js";
 import { renderPassport, canvasToBlob, downloadBlob } from "./passport-render.js";
 import { openModal, closeActiveModal } from "./modals-manager.js";
-import { confirmSmartDownload } from "./smart-link.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -669,12 +668,6 @@ function showPrintAdModal(blob) {
 let exporting = false;
 async function exportFullSheet(mode) {
   if (exporting || !state.spec || !state.cutout) return;
-
-  // Tell the visitor a sponsor tab opens before the sheet is saved / printed.
-  const proceed = await confirmSmartDownload(mode === "print" ? "print" : "sheet");
-  if (!proceed) return;
-  if (exporting) return;
-
   exporting = true;
   const btn = mode === "print" ? $("confirmPrintPdf") : $("confirmDownloadSheet");
   if (btn) btn.disabled = true;

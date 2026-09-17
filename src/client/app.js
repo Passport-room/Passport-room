@@ -25,7 +25,12 @@ import {
   checkAndShowSavePhotosNotice,
 } from "./modals-manager.js";
 import { recordActivity, addHistoryItem, loadAccount } from "./account-manager.js";
-import { confirmSmartDownload } from "./smart-link.js";
+import {
+  canGenerate,
+  consumeGeneration,
+  showLimitReached,
+  FREE_DAILY_LIMIT,
+} from "./membership.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -467,6 +472,17 @@ async function handleFile(file) {
     showError(uploadError, "Please choose an image file (JPG or PNG).");
     return;
   }
+  // Free plan: 3 photos per day. Pro members are never limited and nothing is
+  // ever deducted from them.
+  if (!canGenerate()) {
+    showError(
+      uploadError,
+      `You have used your ${FREE_DAILY_LIMIT} free photos for today. Get Pro for $0.99 for unlimited photos.`,
+    );
+    showLimitReached();
+    return;
+  }
+
   showError(uploadError, null);
   startFreshSession();
   setPhase("processing");
@@ -490,6 +506,7 @@ async function handleFile(file) {
 
     // Record activity and save thumbnail to history
     recordActivity("photo_processed");
+    consumeGeneration();
     hasCreatedImageInSession = true;
     const currentSpec = getActiveSpec();
     try {
@@ -1044,10 +1061,6 @@ async function download(kind) {
     updateHeaderProfileWidget();
     return;
   }
-
-  // Tell the visitor a sponsor tab opens before the file starts saving.
-  const proceed = await confirmSmartDownload("single");
-  if (!proceed) return;
 
   busy = true;
   if ($("dlSingle")) $("dlSingle").disabled = true;

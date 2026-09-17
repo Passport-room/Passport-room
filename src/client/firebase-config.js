@@ -59,25 +59,3 @@ export async function dbPatch(path, fields, { auth, keepalive = false } = {}) {
   if (!res.ok) throw new Error(`firebase update ${path} failed (${res.status})`);
   return true;
 }
-
-/** Appends a new child under `path` (Firebase push). Returns the new key. */
-export async function dbPush(path, value, { auth } = {}) {
-  const res = await fetch(url(path, auth), {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(value),
-  });
-  if (!res.ok) throw new Error(`firebase push ${path} failed (${res.status})`);
-  const out = await res.json();
-  return out && out.name ? out.name : null;
-}
-
-/** Reads the newest `limit` children of a list ordered by the `ts` field. */
-export async function dbRecent(path, limit = 60, { auth } = {}) {
-  const q = `orderBy=${encodeURIComponent('"ts"')}&limitToLast=${limit}`;
-  const res = await fetch(
-    `${DB_URL}/${path}.json?${q}${auth ? `&auth=${encodeURIComponent(auth)}` : ""}`,
-  );
-  if (!res.ok) throw new Error(`firebase query ${path} failed (${res.status})`);
-  return (await res.json()) || {};
-}

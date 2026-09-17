@@ -47,7 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=c60b8d8657" />
+    <link rel="stylesheet" href="style.css?v=be773ac663" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -378,51 +378,20 @@
               <button id="pickBtn" class="btn primary">Choose photo</button>
             </div>
           </div>
+          <!-- Kept outside #drop so this link never opens the image picker. -->
+          <div class="uploadPlanBar">
+            <div id="planLine" class="planLine"><span>3 free photos left today</span></div>
+            <a id="upgradeLink" class="planLineLink" href="/payment">Buy Pro for $0.99 for unlimited photos <span aria-hidden="true">→</span></a>
+            <div class="proExpiredNote hidden" data-pro-expired>
+              Your Pro membership expired on <strong data-pro-expired-date>—</strong>.
+              <a class="planLineLink" href="/payment">Renew for $0.99</a>
+            </div>
+            <div class="proRenewNote hidden" data-pro-renew-soon>
+              Your Pro membership ends in <strong data-pro-days-left>0</strong> days.
+              <a class="planLineLink" href="/payment">Renew now</a>
+            </div>
+          </div>
           <div id="uploadError" class="err hidden"></div>
-
-          <!-- Community reviews chat -->
-          <section id="reviewBox" class="rvBox" aria-label="User reviews">
-            <div class="rvTop">
-              <div>
-                <h2 class="rvTitle">Reviews &amp; chat</h2>
-                <div class="rvSub muted small">See what others say, then rate us</div>
-              </div>
-              <div id="rvSummary" class="rvSummary"></div>
-            </div>
-            <div id="rvList" class="rvList" role="log" aria-live="polite"></div>
-            <div class="rvCompose">
-              <div class="rvComposeTop">
-                <div id="rvRate" class="rvRate" role="radiogroup" aria-label="Your rating"></div>
-                <span id="rvWho" class="rvWho muted small"></span>
-              </div>
-              <div class="rvRow">
-                <textarea
-                  id="rvInput"
-                  class="rvInput"
-                  rows="1"
-                  placeholder="Write your review…"
-                ></textarea>
-                <button id="rvSend" class="rvSend" type="button" aria-label="Post review">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m22 2-7 20-4-9-9-4z" />
-                    <path d="M22 2 11 13" />
-                  </svg>
-                </button>
-              </div>
-              <div class="rvFoot">
-                <span id="rvCount" class="muted small">0/300</span>
-                <span class="muted small">Be kind — reviews are public</span>
-              </div>
-              <div id="rvError" class="err hidden"></div>
-            </div>
-          </section>
         </div>
       </section>
 
@@ -959,53 +928,21 @@
         </div>
       </div>
 
-      <!-- Pre-download notice: sponsor link opens, file saves automatically -->
-      <div id="smartLinkModal" class="modalOverlay hidden" role="dialog" aria-modal="true">
+      <!-- Daily free limit reached -->
+      <div id="proLimitModal" class="modalOverlay hidden">
         <div class="modalBox">
-          <button
-            id="smartLinkClose"
-            type="button"
-            class="cubit-download-modal-close"
-            aria-label="Close dialog"
-            title="Close"
-          >
-            ×
-          </button>
-          <div class="modalIcon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <path d="M15 3h6v6" />
-              <path d="M10 14 21 3" />
-            </svg>
-          </div>
-          <div class="modalTitle">You're about to leave this page</div>
-
-          <div class="pr-ad pr-ad-modal">
-            <div class="cubit-ad-label">Advertisement</div>
-            <div class="pr-ad-slot" data-pr-ad></div>
-          </div>
-
-          <p id="smartLinkSub" class="modalSub muted small">
-            When you tap Continue, a sponsor page opens in a new tab and your passport photo starts
-            saving to this device automatically. Just close the new tab and come back — your file
-            will be waiting in your Downloads folder.
+          <button type="button" class="cubit-download-modal-close" data-close-pro-modal aria-label="Close dialog" title="Close">×</button>
+          <div class="modalTitle">Donate a little to feel the unlimited</div>
+          <p class="modalSub muted small">
+            You have used your 3 free photos for today. Come back tomorrow, or get Pro for $0.99 and
+            create unlimited photos for 30 days — with no ads.
           </p>
           <div class="modalBtns">
-            <button id="smartLinkGo" class="btn primary">Continue &amp; download</button>
-            <button id="smartLinkCancel" class="btn ghost">Cancel</button>
+            <a class="btn primary" href="/payment">Get Pro — $0.99</a>
+            <button type="button" class="btn ghost" data-close-pro-modal>Maybe later</button>
           </div>
         </div>
       </div>
-
 
       <div id="downloadModal" class="modalOverlay hidden">
         <div class="modalBox">
@@ -1036,6 +973,33 @@
 </div>
 
           <p class="modalSub muted small">Check your device's downloads folder for the file.</p>
+
+          <!-- Pro offer: free visitors only. Pro members never see this. -->
+          <div class="proBox" data-pro-offer>
+            <div class="proBoxTitle">Donate a little to feel the unlimited</div>
+            <p class="proBoxText muted small">
+              You have <strong data-free-left>3</strong> free photos left today. One $0.99 payment
+              gives you 30 days of unlimited photos with no ads at all.
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Get Pro — $0.99 for 30 days</a>
+          </div>
+          <div class="proBox proBoxWarn hidden" data-pro-expired>
+            <div class="proBoxTitle">Your Pro membership expired</div>
+            <p class="proBoxText muted small">
+              Unlimited access ended on <strong data-pro-expired-date>—</strong>. You are back on the
+              free plan (3 photos a day).
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Renew Pro — $0.99</a>
+          </div>
+          <div class="proBox proBoxWarn hidden" data-pro-renew-soon>
+            <div class="proBoxTitle">Renew soon</div>
+            <p class="proBoxText muted small">
+              Your Pro membership ends in <strong data-pro-days-left>0</strong> days. Renewing adds
+              30 days on top of the days you still have.
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Renew Pro — $0.99</a>
+          </div>
+
           <div class="modalBtns">
             <button id="modalHome" class="btn primary">Home</button>
           </div>
@@ -1183,6 +1147,14 @@
             </span>
             <span>My Saved Photos</span>
           </button>
+          <a class="drawerNavItem" href="/payment">
+            <span class="navIcon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 15 8.5 22 9.5l-5 4.9 1.2 7.1L12 18l-6.2 3.5L7 14.4 2 9.5l7-1z" />
+              </svg>
+            </span>
+            <span>Pro Membership &amp; Payment</span>
+          </a>
           <button class="drawerNavItem" data-menu-action="account">
             <span class="navIcon">
               <svg
@@ -2402,9 +2374,9 @@
           <div class="homeFooterDivider"></div>
           <div class="homeFooterBottom">
             <div class="homeFooterLinks">
-              <a href="/features">Features</a> | <a href="/about">About</a> |
+              <a href="/features">Features</a> | <a href="/pricing">Pricing</a> | <a href="/about">About</a> |
               <a href="/privacy-policy">Privacy Policy</a> |
-              <a href="/terms-of-service">Terms of Service</a> | <a href="/contact">Contact</a>
+              <a href="/terms-of-service">Terms of Service</a> | <a href="/refund-policy">Refund Policy</a> | <a href="/contact">Contact</a>
             </div>
           </div>
 
@@ -2444,6 +2416,8 @@
           '<scr' + 'ipt src="https://www.highrevenueformat.com/' + KEY + '/invoke.js"></scr' + 'ipt>' +
           '</body></html>';
         function mount(el) {
+          /* Pro members never see a single ad. */
+          if (document.body && document.body.classList.contains("is-pro")) return;
           if (el.dataset.prAdMounted === "1") return;
           if (!el.isConnected || el.clientWidth < 20) return;
           el.dataset.prAdMounted = "1";
@@ -2482,6 +2456,6 @@
         else start();
       })();
     </script>
-    <script type="module" src="assets/app.min.js?v=09d548ce9a"></script>
+    <script type="module" src="assets/app.min.js?v=7c95fa85a0"></script>
   </body>
 </html>
