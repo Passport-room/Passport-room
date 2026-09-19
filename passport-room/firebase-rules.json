@@ -1,0 +1,47 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "counters": {
+      "customerNumber": {
+        ".read": true,
+        ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+      }
+    },
+
+    "devices": {
+      "$deviceId": {
+        ".read": true,
+        ".write": "!data.exists() && newData.isString() && newData.val().length <= 20"
+      }
+    },
+
+    "customers": {
+      ".read": false,
+      ".indexOn": "lastVisit",
+
+      "$customerId": {
+        ".read": false,
+        ".write": "newData.exists()",
+        ".validate": "newData.hasChildren(['id', 'visitCount', 'lastVisit'])",
+
+        "id": { ".validate": "newData.isString()" },
+        "deviceId": { ".validate": "newData.isString()" },
+        "browser": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "deviceType": { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "os": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "screen": { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "userAgent": { ".validate": "newData.isString() && newData.val().length <= 400" },
+        "country": { ".validate": "newData.isString() && newData.val().length <= 60" },
+        "countryCode": { ".validate": "newData.isString() && newData.val().length <= 4" },
+        "visitCount": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "photoCount": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "totalMs": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "firstVisit": { ".validate": "newData.isNumber()" },
+        "lastVisit": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
