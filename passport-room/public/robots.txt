@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://passport-room.com/sitemap.xml
