@@ -1,7 +1,6 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
-  
   "installCommand": "npm install",
   "headers": [
     {
@@ -11,18 +10,33 @@
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
         },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
         {
           "key": "Permissions-Policy",
           "value": "geolocation=(), microphone=(), payment=(self \"https://buy.paddle.com\" \"https://sandbox-buy.paddle.com\"), usb=(), interest-cohort=()"
         },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
-        { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        },
+        {
+          "key": "X-Permitted-Cross-Domain-Policies",
+          "value": "none"
+        },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.paddle.com https://*.paddle.com https://www.highrevenueformat.com https://*.highrevenueformat.com https://*.adsterratech.com https://*.profitableratecpm.com https://*.effectivegatecpm.com https://cdn.jsdelivr.net; worker-src 'self' blob:; connect-src 'self' blob: data: https://*.paddle.com https://cdn.paddle.com https://passport-48389-default-rtdb.firebaseio.com https://ipwho.is https://huggingface.co https://*.huggingface.co https://*.hf.co https://*.xethub.hf.co https://*.amazonaws.com https://www.highrevenueformat.com https://*.highrevenueformat.com https://*.adsterratech.com https://*.profitableratecpm.com https://*.effectivegatecpm.com https://cdn.jsdelivr.net; frame-src 'self' data: blob: https:; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.paddle.com https://*.paddle.com https://www.highrevenueformat.com https://*.highrevenueformat.com https://*.adsterratech.com https://*.profitableratecpm.com https://*.effectivegatecpm.com https://cdn.jsdelivr.net https://apis.google.com https://www.gstatic.com; worker-src 'self' blob:; connect-src 'self' blob: data: https://*.paddle.com https://cdn.paddle.com https://passport-48389-default-rtdb.firebaseio.com https://ipwho.is https://huggingface.co https://*.huggingface.co https://*.hf.co https://*.xethub.hf.co https://*.amazonaws.com https://www.highrevenueformat.com https://*.highrevenueformat.com https://*.adsterratech.com https://*.profitableratecpm.com https://*.effectivegatecpm.com https://cdn.jsdelivr.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://apis.google.com https://passport-48389.firebaseapp.com https://passport-48389.firebaseio.com https://*.firebaseio.com; frame-src 'self' data: blob: https:; upgrade-insecure-requests"
         }
       ]
     }

@@ -401,17 +401,16 @@ export async function restoreSession() {
 
 /* ------------------------------ Google sign-in ----------------------------- */
 
-const SDK = "https://www.gstatic.com/firebasejs/10.12.0/";
+// Firebase Auth is bundled with the app (npm package) and served from this
+// site, so nothing is loaded from an external CDN at runtime.
 let googleAuthPromise = null;
 
 async function loadGoogleAuth() {
   if (!googleAuthPromise) {
     googleAuthPromise = (async () => {
-      const appUrl = `${SDK}firebase-app.js`;
-      const authUrl = `${SDK}firebase-auth.js`;
       const [{ initializeApp, getApps }, authMod] = await Promise.all([
-        import(/* @vite-ignore */ appUrl),
-        import(/* @vite-ignore */ authUrl),
+        import("firebase/app"),
+        import("firebase/auth"),
       ]);
       const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
       const auth = authMod.getAuth(app);
