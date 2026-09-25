@@ -24,7 +24,12 @@ import {
   updateHeaderProfileWidget,
   checkAndShowSavePhotosNotice,
 } from "./modals-manager.js";
-import { recordActivity, addHistoryItem, loadAccount } from "./account-manager.js";
+import {
+  recordActivity,
+  addHistoryItem,
+  loadAccount,
+  requireAuth,
+} from "./account-manager.js";
 import {
   canGenerate,
   consumeGeneration,
@@ -367,10 +372,15 @@ const drop = $("drop"),
 if (pickBtn)
   pickBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+    // Photos can only be made by a signed-in account.
+    if (!requireAuth()) return;
     fileInput.click();
   });
 if (drop) {
-  drop.addEventListener("click", () => fileInput.click());
+  drop.addEventListener("click", () => {
+    if (!requireAuth()) return;
+    fileInput.click();
+  });
   drop.addEventListener("dragover", (e) => {
     e.preventDefault();
     drop.classList.add("drag");
@@ -379,6 +389,7 @@ if (drop) {
   drop.addEventListener("drop", (e) => {
     e.preventDefault();
     drop.classList.remove("drag");
+    if (!requireAuth()) return;
     const f = e.dataTransfer.files?.[0];
     if (f) handleFile(f);
   });
@@ -468,6 +479,7 @@ function startFreshSession() {
 }
 
 async function handleFile(file) {
+  if (!requireAuth()) return;
   if (!file.type.startsWith("image/")) {
     showError(uploadError, "Please choose an image file (JPG or PNG).");
     return;

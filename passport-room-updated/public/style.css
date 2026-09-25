@@ -31,7 +31,14 @@ body {
     radial-gradient(60% 50% at 50% 0%, oklch(0.3 0.12 305 / 0.35), transparent 70%),
     radial-gradient(50% 40% at 100% 100%, oklch(0.28 0.12 328 / 0.25), transparent 70%);
   background-attachment: fixed;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  max-width: 100%;
 }
 h1,
 h2,
@@ -239,6 +246,9 @@ h3 {
 /* View */
 .view {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   max-width: 1180px;
   margin: 0 auto;
   padding: 2px 20px 20px;
@@ -294,6 +304,9 @@ h3 {
 
 .hero {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   z-index: 1;
   padding-top: 2px;
   text-align: center;
@@ -4449,7 +4462,47 @@ select:focus {
    flush against the feature cards or the drop zone. */
 .pr-ad-hero {
   margin-top: 22px;
-  margin-bottom: 26px;
+  margin-bottom: 12px;
+}
+
+.trustedLine {
+  margin: 0 auto 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px 8px 9px;
+  border: 1px solid oklch(0.76 0.15 151 / 0.32);
+  border-radius: 10px;
+  background: oklch(0.25 0.075 151 / 0.28);
+  color: oklch(0.94 0.035 151);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-align: center;
+  letter-spacing: 0;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.05);
+}
+
+.trustedCheck {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  border-radius: 50%;
+  background: oklch(0.73 0.2 148);
+  color: oklch(0.18 0.05 148);
+  box-shadow: 0 0 14px oklch(0.73 0.2 148 / 0.28);
+}
+
+.trustedCheck svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Banner under the AI loading animation. */
@@ -4818,6 +4871,37 @@ body.is-pro [data-pr-ad] {
   margin-top: 7px;
   min-height: 15px;
 }
+@media (min-width: 800px) {
+  .reviewChat {
+    max-width: 820px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+    grid-template-areas:
+      "head form"
+      "list form";
+  }
+  .reviewChatHead {
+    grid-area: head;
+  }
+  .reviewChatBody {
+    grid-area: list;
+    height: 330px;
+  }
+  .reviewChatForm {
+    grid-area: form;
+    border-top: 0;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .reviewChatInputRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reviewSendBtn {
+    width: 100%;
+  }
+}
 @media (max-width: 480px) {
   .reviewChatBody {
     height: 250px;
@@ -4839,4 +4923,193 @@ body.is-pro [data-pr-ad] {
   .reviewStar small {
     font-size: 8px;
   }
+}
+
+.localProfileUi {
+  display: none !important;
+}
+
+@media (max-width: 639px) {
+  .seoTableWrap,
+  .homeFooter,
+  .homeFooterBottom,
+  .homeFooterLinks {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .seoTableWrap {
+    overflow-x: auto;
+  }
+  .homeFooterLinks {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+.profileCard:has(.accAuthBlock:not(.hidden)) {
+  align-items: stretch;
+  text-align: left;
+}
+
+
+/* ------------------------------ Sign in / sign up ------------------------------ */
+.authView {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(6, 8, 18, 0.72);
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
+}
+.authView.hidden { display: none; }
+body.authOpen { overflow: hidden; }
+.authCard {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding: 26px 22px 22px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #12141f;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  color: #eef1f8;
+  text-align: left;
+}
+.authClose {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eef1f8;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.authBrand {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+.authCard h2 { margin: 0 0 6px; font-size: 22px; }
+.authSub { margin: 0 0 18px; font-size: 14px; opacity: 0.7; }
+.authForm { display: block; }
+.authLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+  margin: 12px 0 6px;
+}
+.authInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+}
+.authInput:focus { border-color: #6366f1; }
+.authMsg {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: rgba(239, 68, 68, 0.14);
+  color: #fda4af;
+}
+.authMsg.ok { background: rgba(34, 197, 94, 0.14); color: #86efac; }
+.authMsg.hidden { display: none; }
+.authSubmit { width: 100%; margin-top: 16px; }
+.authLink {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #a5b4fc;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.authLink.hidden { display: none; }
+#authForgot { margin-top: 12px; display: inline-block; }
+.authSwap { margin-top: 14px; font-size: 13px; opacity: 0.85; }
+.authSwap span { margin-right: 6px; }
+.authAccountLine { margin-top: 6px; font-size: 13px; opacity: 0.8; }
+.authAccountLine.hidden { display: none; }
+.authAccountLine .authLink { margin-left: 8px; }
+
+/* ===== Accounts: stepped sign-in screen + profile account block ===== */
+.authGoogleWrap { margin-top: 14px; }
+.authDivider {
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255, 255, 255, 0.45); font-size: 12px; margin: 10px 0;
+}
+.authDivider::before, .authDivider::after {
+  content: ""; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.14);
+}
+.authGoogleBtn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px 14px; border-radius: 12px; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.96); color: #1f1f1f;
+  font-size: 14px; font-weight: 600; transition: transform .15s ease, box-shadow .15s ease;
+}
+.authGoogleBtn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0, 0, 0, .25); }
+.authGoogleBtn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.authCodeInput { letter-spacing: .04em; }
+.authVerifyRow { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.authSwap { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+
+.accAuthBlock {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px; padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.accAuthPhoto { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.accAuthText { flex: 1; min-width: 150px; }
+.accAuthName { font-size: 14px; font-weight: 700; }
+.accAuthEmail { font-size: 12px; opacity: .75; word-break: break-all; }
+.accAuthMeta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.accAuthProvider, .accAuthStatus {
+  font-size: 11px; padding: 3px 8px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.accAuthStatus.ok { background: rgba(34, 197, 94, 0.18); color: #6ee7a8; }
+.accAuthStatus.warn { background: rgba(250, 204, 21, 0.18); color: #fbe07a; }
+.accAuthActions { display: flex; gap: 12px; align-items: center; }
+
+/* Log in / Sign up switch */
+.authTabs {
+  display: flex; gap: 6px; padding: 4px; margin: 0 0 14px;
+  border-radius: 14px; background: rgba(255, 255, 255, 0.06);
+}
+.authTabs.hidden { display: none; }
+.authTab {
+  flex: 1; padding: 10px 12px; border: 0; border-radius: 11px; cursor: pointer;
+  background: transparent; color: rgba(238, 241, 248, 0.7);
+  font-size: 14px; font-weight: 700; min-height: 44px;
+}
+.authTab.on { background: #6366f1; color: #fff; }
+.authPwHint { margin-top: 8px; font-size: 12px; line-height: 1.45; opacity: 0.72; }
+.authPwHint.ok { color: #86efac; opacity: 1; }
+.authPwHint.hidden { display: none; }
+@media (max-width: 480px) {
+  .authCard { padding: 22px 16px 18px; border-radius: 16px; }
+  .authInput { font-size: 16px; } /* stops iOS from zooming in */
+  .authVerifyRow, .authSwap { flex-wrap: wrap; }
 }

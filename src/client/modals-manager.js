@@ -50,6 +50,9 @@ export function showToast(message, type = "info", duration = 3200) {
   }, duration);
 }
 
+// Let other modules (sign-in, account) raise the same notifications.
+if (typeof window !== "undefined") window.__prToast = showToast;
+
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (m) => {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];

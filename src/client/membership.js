@@ -213,7 +213,7 @@ function paint() {
         FREE_DAILY_LIMIT === 1 ? "" : "s"
       } left today</span>`;
       if (upgradeLink) {
-        upgradeLink.textContent = `Buy Pro for ${PRICE_LABEL} for unlimited photos →`;
+        upgradeLink.textContent = "Buy Pro for for unlimited";
         upgradeLink.classList.remove("hidden");
       }
     }

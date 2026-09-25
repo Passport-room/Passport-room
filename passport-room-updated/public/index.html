@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c0519" />
     <title>Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room</title>
     <meta
       name="description"
@@ -47,7 +48,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=98658fd319" />
+    <link rel="stylesheet" href="style.css?v=7c1bceff87" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -359,6 +360,14 @@
           <div id="drop" class="drop">
             <input id="fileInput" type="file" accept="image/*" hidden />
             <div class="dropInner">
+              <div class="trustedLine">
+                <span class="trustedCheck" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <path d="m5.2 10.2 3 3.1 6.8-7" />
+                  </svg>
+                </span>
+                <span>Trusted by 1,000+</span>
+              </div>
               <div class="dropIcon">
                 <svg
                   viewBox="0 0 24 24"
@@ -382,7 +391,7 @@
           <!-- Kept outside #drop so this link never opens the image picker. -->
           <div class="uploadPlanBar">
             <div id="planLine" class="planLine"><span>3 free photos left today</span></div>
-            <a id="upgradeLink" class="planLineLink" href="/payment">Buy Pro for $0.99 for unlimited photos <span aria-hidden="true">→</span></a>
+            <a id="upgradeLink" class="planLineLink" href="/payment">Buy Pro for for unlimited</a>
             <div class="proExpiredNote hidden" data-pro-expired>
               Your Pro membership expired on <strong data-pro-expired-date>—</strong>.
               <a class="planLineLink" href="/payment">Renew for $0.99</a>
@@ -1350,7 +1359,7 @@
         <div class="drawerContent">
           <!-- Profile Card -->
           <div class="profileCard">
-            <div class="profileAvatarBox">
+            <div class="profileAvatarBox localProfileUi" aria-hidden="true">
               <img id="accAvatarImg" class="profileAvatarImg hidden" alt="Avatar" />
               <div id="accAvatarInitials" class="profileAvatarInitials">P</div>
               <label class="avatarEditBadge" title="Change Avatar Photo">
@@ -1371,7 +1380,7 @@
               </label>
             </div>
             <div class="profileInfoGroup">
-              <div class="profileNameRow">
+              <div class="profileNameRow localProfileUi" aria-hidden="true">
                 <input
                   type="text"
                   id="accNameInput"
@@ -1381,11 +1390,37 @@
                 />
                 <button id="accSaveNameBtn" class="accSaveBtn" title="Save name">Save</button>
               </div>
-              <div id="accCreatedDate" class="profileSubText">Member since July 2026</div>
-              <div class="profileBadgeTag">Pro Citizen • Local Account</div>
-              <div class="profileSubText" title="Your permanent user number — it never changes">
+              <div id="accCreatedDate" class="profileSubText localProfileUi" aria-hidden="true">Member since July 2026</div>
+              <div class="profileBadgeTag localProfileUi" aria-hidden="true">Pro Citizen • Local Account</div>
+              <div class="profileSubText localProfileUi" aria-hidden="true" title="Your permanent user number — it never changes">
                 User number:
                 <strong data-customer-code style="font-family: ui-monospace, monospace">—</strong>
+              </div>
+
+              <div id="accAuthBlock" class="accAuthBlock hidden">
+                <img id="accAuthPhoto" class="accAuthPhoto hidden" alt="" />
+                <div class="accAuthText">
+                  <div id="accAuthName" class="accAuthName">Your account</div>
+                  <div id="accAuthEmail" class="accAuthEmail"></div>
+                  <div class="accAuthMeta">
+                    <span id="accAuthProvider" class="accAuthProvider"></span>
+                    <span id="accAuthStatus" class="accAuthStatus"></span>
+                  </div>
+                </div>
+                <div class="accAuthActions">
+                  <button id="accVerifyBtn" class="authLink hidden" type="button">Verify email</button>
+                  <button id="accSignOutBtn" class="authLink" type="button">Sign out</button>
+                </div>
+              </div>
+              <div id="accAuthSignedOut" class="accAuthBlock">
+                <div class="accAuthText">
+                  <div class="accAuthName">You are not signed in</div>
+                  <div class="accAuthEmail">Log in, or sign up, to save your account across devices.</div>
+                </div>
+                <div class="accAuthActions">
+                  <button id="accSignInBtn" class="authLink" type="button">Log in</button>
+                  <button id="accSignUpBtn" class="authLink" type="button">Sign up</button>
+                </div>
               </div>
 
             </div>
@@ -2508,6 +2543,56 @@
         else start();
       })();
     </script>
-    <script type="module" src="assets/app.min.js?v=e4efb9d305"></script>
+    <!-- Sign in / create account (Firebase) -->
+    <div id="authView" class="authView hidden" role="dialog" aria-modal="true" aria-label="Sign in">
+      <div class="authCard">
+        <button id="authClose" class="authClose" type="button" aria-label="Close">&times;</button>
+        <div class="authBrand">Passport Room</div>
+        <div id="authTabs" class="authTabs" role="tablist">
+          <button id="authTabLogin" class="authTab on" type="button" role="tab">Log in</button>
+          <button id="authTabSignup" class="authTab" type="button" role="tab">Sign up</button>
+        </div>
+        <h2 id="authTitle">Welcome back</h2>
+        <p id="authSub" class="authSub">Log in with your email and password, or continue with Google.</p>
+        <form id="authForm" class="authForm" novalidate>
+          <div id="authStepEmail">
+            <label class="authLabel" for="authEmail">Email</label>
+            <input id="authEmail" class="authInput" type="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div id="authStepPassword" class="hidden">
+            <label class="authLabel" for="authPassword">Password</label>
+            <input id="authPassword" class="authInput" type="password" autocomplete="current-password" placeholder="Your password" />
+            <div id="authPwHint" class="authPwHint hidden">Password needs: 8+ characters, a capital letter, a lowercase letter and a number.</div>
+            <div id="authPasswordConfirmRow" class="hidden">
+              <label class="authLabel" for="authPasswordConfirm">Confirm password</label>
+              <input id="authPasswordConfirm" class="authInput" type="password" autocomplete="new-password" placeholder="Type it again" />
+            </div>
+          </div>
+          <div id="authStepVerify" class="hidden">
+            <p id="authVerifyHelp" class="authLabel">Open the email we just sent and tap the verification link. Then come back to this page.</p>
+            <button id="authCodeSubmit" class="btn primary authSubmit" type="button">I've verified my email</button>
+            <div class="authVerifyRow">
+              <button id="authResend" class="authLink" type="button">Resend email</button>
+              <button id="authVerifyLater" class="authLink" type="button">I'll do it later</button>
+            </div>
+          </div>
+          <div id="authMsg" class="authMsg hidden"></div>
+          <button id="authSubmit" class="btn primary authSubmit" type="submit">Continue</button>
+        </form>
+        <div id="authGoogleWrap" class="authGoogleWrap">
+          <div class="authDivider"><span>or</span></div>
+          <button id="authGoogleBtn" class="authGoogleBtn" type="button">
+            <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.5 2.5 30.1 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 6.9l7 5.4c4.1-3.8 6.5-9.4 6.5-16.1z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C.9 16.3 0 20 0 24s.9 7.7 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7-5.4c-2 1.3-4.6 2.1-8.9 2.1-6.3 0-11.7-3.7-13.6-9.2l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+            Continue with Google
+          </button>
+        </div>
+        <div class="authSwap">
+          <button id="authForgot" class="authLink hidden" type="button">Forgot password?</button>
+          <button id="authBack" class="authLink hidden" type="button">&larr; Use another email</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="assets/app.min.js?v=78dd0574b8"></script>
   </body>
 </html>

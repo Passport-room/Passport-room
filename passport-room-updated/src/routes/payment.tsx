@@ -160,7 +160,7 @@ function PaymentPage() {
     ? `Renew for ${priceLabel}`
     : state.status === "expired"
       ? `Renew Pro — ${priceLabel}`
-      : `Get Pro — ${priceLabel}`;
+      : "Start";
 
   return (
     <main className="studio-theme min-h-screen bg-background px-4 py-6 text-foreground sm:px-6 sm:py-10">
@@ -171,10 +171,7 @@ function PaymentPage() {
         </a>
 
         <header className="mx-auto mt-8 max-w-xl text-center sm:mt-12">
-          <span className="inline-flex rounded-full border border-border bg-secondary px-3 py-1 text-xs font-semibold uppercase text-secondary-foreground">
-            Simple pricing
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-5xl">Choose your plan</h1>
+          <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">How is it going?</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base">
             Make passport photos for free, or unlock unlimited, ad-free access for one small payment.
           </p>
