@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no upload, no account, no watermark.",
+          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
       },
       { name: "author", content: "Passport Room" },
       { property: "og:site_name", content: "Passport Room" },
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no upload, no account, no watermark.",
+          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://passport-room.com/" },
@@ -103,15 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "twitter:description",
         content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no upload, no account, no watermark.",
-      },
-      {
-        property: "og:image",
-        content: "https://passport-room.com/assets/og-image.png",
-      },
-      {
-        name: "twitter:image",
-        content: "https://passport-room.com/assets/og-image.png",
+          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
       },
     ],
     links: [
