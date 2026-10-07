@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta name="24c738a49a81084967752ad0d8b1148a18995934" content="24c738a49a81084967752ad0d8b1148a18995934" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0c0519" />
@@ -50,7 +49,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=da8cef6b94" />
+    <link rel="stylesheet" href="style.css?v=6a5169af02" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -353,10 +352,21 @@
               </div>
             </div>
           </div>
-          <!-- Google AdSense above the upload box -->
-<div class="pr-ad pr-ad-hero">
+          <!-- HilltopAds banner above the upload box -->
+<div class="pr-ad pr-ad-hero pr-hta">
   <div class="cubit-ad-label">Advertisement</div>
-  <div class="pr-ad-slot" data-pr-ad><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9371329820300868" data-ad-format="horizontal" data-full-width-responsive="false"></ins></div>
+  <div class="pr-hta-slot"><script>
+(function(sswmepg){
+var d = document,
+    s = d.createElement('script'),
+    l = d.currentScript || d.scripts[d.scripts.length - 1];
+s.settings = sswmepg || {};
+s.src = "\/\/peacefulbicycle.com\/b\/X\/V.sxd\/GNlT0\/YFWyce\/Eevmi9fuOZQUHlrkgPFTlcf0ROiT\/Yg2\/NWD\/E\/t\/NuzCQ\/5BN\/j\/Y\/0WNqQo";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
+</script></div>
 </div>
 
           <div id="drop" class="drop">
@@ -447,11 +457,14 @@
         <div id="procTitle" class="procTitle">Warming up the AI…</div>
         <div id="procSub" class="procSub">Preparing your photo studio.</div>
 
-        <!-- Google AdSense under the AI loading animation -->
-<div class="pr-ad pr-ad-proc">
-  <div class="cubit-ad-label">Advertisement</div>
-  <div class="pr-ad-slot" data-pr-ad><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9371329820300868" data-ad-format="horizontal" data-full-width-responsive="false"></ins></div>
-</div>
+        <!-- HilltopAds VAST video zone on the loading screen -->
+        <div id="prVideoAd" class="pr-vad hidden">
+          <div class="cubit-ad-label">Advertisement</div>
+          <div class="pr-vad-frame">
+            <video id="prVideoAdEl" muted playsinline loop preload="none"></video>
+            <a id="prVideoAdClick" class="pr-vad-click" href="#" target="_blank" rel="noopener sponsored" aria-label="Visit advertiser"></a>
+          </div>
+        </div>
       </section>
 
       <section id="resultView" class="view hidden">
@@ -487,6 +500,22 @@
                 <canvas id="previewCanvas"></canvas>
                 <img id="tryOnResult" class="tryOnResult hidden" alt="AI dress try-on result" />
               </div>
+            </div>
+            <!-- HilltopAds banner under the preview box -->
+            <div class="pr-ad pr-ad-preview pr-hta">
+              <div class="cubit-ad-label">Advertisement</div>
+              <div class="pr-hta-slot"><script>
+(function(sswmepg){
+var d = document,
+    s = d.createElement('script'),
+    l = d.currentScript || d.scripts[d.scripts.length - 1];
+s.settings = sswmepg || {};
+s.src = "\/\/peacefulbicycle.com\/b\/X\/V.sxd\/GNlT0\/YFWyce\/Eevmi9fuOZQUHlrkgPFTlcf0ROiT\/Yg2\/NWD\/E\/t\/NuzCQ\/5BN\/j\/Y\/0WNqQo";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
+</script></div>
             </div>
           </div>
 
@@ -2455,7 +2484,7 @@
     <!-- Sign in / create account (Firebase) -->
     
 
-    <script type="module" src="assets/app.min.js?v=f82fc49705"></script>
+    <script type="module" src="assets/app.min.js?v=317d7a037c"></script>
   
     <!-- First-visit "free forever" banner -->
     <div id="prFreeBanner" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">
@@ -2467,21 +2496,5 @@
       </div>
     </div>
 
-    <!-- Pre-download advertisement notice -->
-    <div id="prAdModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="prAdTitle">
-      <div class="modalBox prAdBox">
-        <button id="prAdClose" type="button" class="prAdClose" aria-label="Close">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        </button>
-        <div class="modalIcon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
-        </div>
-        <div id="prAdTitle" class="modalTitle">Ready to download</div>
-        <p class="modalSub muted small">Clicking <strong>Download</strong> will open an advertisement website in a new tab, while your picture downloads automatically. Ads keep Passport Room free forever — thank you!</p>
-        <div class="modalBtns">
-          <button id="prAdGo" type="button" class="btn primary">Download</button>
-        </div>
-      </div>
-    </div>
 </body>
 </html>

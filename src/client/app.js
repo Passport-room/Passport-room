@@ -245,7 +245,16 @@ function stopProcMessageCycle() {
 // Views
 const views = { upload: $("uploadView"), processing: $("processingView"), result: $("resultView") };
 function setPhase(p) {
+  // Keep the loading-screen video ad on screen for its minimum 10 seconds.
+  if (phase === "processing" && p === "result") {
+    const wait = window.__prVideoAdHold ? window.__prVideoAdHold() : 0;
+    if (wait > 0) {
+      setTimeout(() => { if (phase === "processing") setPhase(p); }, wait);
+      return;
+    }
+  }
   phase = p;
+  window.dispatchEvent(new CustomEvent("pr:phase", { detail: p }));
   for (const [k, el] of Object.entries(views)) el.classList.toggle("hidden", k !== p);
   // Home-only sections (About + Articles) show only on the upload/home view
   document
