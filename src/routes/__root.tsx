@@ -11,6 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -37,6 +38,9 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  useEffect(() => {
+    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -74,37 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#0c0519" },
-      { title: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room" },
-      {
-        name: "description",
-        content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
-      },
-      { name: "author", content: "Passport Room" },
-      { property: "og:site_name", content: "Passport Room" },
-      { property: "og:locale", content: "en_US" },
-      {
-        property: "og:title",
-        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room",
-      },
-      {
-        property: "og:description",
-        content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
-      },
+      { title: "Passport Room" },
+      { name: "description", content: "Create print-ready passport photos with Passport Room." },
+      { name: "author", content: "Lovable" },
+      { property: "og:title", content: "Passport Room" },
+      { property: "og:description", content: "Create print-ready passport photos with Passport Room." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://passport-room.com/" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: "Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Make a passport or visa photo free in seconds. AI background removal and exact country sizes run in your browser — no photo upload or watermark, with optional sign-in.",
-      },
+      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {

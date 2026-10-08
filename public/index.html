@@ -471,7 +471,6 @@ l.parentNode.insertBefore(s, l);
         <div class="resultHead">
           <div class="resultHeadText">
             <h1>Your passport photo is ready</h1>
-            <button id="hintBtn" type="button" class="btn ghost prHintBtn" data-ad-link>💡 Hint</button>
             <p class="muted small">Fine-tune framing, adjust, pick a background, then download.</p>
           </div>
           <div class="resultHeadButtons">
@@ -1005,43 +1004,20 @@ l.parentNode.insertBefore(s, l);
       <!-- Daily free limit reached -->
       
 
-      <div id="downloadModal" class="modalOverlay hidden">
-        <div class="modalBox">
-          <div class="modalIcon">
-          <button id="downloadModalClose" type="button" class="cubit-download-modal-close" aria-label="Close dialog" title="Close">×</button>
-
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 3v12" />
-              <path d="m7 10 5 5 5-5" />
-              <path d="M4 21h16" />
-            </svg>
+      <div id="downloadModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+        <div class="modalBox pr-download-box">
+          <div class="modalIcon" aria-hidden="true">↓</div>
+          <h2 id="downloadTitle" class="modalTitle">Your picture is downloading</h2>
+          <div class="pr-download-ad">
+            <div class="cubit-ad-label">Advertisement</div>
+            <div class="pr-vad-frame">
+              <video id="prDownloadVideo" muted playsinline preload="none" aria-label="Video advertisement"></video>
+            </div>
+            <p id="prDownloadStatus" class="muted small" role="status">Skip available in 5 seconds</p>
           </div>
-          <div class="modalTitle">Your image is downloading…</div>
-
-<!-- Google AdSense in the download popup -->
-<div class="pr-ad pr-ad-modal">
-  <div class="cubit-ad-label">Advertisement</div>
-  <div class="pr-ad-slot" data-pr-ad><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9371329820300868" data-ad-format="horizontal" data-full-width-responsive="false"></ins></div>
-</div>
-
-          <p class="modalSub muted small">Check your device's downloads folder for the file.</p>
-
-          <!-- Pro offer: free visitors only. Pro members never see this. -->
-          
-          
-          
-
-          <div class="modalBtns">
-            <button id="modalHome" class="btn primary">Home</button>
+          <div class="modalBtns pr-download-actions">
+            <button id="prDownloadSkip" type="button" class="btn ghost" disabled>Skip · 5s</button>
+            <button id="modalHome" type="button" class="btn primary" disabled>Go home</button>
           </div>
         </div>
       </div>

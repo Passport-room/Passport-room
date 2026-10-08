@@ -1,5 +1,29 @@
-# Passport Room
+# Welcome to your Lovable project
 
-Install dependencies with `npm install`, then run `npm run dev` for local development or `npm run build` for deployment. The build script regenerates the browser app bundle in `public/assets/` from `src/client/`.
+This project was built with [Lovable](https://lovable.dev).
 
-The four former Adsterra placements now contain Google AdSense ad units and the publisher loader is configured for `ca-pub-9371329820300868`. For guaranteed ads in these exact four placements, create ad units in your AdSense account and add each unit's numeric `data-ad-slot` value to its `<ins class="adsbygoogle">` in `public/index.html`. Your provided publisher ID alone does not include those unit IDs. Auto ads may place ads independently, subject to Google's approval, inventory and policy checks. Pro members continue to see no ads.
+## Build with Lovable
+
+Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
+- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
+npm run dev
+```
+
+## Built with
+
+- TanStack Start
+- TypeScript
+- React
+- Tailwind CSS

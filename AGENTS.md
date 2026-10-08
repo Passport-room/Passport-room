@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Preserve Passport Room's photo studio as the self-contained `public/index.html` served through the `/` redirect, because its browser-side photo tools and established content pages depend on those static assets.
-- Keep the four advertising placements in the studio and load AdSense only when a placement is visible. The site is free forever with no accounts or payments; monetisation is ads plus a Smart Link gate on Hint and Download buttons (src/client/free-and-ads.js).
+- Preserve the supplied self-contained Passport Room studio in public/index.html with a home redirect so preview and archive show the same existing photo tools.
+- Share post-download dismissal logic in a dedicated browser module so all photo exports use consistent timing without redirects.
