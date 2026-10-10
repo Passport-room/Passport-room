@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta name="referrer" content="no-referrer-when-downgrade" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0c0519" />
@@ -25,6 +24,9 @@
       property="og:description"
       content="Make a passport or visa photo in your browser — no photo upload, no watermark, no sign-up. 100% free forever with unlimited photos."
     />
+    <meta property="og:image" content="https://passport-room.com/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
       content="Passport Room passport photo maker with a 35x45mm ID photo and measurement guides"
@@ -38,14 +40,16 @@
       name="twitter:description"
       content="Make a passport or visa photo in your browser — no photo upload, no watermark, no sign-up. 100% free forever with unlimited photos."
     />
+    <meta name="twitter:image" content="https://passport-room.com/assets/og-image.png" />
     <link rel="icon" href="favicon.ico" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9371329820300868" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=20261009" />
+    <link rel="stylesheet" href="style.css?v=6a5169af02" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -234,7 +238,7 @@
       <header class="top">
         <div class="topbar">
           <div class="topLogoGroup">
-            <img id="logo" src="/logo.png" alt="Passport Room" />
+            <img id="logo" src="logo.png" alt="Passport Room" />
           </div>
           <div class="topright">
             <span id="backendBadge" class="badge hidden"></span>
@@ -351,7 +355,18 @@
           <!-- HilltopAds banner above the upload box -->
 <div class="pr-ad pr-ad-hero pr-hta">
   <div class="cubit-ad-label">Advertisement</div>
-  <div class="pr-hta-slot" data-hilltop-banner></div>
+  <div class="pr-hta-slot"><script>
+(function(sswmepg){
+var d = document,
+    s = d.createElement('script'),
+    l = d.currentScript || d.scripts[d.scripts.length - 1];
+s.settings = sswmepg || {};
+s.src = "\/\/peacefulbicycle.com\/b\/X\/V.sxd\/GNlT0\/YFWyce\/Eevmi9fuOZQUHlrkgPFTlcf0ROiT\/Yg2\/NWD\/E\/t\/NuzCQ\/5BN\/j\/Y\/0WNqQo";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
+</script></div>
 </div>
 
           <div id="drop" class="drop">
@@ -442,10 +457,13 @@
         <div id="procTitle" class="procTitle">Warming up the AI…</div>
         <div id="procSub" class="procSub">Preparing your photo studio.</div>
 
-        <!-- Existing home-page HilltopAds banner, replacing the video. -->
-        <div class="pr-ad pr-ad-proc pr-hta">
+        <!-- HilltopAds VAST video zone on the loading screen -->
+        <div id="prVideoAd" class="pr-vad hidden">
           <div class="cubit-ad-label">Advertisement</div>
-          <div class="pr-hta-slot" data-hilltop-banner></div>
+          <div class="pr-vad-frame">
+            <video id="prVideoAdEl" muted playsinline loop preload="none"></video>
+            <a id="prVideoAdClick" class="pr-vad-click" href="#" target="_blank" rel="noopener sponsored" aria-label="Visit advertiser"></a>
+          </div>
         </div>
       </section>
 
@@ -485,7 +503,18 @@
             <!-- HilltopAds banner under the preview box -->
             <div class="pr-ad pr-ad-preview pr-hta">
               <div class="cubit-ad-label">Advertisement</div>
-              <div class="pr-hta-slot" data-hilltop-banner></div>
+              <div class="pr-hta-slot"><script>
+(function(sswmepg){
+var d = document,
+    s = d.createElement('script'),
+    l = d.currentScript || d.scripts[d.scripts.length - 1];
+s.settings = sswmepg || {};
+s.src = "\/\/peacefulbicycle.com\/b\/X\/V.sxd\/GNlT0\/YFWyce\/Eevmi9fuOZQUHlrkgPFTlcf0ROiT\/Yg2\/NWD\/E\/t\/NuzCQ\/5BN\/j\/Y\/0WNqQo";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
+</script></div>
             </div>
           </div>
 
@@ -975,18 +1004,21 @@
       <!-- Daily free limit reached -->
       
 
-      <div id="downloadModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="downloadTitle" aria-describedby="downloadDescription">
+      <div id="downloadModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
         <div class="modalBox pr-download-box">
-          <button id="prDownloadClose" type="button" class="pr-download-close" aria-label="Close download dialog" title="Close">×</button>
-          <div class="pr-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg></div>
-          <h2 id="downloadTitle" class="modalTitle">Download Your Picture</h2>
-          <p id="downloadDescription" class="pr-download-description">Click the button below to continue to an advertisement website. Your image will be downloaded automatically.</p>
-          <div class="pr-ad pr-ad-modal pr-hta">
+          <div class="modalIcon" aria-hidden="true">↓</div>
+          <h2 id="downloadTitle" class="modalTitle">Your picture is downloading</h2>
+          <div class="pr-download-ad">
             <div class="cubit-ad-label">Advertisement</div>
-            <div class="pr-hta-slot" data-hilltop-banner></div>
+            <div class="pr-vad-frame">
+              <video id="prDownloadVideo" muted playsinline preload="none" aria-label="Video advertisement"></video>
+            </div>
+            <p id="prDownloadStatus" class="muted small" role="status">Skip available in 5 seconds</p>
           </div>
-          <button id="prDownloadConfirm" type="button" class="btn primary pr-download-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5"/></svg><span>Download Your Picture</span></button>
-          <p id="prDownloadStatus" class="pr-download-status" role="status" aria-live="polite"></p>
+          <div class="modalBtns pr-download-actions">
+            <button id="prDownloadSkip" type="button" class="btn ghost" disabled>Skip · 5s</button>
+            <button id="modalHome" type="button" class="btn primary" disabled>Go home</button>
+          </div>
         </div>
       </div>
 
@@ -1004,9 +1036,9 @@
           </button>
           <div class="modalTitle">Ready to print</div>
 
-<div class="pr-ad pr-ad-modal pr-hta">
+<div class="pr-ad pr-ad-modal">
   <div class="cubit-ad-label">Advertisement</div>
-  <div class="pr-hta-slot" data-hilltop-banner></div>
+  <div class="pr-ad-slot" data-pr-ad><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9371329820300868" data-ad-format="horizontal" data-full-width-responsive="false"></ins></div>
 </div>
 
           <p class="modalSub muted small">Your print sheet has been sent to the print dialog.</p>
@@ -1025,7 +1057,7 @@
       <aside id="menuDrawer" class="slideDrawer right hidden" aria-label="Main navigation menu">
         <div class="drawerHeader">
           <div class="drawerHeaderTitle">
-            <img src="/logo.png" alt="Passport Room" class="drawerLogo" />
+            <img src="logo.png" alt="Passport Room" class="drawerLogo" />
             <span class="drawerBadge">v2.5</span>
           </div>
           <button class="drawerCloseBtn" data-close-drawer title="Close menu">
@@ -2129,7 +2161,7 @@
 
           <div class="aboutDemoBox">
             <img
-              src="/assets/how-it-works.jpg"
+              src="assets/how-it-works.jpg"
               loading="lazy"
               width="720"
               height="593"
@@ -2386,12 +2418,49 @@
         if (yr) yr.textContent = new Date().getFullYear();
       })();
     </script>
+    <script>
+      /* Activate AdSense only when the existing placement is visible. Google
+         requires real ad unit IDs for guaranteed placement; Auto ads may also
+         place ads independently when enabled for this publisher account. */
+      (function () {
+        function mount(el) {
+          if (document.body && document.body.classList.contains("is-pro")) return;
+          if (el.dataset.prAdMounted === "1" || !el.isConnected || el.clientWidth < 20) return;
+          var unit = el.querySelector(".adsbygoogle");
+          if (!unit) return;
+          el.dataset.prAdMounted = "1";
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (error) {
+            el.dataset.prAdMounted = "";
+            console.warn("AdSense placement could not load", error);
+          }
+        }
+        function start() {
+          var slots = document.querySelectorAll("[data-pr-ad]");
+          if ("IntersectionObserver" in window) {
+            var observer = new IntersectionObserver(function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  mount(entry.target);
+                  observer.unobserve(entry.target);
+                }
+              });
+            });
+            slots.forEach(function (el) { observer.observe(el); });
+          } else {
+            slots.forEach(mount);
+          }
+        }
+        if (document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", start);
+        else start();
+      })();
+    </script>
     <!-- Sign in / create account (Firebase) -->
     
 
-    <script src="download-flow.js?v=20261009"></script>
-    <script src="hilltop-banners.js?v=20261009"></script>
-    <script type="module" src="assets/app.min.js?v=20261009"></script>
+    <script type="module" src="assets/app.min.js?v=317d7a037c"></script>
   
     <!-- First-visit "free forever" banner -->
     <div id="prFreeBanner" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">

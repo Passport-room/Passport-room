@@ -5142,33 +5142,25 @@ body.authOpen { overflow: hidden; }
 @keyframes prFade{from{opacity:0}to{opacity:1}}
 @keyframes prPop{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:none}}
 
-/* HilltopAds zones and download confirmation: established studio tokens. */
-:root {
-  --download-surface: oklch(0.19 0.045 300);
-  --download-overlay: oklch(0.07 0.025 300 / 0.8);
-  --download-icon-bg: oklch(0.3 0.09 305);
-  --download-icon-fg: oklch(0.8 0.16 310);
-  --download-shadow: 0 24px 80px oklch(0.03 0.01 300 / 0.65);
-}
-.pr-hta .pr-hta-slot { display:flex; justify-content:center; align-items:center; width:100%; max-width:100%; overflow:hidden; min-height:90px; }
-.pr-banner-frame { display:block; width:100%; max-width:100%; height:90px; border:0; }
+/* HilltopAds zones */
+.pr-hta .pr-hta-slot { display:flex; justify-content:center; align-items:center; width:100%; max-width:100%; overflow:hidden; min-height:0; }
+.pr-hta .pr-hta-slot > * { max-width:100%; }
+.pr-hta .pr-hta-slot iframe, .pr-hta .pr-hta-slot img { max-width:100% !important; height:auto; }
 .pr-ad-preview { margin:12px 0 0; width:100%; }
-body.is-pro .pr-hta { display:none !important; }
-#downloadModal { background:var(--download-overlay); padding:16px; }
-.pr-download-box { width:min(480px,100%); max-width:none; max-height:calc(100dvh - 32px); overflow-y:auto; border-radius:20px; padding:36px 28px 24px; background:var(--download-surface); box-shadow:var(--download-shadow); }
-.pr-download-box .modalTitle { font-size:24px; line-height:1.3; margin:0 0 12px; letter-spacing:0; }
-.pr-download-icon { display:grid; place-items:center; width:64px; height:64px; margin:0 auto 20px; border-radius:18px; background:var(--download-icon-bg); color:var(--download-icon-fg); }
-.pr-download-icon svg { width:30px; height:30px; }
-.pr-download-description { color:var(--muted); font-size:14px; line-height:1.75; margin:0; }
-.pr-download-close { position:absolute; right:12px; top:12px; width:36px; height:36px; border:0; border-radius:50%; color:var(--muted); background:transparent; font-size:26px; cursor:pointer; }
-.pr-download-close:hover { background:var(--download-icon-bg); color:var(--fg); }
-.pr-download-confirm { margin-top:20px; display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:52px; padding:12px 14px; border-radius:10px; font-size:15px; font-weight:700; white-space:normal; }
-.pr-download-confirm svg { width:21px; height:21px; flex-shrink:0; }
-.pr-download-confirm:disabled { opacity:.6; cursor:wait; }
-.pr-download-close:focus-visible,.pr-download-confirm:focus-visible { outline:2px solid var(--download-icon-fg); outline-offset:4px; }
-.pr-download-status { color:var(--muted); font-size:12px; line-height:1.5; margin:12px 0 0; }
-.pr-download-status:empty { display:none; }
-@media (max-width:480px) { .pr-download-box { padding:32px 20px 22px; } .pr-download-box .modalTitle { font-size:22px; } }
-@media (prefers-reduced-motion:reduce) { .pr-download-box { animation:none; } }
+.pr-vad { width:100%; max-width:480px; margin:18px auto 0; }
+.pr-vad-frame { position:relative; width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:rgba(0,0,0,.35); }
+.pr-vad-frame video { width:100%; height:100%; object-fit:cover; display:block; }
+.pr-vad-click { position:absolute; inset:0; }
+body.is-pro .pr-vad, body.is-pro .pr-hta { display:none !important; }
 
-.pr-banner-unavailable { display:none; }
+/* Download video uses the established studio palette and controls. */
+.pr-download-box { width:min(520px,100%); max-height:calc(100dvh - 32px); overflow-y:auto; }
+.pr-download-box .modalTitle { font-size:22px; line-height:1.35; margin:0 0 16px; }
+.pr-download-ad { margin:16px 0; }
+.pr-download-ad .pr-vad-frame { border-radius:8px; background:var(--bg); }
+.pr-download-ad video { object-fit:contain; }
+.pr-download-actions { display:flex; gap:12px; }
+.pr-download-actions .btn { flex:1; min-height:44px; }
+.pr-download-actions .btn:disabled { opacity:.5; cursor:not-allowed; }
+#prDownloadStatus { min-height:20px; margin:12px 0 0; }
+@media (max-width:480px) { .pr-download-box { padding:24px 18px; } .pr-download-box .modalTitle { font-size:20px; } }
