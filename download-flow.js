@@ -39,8 +39,23 @@
     window.dispatchEvent(new Event('pr:banner-visible'));
     confirm.focus();
   };
-  confirm.addEventListener('click', function () {
-    if (!pending || confirm.disabled) return;
+  // Vendor scripts never execute in this document: their global click listeners
+  // are confined to a window created exclusively by a trusted download click.
+  function openDownloadAdvertisement() {
+    let adWindow;
+    try {
+      const adPage = new URL('download-ad.html', document.baseURI);
+      adWindow = window.open(adPage.href, '_blank', 'popup=yes,width=960,height=640');
+      if (!adWindow) return; // Popup blockers must never block the photo.
+      // Placement and focus are ultimately controlled by the user's browser.
+      try { adWindow.blur(); window.focus(); } catch (_) {}
+    } catch (_) {
+      try { adWindow?.close(); } catch (_) {}
+    }
+  }
+  confirm.addEventListener('click', function (event) {
+    if (!pending || confirm.disabled || !event.isTrusted) return;
+    openDownloadAdvertisement();
     const { blob, filename, onDownloaded } = pending;
     confirm.disabled = true;
     try {
