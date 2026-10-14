@@ -1,4 +1,4 @@
-/* The photo Blob stays on-device. Advertising never controls the download. */
+/* The photo Blob stays on-device. Downloads do not open third-party windows. */
 (function () {
   const modal = document.getElementById('downloadModal');
   const confirm = document.getElementById('prDownloadConfirm');
@@ -24,7 +24,7 @@
     if (modal.classList.contains('hidden')) {
       previousFocus = document.activeElement;
       previousOverflow = document.body.style.overflow;
-      // Prevent focus from escaping the dialog, including into ad frames.
+      // Prevent focus from escaping the dialog.
       const app = document.getElementById('app');
       background = Array.from((app || document.body).children)
         .filter(element => element !== modal && !element.contains(modal))
@@ -36,26 +36,10 @@
     confirm.disabled = false;
     document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
-    window.dispatchEvent(new Event('pr:banner-visible'));
     confirm.focus();
   };
-  // Vendor scripts never execute in this document: their global click listeners
-  // are confined to a window created exclusively by a trusted download click.
-  function openDownloadAdvertisement() {
-    let adWindow;
-    try {
-      const adPage = new URL('download-ad.html', document.baseURI);
-      adWindow = window.open(adPage.href, '_blank', 'popup=yes,width=960,height=640');
-      if (!adWindow) return; // Popup blockers must never block the photo.
-      // Placement and focus are ultimately controlled by the user's browser.
-      try { adWindow.blur(); window.focus(); } catch (_) {}
-    } catch (_) {
-      try { adWindow?.close(); } catch (_) {}
-    }
-  }
   confirm.addEventListener('click', function (event) {
     if (!pending || confirm.disabled || !event.isTrusted) return;
-    openDownloadAdvertisement();
     const { blob, filename, onDownloaded } = pending;
     confirm.disabled = true;
     try {

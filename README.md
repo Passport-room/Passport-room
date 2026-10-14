@@ -1,7 +1,12 @@
 Passport Room — Vercel static website
 
-Deploy these root-level files with framework preset Other, no build command, and output directory .
+Extract the ZIP first. Deploy this folder with index.html and vercel.json at the root.
+Use Vercel framework preset Other, leave the build command empty, and set output directory to .
+No installation or build step is required.
 
-The download popup includes the supplied HilltopAds banner. The download button saves the picture independently of advertising. Banner clicks follow the ad network destination; third-party ad clicks cannot reliably trigger image downloads.
+Existing ad scripts and ad popups have been removed. All five placement containers remain in
+index.html, marked data-ad-placement and hidden. No ad units are activated.
+Google AdSense verification and ads.txt use publisher pub-2279678646698716.
 
-Live ad serving and deployment on your Vercel account remain unverified.
+After deployment, request verification in your AdSense account. Google decides approval.
+Deployment to your Vercel account and AdSense approval cannot be guaranteed by this archive.
