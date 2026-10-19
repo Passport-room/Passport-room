@@ -1307,6 +1307,12 @@
               </label>
             </div>
             <div class="profileInfoGroup">
+              <div id="visitorProfile" aria-live="polite">
+                <strong id="visitorName">Guest</strong>
+                <div class="profileSubText">User ID: <span id="visitorUid" style="overflow-wrap:anywhere">Not assigned</span></div>
+                <div id="visitorStatus" class="profileSubText">Visitor tracking is off until you accept cookies.</div>
+                <p class="profileSubText">With your consent, Firebase assigns a persistent visitor ID to recognise this browser. This is pseudonymous, not completely anonymous. Photos remain on your device. <a href="/privacy-policy">Privacy Policy</a></p>
+              </div>
               <div class="profileNameRow localProfileUi" aria-hidden="true">
                 <input
                   type="text"
@@ -1672,7 +1678,7 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Terms of Service</h2>
-              <p class="muted small">Updated: 26 September 2026 · Passport Room Legal Terms</p>
+              <p class="muted small">Updated: 19 October 2026 · Passport Room Legal Terms</p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close Terms of Service">
               <svg
@@ -1712,8 +1718,7 @@
 
             <h3>4. Optional Accounts</h3>
             <p>
-              The free tools do not require an account. Optional email or Google sign-in is available.
-              Pro access removes the daily export limit for 30 days. See the full <a href="/terms-of-service">Terms of Service</a>.
+              The free tools do not require registration. With cookie consent, Firebase Anonymous Authentication assigns a persistent visitor ID, shown in your profile, to recognise return visits. Photos are unlimited and no payments are taken. See the full <a href="/terms-of-service">Terms of Service</a>.
             </p>
 
             <h3>5. Government Compliance Disclaimer</h3>
@@ -1740,7 +1745,7 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Privacy Policy</h2>
-              <p class="muted small">Updated: 26 September 2026 · Read the full policy for details</p>
+              <p class="muted small">Updated: 19 October 2026 · Read the full policy for details</p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close Privacy Policy">
               <svg
@@ -1765,16 +1770,14 @@
 
             <h3>2. Local Storage &amp; Cookies</h3>
             <p>
-              Browser storage remembers your preferences, visitor identifier, sign-in session and optional
-              saved photo history. Google Firebase handles optional accounts and visitor statistics;
-              The Google AdSense verification script is included while ad placements remain inactive.
+              Browser storage remembers your preferences and optional saved photo history. If you accept cookies, Firebase Anonymous Authentication stores a visitor session to recognise this browser. A random display name, visit count and dates stay in your browser; Firebase receives authentication requests and holds the visitor account. Google AdSense may use advertising cookies. Rejecting cookies turns this visitor tracking off.
               Google's <a href="https://policies.google.com/privacy" rel="nofollow noopener">privacy policy</a> applies to requests to Google.
             </p>
 
             <h3>3. Your Data Rights</h3>
             <p>
               Photos opened in the editor are not uploaded to our servers. Account information, visitor
-              statistics, reviews and Pro purchase information may be stored by our providers.
+              identifiers and submitted reviews may be processed by our providers. A visitor ID is pseudonymous, not a guarantee of anonymity; we do not publish your authentication session.
               Clearing browser data does not delete remote records; contact us to request access
               or deletion. Read the full <a href="/privacy-policy">Privacy Policy</a>.
             </p>
@@ -2406,5 +2409,6 @@
     </div>
 
 <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261019"></script>
 </body>
 </html>

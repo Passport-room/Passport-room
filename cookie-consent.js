@@ -4,6 +4,7 @@
   function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
   function apply(v) {
+    window.dispatchEvent(new CustomEvent("pr:consent", { detail: v }));
     var g = v === "accepted" ? "granted" : "denied";
     if (typeof gtag === "function") {
       gtag("consent", "update", { ad_storage: g, ad_user_data: g, ad_personalization: g, analytics_storage: g });
@@ -15,7 +16,7 @@
     if (document.getElementById("prCookie")) return;
     var d = document.createElement("div");
     d.id = "prCookie"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Cookie consent");
-    d.innerHTML = '<p>We use cookies to keep the site working, measure visits and show ads. Google and its partners may use cookies to personalise ads. Your photos never leave your device. See our <a href="/privacy-policy">Privacy Policy</a>.</p><div class="b"><button class="r" type="button">Reject</button><button class="a" type="button">Accept all</button></div>';
+    d.innerHTML = '<p>We use essential storage to keep the site working. If you accept, Firebase assigns a persistent visitor ID to recognise this browser; a random name and visit counts are stored on your device. This is not complete anonymity. Google and its partners may use cookies to personalise ads. Your photos never leave your device. See our <a href="/privacy-policy">Privacy Policy</a>.</p><div class="b"><button class="r" type="button">Reject</button><button class="a" type="button">Accept all</button></div>';
     d.querySelector(".a").onclick = function () { set("accepted"); apply("accepted"); d.remove(); };
     d.querySelector(".r").onclick = function () { set("rejected"); apply("rejected"); d.remove(); };
     document.body.appendChild(d);

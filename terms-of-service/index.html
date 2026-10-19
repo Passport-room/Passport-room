@@ -69,10 +69,10 @@
     <main class="pgWrap">
       <p class="pgCrumbs"><a href="/">Home</a> › Terms of Service</p>
       <h1>Terms of Service</h1>
-      <p class="pgMeta">Last updated: 17 October 2026</p>
+      <p class="pgMeta">Last updated: 19 October 2026</p>
       <p class="pgLead">
         By using Passport Room you agree to these terms. They are short on purpose, because the service
-        is free, has optional accounts, is supported by ads, and does not upload photos opened in the editor.
+        is free, uses consent-based visitor identification, is supported by ads, and does not upload photos opened in the editor.
       </p>
 
       <h2>1. The service</h2>
@@ -83,13 +83,9 @@
         permanently, without notice and without liability.
       </p>
 
-      <h2>2. Optional accounts and reviews</h2>
-      <p>
-        You may create an account using email and password or Google sign-in. Keep your credentials
-        secure and provide accurate account information. Community reviews you submit may be shown
-        publicly with a customer label; do not post private information or unlawful content. We
-        may remove abusive reviews or restrict misuse of accounts.
-      </p>
+      <h2>2. Visitor identity and reviews</h2>
+      <p>Registration is not required. If you accept cookies, Google Firebase Anonymous Authentication creates a persistent user ID to recognise this browser on return visits. Your profile displays that ID and a random name. This is pseudonymous tracking, not a promise of complete anonymity. Local visit counts and dates remain in your browser. Rejecting cookies or withdrawing consent disables visitor authentication without preventing use of the free photo tools. Details and deletion requests are explained in our <a href="/privacy-policy">Privacy Policy</a>.</p>
+      <p>Community reviews you submit may be shown publicly with a customer label. Do not post private information or unlawful content. We may remove abusive reviews or restrict misuse.</p>
 
       <h2>3. You keep ownership of your images</h2>
       <p>
@@ -168,8 +164,8 @@
 
       <h2>10. Third-party resources</h2>
       <p>
-        The app downloads AI model files and libraries from third-party hosts; optional accounts
-        use Google Firebase authentication.
+        The app downloads AI model files and libraries from third-party hosts; consent-based visitor identity
+        uses Google Firebase Anonymous Authentication.
         Details are in our <a href="/privacy-policy">privacy policy</a>. These providers operate
         under their own terms and their availability is outside our control.
       </p>
@@ -213,5 +209,6 @@
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
     </footer>
   <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261019"></script>
 </body>
 </html>

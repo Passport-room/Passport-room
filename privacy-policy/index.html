@@ -8,7 +8,7 @@
     <title>Privacy Policy — Passport Room</title>
     <meta
       name="description"
-      content="How Passport Room handles on-device photos, optional accounts, visitor analytics, community reviews, Google verification and Pro payments."
+      content="How Passport Room handles on-device photos, consent-based Firebase visitor IDs, browser storage, reviews and Google advertising."
     />
     <link rel="canonical" href="https://passport-room.com/privacy-policy" />
     <meta property="og:site_name" content="Passport Room" />
@@ -18,13 +18,13 @@
     <meta property="og:title" content="Privacy Policy — Passport Room" />
     <meta
       property="og:description"
-      content="How Passport Room handles on-device photos, optional accounts, visitor analytics, community reviews, Google verification and Pro payments."
+      content="How Passport Room handles on-device photos, consent-based Firebase visitor IDs, browser storage, reviews and Google advertising."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Privacy Policy — Passport Room" />
     <meta
       name="twitter:description"
-      content="How Passport Room handles on-device photos, optional accounts, visitor analytics, community reviews, Google verification and Pro payments."
+      content="How Passport Room handles on-device photos, consent-based Firebase visitor IDs, browser storage, reviews and Google advertising."
     />
     <meta name="author" content="Passport Room" />
     <link rel="icon" href="/favicon.ico" />
@@ -69,7 +69,7 @@
     <main class="pgWrap">
       <p class="pgCrumbs"><a href="/">Home</a> › Privacy Policy</p>
       <h1>Privacy Policy</h1>
-      <p class="pgMeta">Last updated: 17 October 2026</p>
+      <p class="pgMeta">Last updated: 19 October 2026</p>
       <p class="pgLead">
         This policy explains how Passport Room handles photos, accounts, visitor information,
         cookies and Google advertising.
@@ -101,8 +101,7 @@
           that execute those models, and the three.js library used by the decorative animation.
         </li>
         <li><strong>fonts.googleapis.com / fonts.gstatic.com</strong> — the site's web fonts.</li>
-        <li><strong>Google Firebase</strong> — account sign-in, visitor records, reviews and Pro access.</li>
-        <li><strong>ipwho.is</strong> — a country lookup using your IP address for visitor statistics.</li>
+        <li><strong>Google Firebase</strong> — consent-based anonymous visitor authentication and community reviews.</li>
         <li><strong>Google AdSense</strong> — displaying advertisements, which may use cookies (see section 5).</li>
       </ul>
       <p>
@@ -117,27 +116,15 @@
         counters, a visitor identifier and number, and your sign-in session in browser storage. If
         you enable photo history, recent photo thumbnails are also saved locally. Clearing browser
         site data removes this local information, including your local photo history, but does not
-        delete a signed-in account, visitor records or purchase records held by service providers.
+        delete an anonymous Firebase account or submitted reviews held by service providers.
         You can turn off or clear saved photo history in the app.
       </p>
 
-      <h2>4. Accounts, visitor statistics and reviews</h2>
-      <p>
-        You can use the free photo tools without signing in. If you choose to sign up or sign in,
-        Google Firebase Authentication processes your email address, password credentials or Google
-        sign-in details, account identifier, display name, profile image and verification status as
-        applicable. We keep a sign-in session on your device. Google handles authentication data
-        under its own privacy policy; we do not store your password in the site's visitor records.
-      </p>
-      <p>
-        We assign each browser a persistent random device identifier and customer number, and store
-        a visitor record in Firebase Realtime Database. It includes device type, browser, operating
-        system, screen size, user agent, country, visit count, time spent, photo-export count and
-        visit dates. A request to ipwho.is uses your IP address to look up your country; the country
-        is cached locally. This is not fully anonymous: a persistent identifier can distinguish
-        return visits. If you submit a community review, we store its rating, text, timestamp,
-        device identifier and customer number and display it publicly under a customer label.
-      </p>
+      <h2>4. Anonymous authentication, return visits and reviews</h2>
+      <p>If you accept cookies, Passport Room signs this browser into Google Firebase Anonymous Authentication without asking for your email, password or real name. Firebase creates a user ID and stores the anonymous authentication account. A session in browser storage lets Firebase recognise the same browser on later visits and renew its authentication tokens. Your random display name and full user ID are shown in the top-bar profile panel.</p>
+      <p>The identifier is <strong>pseudonymous, not completely anonymous</strong>: it can distinguish returning visitors. Google receives your IP address and browser information through authentication requests. We do not send your photos to Firebase, collect a real name through this feature, or publicly display authentication tokens. The random name, number of visits, first visit and last visit dates are saved locally in your browser, not uploaded to a visitor-statistics database. This update does not send a browsing history, country lookup, time spent or photo-export statistics to Firebase.</p>
+      <p>Rejecting cookies disables this visitor authentication and clears its browser session and local visitor profile. You can withdraw consent through Cookie settings. Clearing local data does not delete an account already held by Firebase; contact us with your user ID to request deletion. Clearing storage, using private browsing or another browser can result in a new ID. If network access or Firebase is unavailable, photo tools remain available and your profile reports the connection problem rather than inventing a Firebase ID.</p>
+      <p>Community reviews are separate from visitor authentication. Submitted review text, rating, timestamp and customer/device label may be stored and publicly displayed where database rules permit submission. Do not include private information in a public review.</p>
 
       <h2>5. Cookies and Google advertising</h2>
       <p>
@@ -168,13 +155,13 @@
       <p>
         <strong>Types of cookies and storage we use:</strong> <em>essential</em> browser storage that
         makes the app work (preferences, sign-in session, your cookie choice);
-        <em>analytics</em> storage for the visitor statistics described in section 4; and
+        <em>visitor tracking</em> storage for the consent-based Firebase session and local visit counts described in section 4; and
         <em>advertising</em> cookies set by Google and its partners. Requests to Google never include
         the photo opened in the editor.
       </p>
       <p>
         <strong>Your consent:</strong> on your first visit a cookie banner asks you to accept or
-        reject advertising cookies. Until you accept, we ask Google to show only non-personalised
+        reject visitor tracking and advertising cookies. Until you accept, visitor authentication does not start; we ask Google to show only non-personalised
         ads and not to store advertising cookies (Google Consent Mode). You can change your choice at
         any time with the "Cookie settings" link at the bottom of every page, or by clearing your
         browser's site data. You can also block or delete cookies in your browser settings.
@@ -186,7 +173,7 @@
       <h2>7. Children</h2>
       <p>
         Passport Room is a general-purpose utility and is not directed at children under 13. Children should not create an account or submit a review without a parent or guardian.
-        Account, visitor and purchase information may be collected as described above; we do not
+        Account, visitor and review information may be collected as described above; we do not
         knowingly seek personal information from children under 13. A parent or guardian is welcome to use the tool to produce a
         child's passport photo, and that photo is handled exactly as described in section 1.
       </p>
@@ -211,8 +198,7 @@
       <h2>10. Legal bases and how long we keep data</h2>
       <p>
         Where the GDPR or UK GDPR applies, the legal basis depends on the activity. Account
-        access is necessary to provide the services you request; security and basic site
-        statistics rely on legitimate interests; personalised advertising cookies rely on your
+        access is necessary to provide the services you request; consent-based visitor identification and personalised advertising cookies rely on your
         consent, which you can withdraw at any time.
       </p>
       <ul>
@@ -230,10 +216,9 @@
       </p>
       <ul>
         <li><strong>Our hosting and CDN provider</strong> — serving the site and delivering the AI model files.</li>
-        <li><strong>Google Firebase (Google LLC / Google Ireland Ltd)</strong> — the Realtime Database holding visitor statistics and reviews described in section 4.</li>
+        <li><strong>Google Firebase (Google LLC / Google Ireland Ltd)</strong> — Anonymous Authentication holding visitor accounts, and Realtime Database for community reviews described in section 4.</li>
         <li><strong>Google Fonts</strong> — serving the web fonts used on the site.</li>
         <li><strong>Google AdSense (Google LLC / Google Ireland Ltd)</strong> — serving advertisements and advertising cookies, as described in section 5.</li>
-        <li><strong>ipwho.is</strong> — country lookup from your IP address for visitor statistics.</li>
         <li><strong>Hugging Face and jsDelivr</strong> — one-time downloads of the AI model files and libraries; these requests never contain image data.</li>
       </ul>
       <p>We do not sell personal data and we do not share it for any purpose not listed here.</p>
@@ -268,5 +253,6 @@
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
     </footer>
   <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261019"></script>
 </body>
 </html>
