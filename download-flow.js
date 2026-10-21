@@ -53,6 +53,7 @@
       // Safari and slow mobile devices need time to consume the Blob URL.
       setTimeout(() => URL.revokeObjectURL(url), 60000);
       close();
+      try { window.dispatchEvent(new CustomEvent('pr:photo-created')); } catch (_) {}
       try { onDownloaded?.(); } catch (_) { /* analytics must not affect export */ }
     } catch (_) {
       status.textContent = 'Your image could not be downloaded. Please try again.';

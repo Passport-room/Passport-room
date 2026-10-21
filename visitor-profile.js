@@ -1,4 +1,4 @@
-/* Consent-controlled Firebase visitor identity. No remote analytics database writes. */
+/* Consent-controlled Firebase visitor identity plus public totals (/stats/visitors, /stats/photos). */
 const config = {
   apiKey: 'AIzaSyBwTzFmMTHEfdX0ZqqXNP29EcQoLud1hrM',
   authDomain: 'passport-48389.firebaseapp.com',
@@ -6,6 +6,22 @@ const config = {
   appId: '1:222961536167:web:618360108d616b8f129f82'
 };
 const PROFILE_KEY = 'pr_anonymous_visitor_v1';
+const COUNTED_KEY = 'pr_counted_visitor_v1';
+const DB_URL = 'https://passport-48389-default-rtdb.firebaseio.com';
+let appRef, dbSdk, db;
+async function bump(field) {
+  try {
+    if (!appRef) return false;
+    if (!db) { dbSdk = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js'); db = dbSdk.getDatabase(appRef, DB_URL); }
+    await dbSdk.runTransaction(dbSdk.ref(db, 'stats/' + field), v => (Number(v) || 0) + 1);
+    return true;
+  } catch { return false; }
+}
+async function countVisitor(uid) {
+  if (read(COUNTED_KEY) === uid) return;
+  if (await bump('visitors')) { try { localStorage.setItem(COUNTED_KEY, uid); } catch {} }
+}
+window.addEventListener('pr:photo-created', () => { if (consent() && auth?.currentUser) bump('photos'); });
 let auth, sdk, profile = null, busy = false, unsubscribe;
 function read(key) { try { return localStorage.getItem(key); } catch { return null; } }
 function removeProfile() { try { localStorage.removeItem(PROFILE_KEY); } catch {} profile = null; }
@@ -14,7 +30,7 @@ function setText(id, text) { const el = document.getElementById(id); if (el) el.
 function render(status) {
   setText('visitorName', profile?.name || 'Guest');
   setText('visitorUid', profile?.uid || 'Not assigned');
-  setText('visitorStatus', status || (profile ? `Visits in this browser: ${profile.visits} · Firebase visitor account active` : 'Visitor tracking is off until you accept cookies.'));
+  setText('visitorStatus', status || (profile ? `Visits: ${profile.visits}` : 'Accept cookies to get your ID.'));
   const button = document.getElementById('profileBtn');
   if (button) button.setAttribute('aria-label', profile ? `Your profile: ${profile.name}, user ID ${profile.uid}` : 'Your profile');
 }
@@ -35,6 +51,7 @@ function showUser(user) {
   profile.lastVisit = now;
   let stored = true;
   try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch { stored = false; }
+  countVisitor(user.uid);
   render(stored ? undefined : 'Firebase connected; browser storage is unavailable, so this profile may not survive a reload.');
 }
 async function start() {
@@ -47,7 +64,7 @@ async function start() {
         import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')
       ]);
       sdk = authSdk;
-      const app = appSdk.initializeApp(config, 'passport-visitor');
+      const app = appSdk.initializeApp(config, 'passport-visitor'); appRef = app;
       auth = sdk.getAuth(app);
       await sdk.setPersistence(auth, sdk.browserLocalPersistence);
       await auth.authStateReady();

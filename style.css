@@ -5172,3 +5172,15 @@ body.is-pro .pr-hta { display:none !important; }
 @media (prefers-reduced-motion:reduce) { .pr-download-box { animation:none; } }
 
 .pr-banner-unavailable { display:none; }
+
+.prFreeBadge svg{color:#e9d5ff}
+.prFreeList{list-style:none;padding:0;margin:14px 0 20px;text-align:left;display:grid;gap:12px;color:#e5e7eb;font-size:14px}
+.prFreeList li{display:flex;gap:10px;align-items:flex-start}.prFreeList svg{flex:none;color:#d946ef;margin-top:1px}
+.prSurveyCard{max-width:480px}.prSurveyStep.hidden,.prSurveyInput.hidden{display:none}
+.prSurveyProg{font-size:12px;color:#c4b5fd;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.prSurveyOpts{display:grid;gap:8px;margin:14px 0;text-align:left}
+.prSurveyOpts label{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);color:#f3f4f6;cursor:pointer;font-size:14px}
+.prSurveyOpts label:has(input:checked){border-color:#d946ef;background:rgba(217,70,239,.12)}
+.prSurveyInput{width:100%;box-sizing:border-box;margin:4px 0 8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:inherit}
+.prSurveyStars{display:flex;justify-content:center;gap:6px;margin:12px 0}
+.prSurveyErr{min-height:18px;color:#fca5a5;font-size:13px;margin-bottom:6px}

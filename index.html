@@ -1116,25 +1116,7 @@
             </span>
             <span>Passport Size Specs</span>
           </button>
-          <button class="drawerNavItem" data-menu-action="history">
-            <span class="navIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-            </span>
-            <span>My Saved Photos</span>
-          </button>
+          
           <button class="drawerNavItem" data-menu-action="account">
             <span class="navIcon">
               <svg
@@ -1311,7 +1293,6 @@
                 <strong id="visitorName">Guest</strong>
                 <div class="profileSubText">User ID: <span id="visitorUid" style="overflow-wrap:anywhere">Not assigned</span></div>
                 <div id="visitorStatus" class="profileSubText">Visitor tracking is off until you accept cookies.</div>
-                <p class="profileSubText">With your consent, Firebase assigns a persistent visitor ID to recognise this browser. This is pseudonymous, not completely anonymous. Photos remain on your device. <a href="/privacy-policy">Privacy Policy</a></p>
               </div>
               <div class="profileNameRow localProfileUi" aria-hidden="true">
                 <input
@@ -1455,106 +1436,7 @@
         </div>
       </div>
 
-      <!-- Saved Photos History Modal -->
-      <div id="historyModal" class="appModalOverlay hidden">
-        <div class="appModalBox">
-          <header class="appModalHeader">
-            <div>
-              <h2 class="appModalTitle">My Recent Saved Photos</h2>
-              <p class="muted small">Local session history saved on this device.</p>
-            </div>
-            <button class="appModalCloseBtn" data-close-modal title="Close history">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </header>
-          <div class="historySettingBar">
-            <label class="historySettingLabel">
-              <input id="historyAutoSaveToggle" type="checkbox" checked />
-              <span class="historySettingText">
-                <strong>Save created photos to history</strong>
-                <span class="muted small displayBlock"
-                  >Store photo history locally on this device. Disabling saves memory &amp; disk
-                  space.</span
-                >
-              </span>
-            </label>
-          </div>
-          <div id="historyList" class="historyList"></div>
-        </div>
-      </div>
-
-      <!-- First Time Save Photo Notice Modal -->
-      <div id="savePhotosNoticeModal" class="appModalOverlay hidden">
-        <div class="appModalBox noticeModalBox">
-          <header class="appModalHeader">
-            <div class="noticeHeaderTitle">
-              <div class="noticeHeaderIcon">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
-              </div>
-              <div>
-                <h2 class="appModalTitle">Save Created Photos to History?</h2>
-                <p class="muted small">Local storage preference notice</p>
-              </div>
-            </div>
-          </header>
-          <div class="noticeModalBody">
-            <p class="noticeBodyMsg">
-              Would you like Passport Room to automatically save your created photos locally in your
-              browser history?
-            </p>
-            <div class="noticeWarningCard">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="noticeWarnIcon"
-              >
-                <path
-                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-              <div class="noticeWarnText">
-                <strong>Important Storage Note:</strong> Saving many high-resolution photos locally
-                can accumulate data and may slow down your browser or computer over time. You can
-                change this setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
-              </div>
-            </div>
-            <label class="noticeCheckboxOption">
-              <input id="noticeSaveCheckbox" type="checkbox" checked />
-              <span><strong>Yes, save my created photos in local history</strong></span>
-            </label>
-            <button id="noticeConfirmBtn" class="btn primary fullWidth noticeBtn">
-              Confirm &amp; Continue
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
       <!-- How It Works Modal -->
       <div id="howItWorksModal" class="appModalOverlay hidden">
@@ -2006,6 +1888,14 @@
           </div>
         </section>
 
+        <section class="seoSec" data-home-only aria-label="Visitor statistics" style="text-align:center">
+          <a href="/stats" style="display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:1.1rem;text-decoration:none;color:inherit;padding:14px 22px;border:1px solid currentColor;border-radius:999px;opacity:.9">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            See how many people visit us
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </section>
+
         <section class="articles" data-home-only aria-labelledby="articlesTitle">
           <header class="articlesHead">
             <div class="aboutKicker">Insights</div>
@@ -2395,20 +2285,59 @@
     <!-- Sign in / create account (Firebase) -->
     
 
+    <script>try{localStorage.setItem("cubit_save_photos_enabled","false");localStorage.setItem("cubit_save_notice_prompted","true");localStorage.removeItem("cubit_history_v1");Object.keys(localStorage).forEach(function(k){if(k.indexOf("cubit_history")===0)localStorage.removeItem(k)})}catch(e){}</script>
     <script src="download-flow.js?v=20261014"></script>
     <script type="module" src="assets/app.min.js?v=20261009"></script>
   
-    <!-- First-visit "free forever" banner -->
-    <div id="prFreeBanner" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">
+    <!-- "Free forever" notice (shown after Accept all) -->
+    <div id="prFreeNotice" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">
       <div class="prFreeCard">
-        <div class="prFreeBadge">🎉</div>
+        <div class="prFreeBadge"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
         <h2 id="prFreeTitle" class="prFreeTitle">Passport Room is <span class="grad">free forever</span></h2>
-        <p class="prFreeText">Unlimited passport &amp; visa photos, print sheets, outfit try-on and AI enhance — no sign-up, no payment, no limits. Your photos never leave your device.</p>
-        <button id="prFreeOk" type="button" class="btn primary prFreeBtn">Got it</button>
+        <ul class="prFreeList">
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span><strong>Unlimited free photos</strong> — passport, visa &amp; print sheets</span></li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span><strong>Device-only privacy</strong> — your photos never leave your device</span></li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></svg><span><strong>No paywalls</strong> — no sign-up, no payment, no limits</span></li>
+        </ul>
+        <button id="prFreeNoticeOk" type="button" class="btn primary prFreeBtn">Got it</button>
       </div>
     </div>
 
-<script src="/cookie-consent.js" defer></script>
-<script type="module" src="/visitor-profile.js?v=20261019"></script>
+    <!-- Post-creation survey (once only) -->
+    <div id="prSurvey" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prSurveyTitle">
+      <div class="prFreeCard prSurveyCard">
+        <div class="prSurveyStep" data-step="1">
+          <div class="prSurveyProg">Step 1 of 2</div>
+          <h2 id="prSurveyTitle" class="prFreeTitle">How did you find us?</h2>
+          <div class="prSurveyOpts" role="radiogroup">
+            <label><input type="radio" name="prSrc" value="search"><span>Search engine (Google, Bing, etc.)</span></label>
+            <label><input type="radio" name="prSrc" value="social"><span>Social media (Facebook, Instagram, TikTok, YouTube)</span></label>
+            <label><input type="radio" name="prSrc" value="ai"><span>AI agents</span></label>
+            <label><input type="radio" name="prSrc" value="other"><span>Other*</span></label>
+          </div>
+          <input id="prSrcOther" class="prSurveyInput hidden" type="text" maxlength="120" placeholder="Please tell us where you found us">
+          <div class="prSurveyErr" id="prSurveyErr1"></div>
+          <button id="prSurveyNext" type="button" class="btn primary prFreeBtn">Next</button>
+        </div>
+        <div class="prSurveyStep hidden" data-step="2">
+          <div class="prSurveyProg">Step 2 of 2</div>
+          <h2 class="prFreeTitle">Rate your experience</h2>
+          <div class="reviewStars prSurveyStars" role="radiogroup" aria-label="Your rating">
+            <button type="button" class="reviewStar" data-sv="1" aria-label="Disappointed, 1 star"><span aria-hidden="true">😡</span><small>Disappointed</small></button>
+            <button type="button" class="reviewStar" data-sv="2" aria-label="Sad, 2 stars"><span aria-hidden="true">😢</span><small>Sad</small></button>
+            <button type="button" class="reviewStar" data-sv="3" aria-label="Confused, 3 stars"><span aria-hidden="true">🤔</span><small>Confused</small></button>
+            <button type="button" class="reviewStar" data-sv="4" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
+            <button type="button" class="reviewStar" data-sv="5" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
+          </div>
+          <textarea id="prSurveyText" class="reviewChatInput prSurveyInput" maxlength="300" rows="3" placeholder="Write your review…"></textarea>
+          <div class="prSurveyErr" id="prSurveyErr2"></div>
+          <button id="prSurveySend" type="button" class="btn primary prFreeBtn">Submit review*</button>
+        </div>
+      </div>
+    </div>
+
+<script src="/cookie-consent.js?v=20261021" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261020"></script>
+<script type="module" src="/survey.js?v=20261021"></script>
 </body>
 </html>

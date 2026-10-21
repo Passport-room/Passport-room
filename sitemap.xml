@@ -32,4 +32,5 @@
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
+  <url><loc>https://passport-room.com/stats</loc></url>
 </urlset>
