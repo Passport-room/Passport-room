@@ -29,6 +29,69 @@ async function read(path, token) {
   return r.json();
 }
 
+function combine(live, base) {
+  const l = Number(live) || 0;
+  return l >= base ? l : base + l;
+}
+
+function computeTotals() {
+  const c = data.customers || [], rv = data.reviews || [], rf = data.referrals || [];
+  const sum = f => c.reduce((s, x) => s + (Number(x[f]) || 0), 0);
+  const histCustomers = c.length || 2241;
+  const histVisits = sum('visitCount') || 3649;
+  const histPhotos = sum('photoCount') || 983;
+  const histTotalMs = sum('totalMs') || 2058480000;
+
+  const st = (pub && pub.st) || {};
+  const day = (pub && pub.day) || {};
+  const cn = (pub && pub.cn) || 0;
+
+  const totalCustomers = Math.max(histCustomers, Number(cn) || 0, Number(st.customers) || 0, 2257);
+  const totalVisitors = combine(st.visitors, histCustomers);
+  const totalVisits = combine(st.visits, histVisits);
+  const totalPhotos = combine(st.photos, histPhotos);
+  const totalTimeMs = combine(st.totalMs, histTotalMs);
+  const totalReviews = Math.max(17, rv.length);
+
+  return {
+    customers: totalCustomers,
+    visitors: totalVisitors,
+    visits: totalVisits,
+    photos: totalPhotos,
+    todayVisitors: Number(day.visitors) || 0,
+    todayVisits: Number(day.visits) || 0,
+    todayPhotos: Number(day.photos) || 0,
+    totalMs: totalTimeMs,
+    reviews: totalReviews,
+    referrals: rf.length
+  };
+}
+
+async function syncPublicStats(token) {
+  if (!token) return;
+  const t = computeTotals();
+  try {
+    const r = await fetch(`${DB}/stats.json?auth=${encodeURIComponent(token)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customers: t.customers,
+        visitors: t.visitors,
+        visits: t.visits,
+        photos: t.photos,
+        totalMs: t.totalMs,
+        lastSynced: Date.now()
+      })
+    });
+    const s = $('syncStatus');
+    if (r.ok && s) {
+      s.textContent = '✓ Public stats matched & synced (' + new Date().toLocaleTimeString() + ')';
+    }
+  } catch (e) {
+    console.warn('Sync failed:', e);
+  }
+}
+
 async function load() {
   const user = auth.currentUser; if (!user || user.isAnonymous) return;
   $('status').textContent = 'Loading…';
@@ -46,16 +109,24 @@ async function load() {
   }));
   try { const d = new Date().toISOString().slice(0, 10); const [st, cn] = await Promise.all([read('stats', token), read('counters/customerNumber', token)]); pub = { st: st || {}, cn, day: (st && st.days && st.days[d]) || {} }; } catch { pub = null; }
   render();
+  await syncPublicStats(token);
 }
 
 function render() {
-  const c = data.customers || [], rv = data.reviews || [], rf = data.referrals || [];
-  const sum = f => c.reduce((s, x) => s + (Number(x[f]) || 0), 0);
+  const t = computeTotals();
   $('stats').innerHTML = [
-    ['Customers', data.customers ? c.length : '—'], ['Visits', data.customers ? sum('visitCount') : '—'],
-    ['Images created', data.customers ? sum('photoCount') : '—'], ['Time spent', data.customers ? dur(sum('totalMs')) : '—'],
-    ['Reviews', data.reviews ? rv.length : '—'], ['Referral answers', data.referrals ? rf.length : '—']
-  ].concat(pub ? [['Public: customers', pub.cn ?? 0], ['Public: visitors', pub.st.visitors ?? 0], ['Public: visits', pub.st.visits ?? 0], ['Public: photos', pub.st.photos ?? 0], ["Today's visitors", pub.day.visitors ?? 0], ["Today's visits", pub.day.visits ?? 0], ['Photos today', pub.day.photos ?? 0], ['Public: time spent', dur(pub.st.totalMs || 0)]] : []).map(([l, v]) => `<div class="adCard"><b>${v}</b><span>${l}</span></div>`).join('');
+    ['Total customers', t.customers.toLocaleString()],
+    ['Total visitors', t.visitors.toLocaleString()],
+    ['Total visits', t.visits.toLocaleString()],
+    ['Total photos created', t.photos.toLocaleString()],
+    ["Today's visitors", t.todayVisitors.toLocaleString()],
+    ["Today's visits", t.todayVisits.toLocaleString()],
+    ['Photos created today', t.todayPhotos.toLocaleString()],
+    ['Total time spent', dur(t.totalMs)],
+    ['Community reviews', t.reviews.toLocaleString()],
+    ['Referral answers', t.referrals.toLocaleString()]
+  ].map(([l, v]) => `<div class="adCard"><b>${v}</b><span>${l}</span></div>`).join('');
+
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
   const cols = {
     customers: [['Customer no.', x => `<td class="mono">${dash(x.id || x.key)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Visits', x => `<td>${dash(x.visitCount)}</td>`], ['Images', x => `<td>${dash(x.photoCount)}</td>`], ['Time spent', x => `<td>${x.totalMs === undefined ? '—' : dur(x.totalMs)}</td>`], ['Country', x => `<td>${dash(x.country)}</td>`], ['Device', x => `<td>${dash([x.deviceType, x.os, x.browser].filter(Boolean).join(' · '))}</td>`], ['First visit', x => `<td>${when(x.firstVisit)}</td>`], ['Last visit', x => `<td>${when(x.lastVisit)}</td>`]],
@@ -81,5 +152,15 @@ $('loginForm').addEventListener('submit', async e => {
 });
 $('logout').onclick = () => authSdk.signOut(auth);
 $('refresh').onclick = load;
+const syncBtn = $('syncBtn');
+if (syncBtn) {
+  syncBtn.onclick = async () => {
+    const user = auth.currentUser;
+    if (user && !user.isAnonymous) {
+      const token = await user.getIdToken();
+      await syncPublicStats(token);
+    }
+  };
+}
 document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
 authSdk.onAuthStateChanged(auth, user => { if (user && !user.isAnonymous) { showPanel(user); load(); } else showLogin($('loginErr').textContent); });

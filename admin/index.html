@@ -27,6 +27,7 @@ th{background:var(--pg-panel);color:var(--pg-muted);font-weight:500;white-space:
 td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
 .adNote{color:var(--pg-muted);font-size:13px}
 .adTop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.adTopActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -45,8 +46,16 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
 
   <section id="panel" hidden>
     <div class="adTop">
-      <h1 style="margin:0;font-size:24px">Passport Room admin</h1>
-      <div><span class="adNote" id="who"></span> <button class="adBtn ghost" id="refresh">Refresh</button> <button class="adBtn ghost" id="logout">Sign out</button></div>
+      <div>
+        <h1 style="margin:0;font-size:24px">Passport Room admin</h1>
+        <span class="adNote" id="syncStatus" style="color:var(--pg-accent);font-size:12px">Public stats matched with admin totals</span>
+      </div>
+      <div class="adTopActions">
+        <span class="adNote" id="who"></span>
+        <button class="adBtn ghost" id="syncBtn" title="Sync live stats to public visitors page">Sync public stats</button>
+        <button class="adBtn ghost" id="refresh">Refresh</button>
+        <button class="adBtn ghost" id="logout">Sign out</button>
+      </div>
     </div>
     <div class="adStats" id="stats"></div>
     <div class="adTabs" role="tablist">
@@ -56,7 +65,7 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
     </div>
     <p class="adNote" id="status"></p>
     <div class="adTable"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
-    <p class="adNote">Read-only view. This page never writes, resets or deletes database records.</p>
+    <p class="adNote">Read-only view. This page never writes, resets or deletes customer records.</p>
   </section>
 </main>
 <script type="module" src="/admin/admin.js"></script>

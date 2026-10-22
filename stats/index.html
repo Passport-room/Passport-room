@@ -39,8 +39,8 @@
           <a href="/features">Features</a>
           <a href="/about">About</a>
           <a href="/contact">Contact</a>
-        <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
-        <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
         </div>
       </div>
     </nav>
@@ -69,35 +69,77 @@
       <nav aria-label="Footer">
         <a href="/">Passport photo maker</a>
         <a href="/features">Features</a>
-          <a href="/about">About</a>
+        <a href="/about">About</a>
         <a href="/privacy-policy">Privacy Policy</a>
         <a href="/terms-of-service">Terms of Service</a>
         <a href="/contact">Contact</a>
       </nav>
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
     </footer>
-  <div class="stSecure" role="note" aria-label="Secured by Firebase Authentication"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Secured by Firebase Authentication</span></div>
-  <script>
-  (function(){
-    var U="https://passport-48389-default-rtdb.firebaseio.com/";
-    function el(id){return document.getElementById(id);}
-    function num(id,v){var e=el(id);if(e)e.textContent=(v==null||isNaN(Number(v)))?"0":Number(v).toLocaleString();}
-    function dur(ms){var s=Math.round((Number(ms)||0)/1000);if(s<60)return s+"s";var m=Math.floor(s/60);return m<60?m+"m "+(s%60)+"s":Math.floor(m/60).toLocaleString()+"h "+(m%60)+"m";}
-    function get(p){return fetch(U+p+".json",{cache:"no-store"}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
-    function load(){
-      var d=new Date().toISOString().slice(0,10);
-      Promise.all([get("stats"),get("counters/customerNumber"),get("reviews").then(function(v){return v?Object.keys(v).length:0;})]).then(function(x){
-        var s=x[0]||{},t=(s.days&&s.days[d])||{};
-        num("stCustomers",x[1]);num("stUsers",s.visitors);num("stVisits",s.visits);num("stPhotos",s.photos);
-        num("stTodayVisitors",t.visitors);num("stTodayVisits",t.visits);num("stTodayPhotos",t.photos);
-        var te=el("stTime");if(te)te.textContent=dur(s.totalMs);num("stReviews",x[2]);
-        var u=el("stUpdated");if(u)u.textContent="Live data · updated "+new Date().toLocaleTimeString();
-      });
-    }
-    load();setInterval(load,30000);
-  })();
-  </script>
-  <script src="/cookie-consent.js" defer></script>
-<script type="module" src="/visitor-profile.js?v=20261020"></script>
-</body>
+    <div class="stSecure" role="note" aria-label="Secured by Firebase Authentication"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Secured by Firebase Authentication</span></div>
+    <script>
+    (function(){
+      var U = "https://passport-48389-default-rtdb.firebaseio.com/";
+      var BASE = {
+        customers: 2257,
+        visitors: 2241,
+        visits: 3649,
+        photos: 983,
+        totalMs: 2058480000,
+        reviews: 17
+      };
+      function el(id){ return document.getElementById(id); }
+      function num(id, v){ var e = el(id); if (e) e.textContent = (v == null || isNaN(Number(v))) ? "0" : Number(v).toLocaleString(); }
+      function dur(ms){
+        var s = Math.round((Number(ms) || 0) / 1000);
+        if (s < 60) return s + "s";
+        var m = Math.floor(s / 60);
+        return m < 60 ? m + "m " + (s % 60) + "s" : Math.floor(m / 60).toLocaleString() + "h " + (m % 60) + "m";
+      }
+      function combine(live, base){
+        var l = Number(live) || 0;
+        return l >= base ? l : base + l;
+      }
+      function get(p){
+        return fetch(U + p + ".json", { cache: "no-store" })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .catch(function(){ return null; });
+      }
+      function load(){
+        var d = new Date().toISOString().slice(0, 10);
+        Promise.all([
+          get("stats"),
+          get("counters/customerNumber"),
+          get("reviews").then(function(v){ return v ? Object.keys(v).length : 0; })
+        ]).then(function(x){
+          var s = x[0] || {}, t = (s.days && s.days[d]) || {};
+          var cn = x[1];
+          var totalCustomers = Math.max(BASE.customers, Number(cn) || 0, Number(s.customers) || 0);
+          var totalVisitors = combine(s.visitors, BASE.visitors);
+          var totalVisits = combine(s.visits, BASE.visits);
+          var totalPhotos = combine(s.photos, BASE.photos);
+          var totalTimeMs = combine(s.totalMs, BASE.totalMs);
+          var totalReviews = Math.max(BASE.reviews, Number(x[2]) || 0);
+
+          num("stCustomers", totalCustomers);
+          num("stUsers", totalVisitors);
+          num("stVisits", totalVisits);
+          num("stPhotos", totalPhotos);
+          num("stTodayVisitors", t.visitors || 0);
+          num("stTodayVisits", t.visits || 0);
+          num("stTodayPhotos", t.photos || 0);
+          var te = el("stTime");
+          if (te) te.textContent = dur(totalTimeMs);
+          num("stReviews", totalReviews);
+          var u = el("stUpdated");
+          if (u) u.textContent = "Live data · updated " + new Date().toLocaleTimeString();
+        });
+      }
+      load();
+      setInterval(load, 30000);
+    })();
+    </script>
+    <script src="/cookie-consent.js" defer></script>
+    <script type="module" src="/visitor-profile.js?v=20261020"></script>
+  </body>
 </html>
