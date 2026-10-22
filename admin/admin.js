@@ -18,6 +18,7 @@ const auth = authSdk.getAuth(app);
 await authSdk.setPersistence(auth, authSdk.browserSessionPersistence);
 
 const data = { customers: null, reviews: null, referrals: null };
+let pub = null;
 const errors = {};
 let tab = 'customers';
 
@@ -43,6 +44,7 @@ async function load() {
     try { const v = await read(p, token); data[p] = Object.entries(v || {}).map(([key, x]) => ({ key, ...(x && typeof x === 'object' ? x : { value: x }) })); delete errors[p]; }
     catch (e) { data[p] = null; errors[p] = e.message === 'denied' ? 'Permission denied by database rules for this path.' : 'Could not load (' + e.message + ').'; }
   }));
+  try { const d = new Date().toISOString().slice(0, 10); const [st, cn] = await Promise.all([read('stats', token), read('counters/customerNumber', token)]); pub = { st: st || {}, cn, day: (st && st.days && st.days[d]) || {} }; } catch { pub = null; }
   render();
 }
 
@@ -53,7 +55,7 @@ function render() {
     ['Customers', data.customers ? c.length : '—'], ['Visits', data.customers ? sum('visitCount') : '—'],
     ['Images created', data.customers ? sum('photoCount') : '—'], ['Time spent', data.customers ? dur(sum('totalMs')) : '—'],
     ['Reviews', data.reviews ? rv.length : '—'], ['Referral answers', data.referrals ? rf.length : '—']
-  ].map(([l, v]) => `<div class="adCard"><b>${v}</b><span>${l}</span></div>`).join('');
+  ].concat(pub ? [['Public: customers', pub.cn ?? 0], ['Public: visitors', pub.st.visitors ?? 0], ['Public: visits', pub.st.visits ?? 0], ['Public: photos', pub.st.photos ?? 0], ["Today's visitors", pub.day.visitors ?? 0], ["Today's visits", pub.day.visits ?? 0], ['Photos today', pub.day.photos ?? 0], ['Public: time spent', dur(pub.st.totalMs || 0)]] : []).map(([l, v]) => `<div class="adCard"><b>${v}</b><span>${l}</span></div>`).join('');
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
   const cols = {
     customers: [['Customer no.', x => `<td class="mono">${dash(x.id || x.key)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Visits', x => `<td>${dash(x.visitCount)}</td>`], ['Images', x => `<td>${dash(x.photoCount)}</td>`], ['Time spent', x => `<td>${x.totalMs === undefined ? '—' : dur(x.totalMs)}</td>`], ['Country', x => `<td>${dash(x.country)}</td>`], ['Device', x => `<td>${dash([x.deviceType, x.os, x.browser].filter(Boolean).join(' · '))}</td>`], ['First visit', x => `<td>${when(x.firstVisit)}</td>`], ['Last visit', x => `<td>${when(x.lastVisit)}</td>`]],

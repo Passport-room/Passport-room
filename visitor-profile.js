@@ -9,19 +9,29 @@ const PROFILE_KEY = 'pr_anonymous_visitor_v1';
 const COUNTED_KEY = 'pr_counted_visitor_v1';
 const DB_URL = 'https://passport-48389-default-rtdb.firebaseio.com';
 let appRef, dbSdk, db;
-async function bump(field) {
+const today = () => new Date().toISOString().slice(0, 10);
+async function bump(path, delta = 1) {
   try {
     if (!appRef) return false;
     if (!db) { dbSdk = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js'); db = dbSdk.getDatabase(appRef, DB_URL); }
-    await dbSdk.runTransaction(dbSdk.ref(db, 'stats/' + field), v => (Number(v) || 0) + 1);
+    await dbSdk.runTransaction(dbSdk.ref(db, 'stats/' + path), v => (Number(v) || 0) + delta);
     return true;
   } catch { return false; }
 }
+let visitCounted = false, timer = null, lastTick = 0;
 async function countVisitor(uid) {
-  if (read(COUNTED_KEY) === uid) return;
-  if (await bump('visitors')) { try { localStorage.setItem(COUNTED_KEY, uid); } catch {} }
+  if (read(COUNTED_KEY) !== uid && await bump('visitors')) { try { localStorage.setItem(COUNTED_KEY, uid); } catch {} }
+  const dayKey = 'pr_counted_day_v1', d = today();
+  if (read(dayKey) !== d + ':' + uid && await bump('days/' + d + '/visitors')) { try { localStorage.setItem(dayKey, d + ':' + uid); } catch {} }
+  if (!visitCounted) { visitCounted = true; bump('visits'); bump('days/' + d + '/visits'); }
+  if (!timer) {
+    lastTick = Date.now();
+    const flush = () => { const ms = Math.min(Date.now() - lastTick, 600000); lastTick = Date.now(); if (ms >= 1000 && consent()) bump('totalMs', ms); };
+    timer = setInterval(() => { if (document.visibilityState === 'visible') flush(); else lastTick = Date.now(); }, 60000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else lastTick = Date.now(); });
+  }
 }
-window.addEventListener('pr:photo-created', () => { if (consent() && auth?.currentUser) bump('photos'); });
+window.addEventListener('pr:photo-created', () => { if (consent() && auth?.currentUser) { bump('photos'); bump('days/' + today() + '/photos'); } });
 let auth, sdk, profile = null, busy = false, unsubscribe;
 function read(key) { try { return localStorage.getItem(key); } catch { return null; } }
 function removeProfile() { try { localStorage.removeItem(PROFILE_KEY); } catch {} profile = null; }

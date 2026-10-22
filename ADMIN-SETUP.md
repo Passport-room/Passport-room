@@ -44,3 +44,7 @@ Vercel "Environment Variables" for this static site - nothing here would use the
 
 ## Deploy (unchanged)
 Vercel: framework "Other", empty build command, output directory "."
+
+## Update (stats page + reviews)
+After uploading this version, open Firebase Console > Realtime Database > Rules, paste the contents of database.rules.json and click Publish.
+This lets the public stats page show the customer count, total and today visits, photos today and total time spent (the same numbers shown in the admin panel).

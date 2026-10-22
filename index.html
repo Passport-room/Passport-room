@@ -420,6 +420,8 @@
                   <button type="button" class="reviewStar" data-star="5" role="radio" aria-checked="false" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
                 </div>
               </fieldset>
+              <label class="reviewInputLabel" for="reviewName">Your name</label>
+              <input id="reviewName" class="reviewChatInput" data-review-name type="text" maxlength="40" autocomplete="name" placeholder="Your full name" required style="margin-bottom:10px;min-height:0" />
               <label class="reviewInputLabel" for="reviewText">Tell us more</label>
               <div class="reviewChatInputRow">
                 <textarea
@@ -2287,7 +2289,8 @@
 
     <script>try{localStorage.setItem("cubit_save_photos_enabled","false");localStorage.setItem("cubit_save_notice_prompted","true");localStorage.removeItem("cubit_history_v1");Object.keys(localStorage).forEach(function(k){if(k.indexOf("cubit_history")===0)localStorage.removeItem(k)})}catch(e){}</script>
     <script src="download-flow.js?v=20261014"></script>
-    <script type="module" src="assets/app.min.js?v=20261009"></script>
+    <script>window.__prRevName=function(r){var n=String((r&&r.name)||"").trim();if(!n||/^(guest|t|test|test user)$/i.test(n)||/^Passpo/i.test(n))return r&&r.customerId&&/^CUS-\d+$/.test(r.customerId)?"Customer "+r.customerId.slice(4):"Verified customer";return n;};</script>
+    <script type="module" src="assets/app.min.js?v=20261022"></script>
   
     <!-- "Free forever" notice (shown after Accept all) -->
     <div id="prFreeNotice" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">
@@ -2329,6 +2332,7 @@
             <button type="button" class="reviewStar" data-sv="4" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
             <button type="button" class="reviewStar" data-sv="5" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
           </div>
+          <input id="prSurveyName" class="reviewChatInput prSurveyInput" type="text" maxlength="40" autocomplete="name" placeholder="Your full name" style="min-height:0;margin-bottom:8px" />
           <textarea id="prSurveyText" class="reviewChatInput prSurveyInput" maxlength="300" rows="3" placeholder="Write your review…"></textarea>
           <div class="prSurveyErr" id="prSurveyErr2"></div>
           <button id="prSurveySend" type="button" class="btn primary prFreeBtn">Submit review*</button>
@@ -2337,7 +2341,7 @@
     </div>
 
 <script src="/cookie-consent.js?v=20261021" defer></script>
-<script type="module" src="/visitor-profile.js?v=20261020"></script>
-<script type="module" src="/survey.js?v=20261021"></script>
+<script type="module" src="/visitor-profile.js?v=20261022"></script>
+<script type="module" src="/survey.js?v=20261022"></script>
 </body>
 </html>

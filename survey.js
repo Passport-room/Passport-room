@@ -62,6 +62,7 @@ function init() {
     m.querySelector('[data-step="1"]').classList.add('hidden');
     m.querySelector('[data-step="2"]').classList.remove('hidden');
   };
+  const nm = $('prSurveyName'); if (nm && !nm.value) nm.value = get('pr_review_name') || '';
   const stars = [...m.querySelectorAll('[data-sv]')];
   stars.forEach(b => b.onclick = () => { rating = Number(b.dataset.sv); stars.forEach(s => s.classList.toggle('on', s === b)); });
   $('prSurveySend').onclick = async () => {
@@ -70,6 +71,9 @@ function init() {
     const text = $('prSurveyText').value.trim().slice(0, 300);
     if (!rating) { err.textContent = 'Please pick a rating first.'; return; }
     if (text.length < 2) { err.textContent = 'Please write a few words.'; return; }
+    const name = (($('prSurveyName') || {}).value || get('pr_review_name') || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    if (name.length < 2) { err.textContent = 'Please enter your name.'; return; }
+    set('pr_review_name', name);
     sending = true; err.textContent = 'Sending…'; $('prSurveySend').disabled = true;
     const ts = Date.now();
     const deviceId = get('cubit_device_id') || '';
@@ -77,7 +81,7 @@ function init() {
       const { t, uid } = await token();
       const src = LABELS[source] + (sourceDetail ? ': ' + sourceDetail : '');
       await post('referrals', { source, sourceLabel: LABELS[source], detail: sourceDetail, uid, ts, page: location.pathname }, t);
-      await post('reviews', { deviceId, customerId: '', name: 'Guest', rating, text, source: src, uid, ts }, t);
+      await post('reviews', { deviceId, customerId: get('pr_customer_code') || '', name, rating, text, source: src, uid, ts }, t);
       set(DONE, String(ts));
       m.classList.add('hidden'); lock(false);
     } catch { err.textContent = 'Could not send. Please check your connection and try again.'; }
