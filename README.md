@@ -30,3 +30,19 @@ not establish compliance with Google's certified CMP requirements or guarantee a
 Admin panel update — 21 October 2026
 Added /admin (read-only; Firebase Email/Password sign-in + /admins/{uid} allowlist).
 See ADMIN-SETUP.md and database.rules.json. No secrets are included.
+
+
+Update - 24 October 2026 (tracking fix)
+
+1. IMPORTANT: open Firebase Console -> Realtime Database -> Rules, paste the full
+   contents of database.rules.json from this ZIP and click Publish. The previous
+   rules denied most counter writes, which froze the customer number, visitor,
+   visit, photo and daily totals. The new file grants every path the site uses
+   (public counter increments are +1-only; customers stay admin-readable).
+   Keep Anonymous sign-in enabled in Authentication -> Sign-in method.
+2. Review names: both review forms no longer ask for a name. The name comes from
+   the visitor profile, and profile names are now words only (no numbers).
+   Existing stored profiles are upgraded automatically on next visit.
+3. The "free forever" notice now appears 1.5 seconds after the cookie box.
+4. Admin panel "Sync public stats" now writes each /stats child separately
+   (the rules grant admin writes per child).

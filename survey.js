@@ -1,4 +1,4 @@
-/* "Free forever" notice after cookie accept + one-time post-creation survey (saved to Firebase). */
+/* "Free forever" notice after cookie accept (1.5 s gap) + one-time post-creation survey (saved to Firebase). */
 const DB = 'https://passport-48389-default-rtdb.firebaseio.com';
 const config = { apiKey: 'AIzaSyBwTzFmMTHEfdX0ZqqXNP29EcQoLud1hrM', authDomain: 'passport-48389.firebaseapp.com', projectId: 'passport-48389', appId: '1:222961536167:web:618360108d616b8f129f82' };
 const DONE = 'pr_survey_done_v1';
@@ -7,10 +7,24 @@ const get = k => { try { return localStorage.getItem(k); } catch { return null; 
 const set = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 const lock = on => { document.body.style.overflow = on ? 'hidden' : ''; };
 
+// Review display names come from the visitor profile and are words only.
+const NAME_OK = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+function profileName() {
+  try {
+    const p = JSON.parse(get('pr_anonymous_visitor_v1') || 'null');
+    const cleaned = String((p || {}).name || '').replace(/[^A-Za-z' -]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+    return NAME_OK.test(cleaned) ? cleaned : 'Guest';
+  } catch { return 'Guest'; }
+}
+
 window.addEventListener('pr:accepted', () => {
   const n = $('prFreeNotice'); if (!n) return;
-  n.classList.remove('hidden'); lock(true);
-  $('prFreeNoticeOk').onclick = () => { n.classList.add('hidden'); lock(false); };
+  // Small pause after the cookie box before the notice appears.
+  setTimeout(() => {
+    if (!n.classList.contains('hidden')) return;
+    n.classList.remove('hidden'); lock(true);
+    $('prFreeNoticeOk').onclick = () => { n.classList.add('hidden'); lock(false); };
+  }, 1500);
 });
 
 async function token() {
@@ -62,7 +76,6 @@ function init() {
     m.querySelector('[data-step="1"]').classList.add('hidden');
     m.querySelector('[data-step="2"]').classList.remove('hidden');
   };
-  const nm = $('prSurveyName'); if (nm && !nm.value) nm.value = get('pr_review_name') || '';
   const stars = [...m.querySelectorAll('[data-sv]')];
   stars.forEach(b => b.onclick = () => { rating = Number(b.dataset.sv); stars.forEach(s => s.classList.toggle('on', s === b)); });
   $('prSurveySend').onclick = async () => {
@@ -71,9 +84,7 @@ function init() {
     const text = $('prSurveyText').value.trim().slice(0, 300);
     if (!rating) { err.textContent = 'Please pick a rating first.'; return; }
     if (text.length < 2) { err.textContent = 'Please write a few words.'; return; }
-    const name = (($('prSurveyName') || {}).value || get('pr_review_name') || '').trim().replace(/\s+/g, ' ').slice(0, 40);
-    if (name.length < 2) { err.textContent = 'Please enter your name.'; return; }
-    set('pr_review_name', name);
+    const name = profileName();
     sending = true; err.textContent = 'Sending…'; $('prSurveySend').disabled = true;
     const ts = Date.now();
     const deviceId = get('cubit_device_id') || '';

@@ -31,8 +31,8 @@ The public visitors page (/stats) and the admin dashboard (/admin) now display t
 1. Open Firebase Console -> Realtime Database -> **Rules**.
 2. Copy the updated contents of `database.rules.json` from this ZIP and click **Publish**.
    - Grants `.read: true` to `/stats` and `/reviews` for the public.
-   - Grants admin write permission to `/stats` so the admin dashboard can sync totals.
-   - Keeps `/customers`, `/referrals`, and `/counters` secured for admins only.
+   - Grants admin write permission to each `/stats` child so the admin dashboard can sync totals (written per child).
+   - Keeps `/customers` and `/referrals` admin-readable; the app itself writes customer records under a strict `CUS-######` pattern.
 
 ## 3. Deploy
 Vercel deployment remains completely unchanged:

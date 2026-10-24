@@ -70,21 +70,17 @@ function computeTotals() {
 async function syncPublicStats(token) {
   if (!token) return;
   const t = computeTotals();
+  const writes = { customers: t.customers, visitors: t.visitors, visits: t.visits, photos: t.photos, totalMs: t.totalMs, lastSynced: Date.now() };
   try {
-    const r = await fetch(`${DB}/stats.json?auth=${encodeURIComponent(token)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        customers: t.customers,
-        visitors: t.visitors,
-        visits: t.visits,
-        photos: t.photos,
-        totalMs: t.totalMs,
-        lastSynced: Date.now()
+    const results = await Promise.all(Object.entries(writes).map(([k, v]) =>
+      fetch(`${DB}/stats/${k}.json?auth=${encodeURIComponent(token)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(v)
       })
-    });
+    ));
     const s = $('syncStatus');
-    if (r.ok && s) {
+    if (results.every(r => r.ok) && s) {
       s.textContent = '✓ Public stats matched & synced (' + new Date().toLocaleTimeString() + ')';
     }
   } catch (e) {
