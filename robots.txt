@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin
 
 Sitemap: https://passport-room.com/sitemap.xml

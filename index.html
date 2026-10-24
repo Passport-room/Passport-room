@@ -1,15 +1,12 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}(function(){var c=null;try{c=localStorage.getItem("pr_cookie_consent");}catch(e){}var g=c==="accepted"?"granted":"denied";gtag("consent","default",{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:g,wait_for_update:500});(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=c==="accepted"?0:1;})();</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2279678646698716" crossorigin="anonymous"></script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0c0519" />
     <title>Free Passport Photo Maker — AI Visa Photos in Your Browser | Passport Room</title>
     <meta
       name="description"
-      content="Make a passport or visa photo in your browser — no photo upload, no watermark, no sign-up. 100% free forever with unlimited photos."
+      content="Make a passport or visa photo in your browser — no upload, no account, no watermark. Free for 3 photos a day; optional Pro pass is a one-off US$0.99 for 30 days of unlimited, ad-free exports."
     />
     <link rel="canonical" href="https://passport-room.com/" />
     <meta name="author" content="Passport Room" />
@@ -24,8 +21,11 @@
     />
     <meta
       property="og:description"
-      content="Make a passport or visa photo in your browser — no photo upload, no watermark, no sign-up. 100% free forever with unlimited photos."
+      content="Make a passport or visa photo in your browser — no upload, no account, no watermark. Free for 3 photos a day; optional Pro pass is a one-off US$0.99 for 30 days of unlimited, ad-free exports."
     />
+    <meta property="og:image" content="https://passport-room.com/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
       content="Passport Room passport photo maker with a 35x45mm ID photo and measurement guides"
@@ -37,8 +37,9 @@
     />
     <meta
       name="twitter:description"
-      content="Make a passport or visa photo in your browser — no photo upload, no watermark, no sign-up. 100% free forever with unlimited photos."
+      content="Make a passport or visa photo in your browser — no upload, no account, no watermark. Free for 3 photos a day; optional Pro pass is a one-off US$0.99 for 30 days of unlimited, ad-free exports."
     />
+    <meta name="twitter:image" content="https://passport-room.com/assets/og-image.png" />
     <link rel="icon" href="favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,10 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=20261009" />
-    <style>/* Reserved placements stay hidden until explicitly enabled. */
-      [data-ad-placement] { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="style.css?v=be773ac663" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -167,7 +165,7 @@
                 "name": "Is Passport Room really free?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Passport Room is 100% free forever — unlimited photos, no account, no sign-up, no payment and no watermark."
+                  "text": "Passport Room is free to use without an account, and exports never carry a watermark. The free plan covers 3 finished photos per day. If you need more, an optional Passport Room Pro pass is a one-off payment of US$0.99 that gives 30 days of unlimited, ad-free exports. It is not a subscription and nothing renews automatically."
                 }
               },
               {
@@ -238,7 +236,7 @@
       <header class="top">
         <div class="topbar">
           <div class="topLogoGroup">
-            <img id="logo" src="/logo.png" alt="Passport Room" />
+            <img id="logo" src="logo.png" alt="Passport Room" />
           </div>
           <div class="topright">
             <span id="backendBadge" class="badge hidden"></span>
@@ -352,23 +350,15 @@
               </div>
             </div>
           </div>
-          <!-- Reserved hidden ad placement -->
-<div class="pr-ad pr-ad-hero pr-hta" data-ad-placement="upload" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="upload"></div>
-            </div>
+          <!-- Adsterra banner above the upload box -->
+<div class="pr-ad pr-ad-hero">
+  <div class="cubit-ad-label">Advertisement</div>
+  <div class="pr-ad-slot" data-pr-ad></div>
+</div>
 
           <div id="drop" class="drop">
             <input id="fileInput" type="file" accept="image/*" hidden />
             <div class="dropInner">
-              <div class="trustedLine">
-                <span class="trustedCheck" aria-hidden="true">
-                  <svg viewBox="0 0 20 20" fill="none">
-                    <path d="m5.2 10.2 3 3.1 6.8-7" />
-                  </svg>
-                </span>
-                <span>Trusted by 1,000+</span>
-              </div>
               <div class="dropIcon">
                 <svg
                   viewBox="0 0 24 24"
@@ -390,51 +380,19 @@
             </div>
           </div>
           <!-- Kept outside #drop so this link never opens the image picker. -->
-          
-          <div id="uploadError" class="err hidden"></div>
-
-          <!-- Community reviews -->
-          <section id="reviewChat" class="reviewChat" aria-label="Real reviews from people using Passport Room">
-            <header class="reviewChatHead">
-              <div class="reviewChatHeadText">
-                <div class="reviewChatTitle">Real Reviews</div>
-                <div class="reviewChatSub muted small">
-                  <span data-review-count>0</span> reviews ·
-                  <span data-review-avg>—</span> average
-                </div>
-              </div>
-            </header>
-
-            <div class="reviewChatBody" data-review-list aria-live="polite">
-              <div class="reviewEmpty muted small" data-review-empty>Loading reviews…</div>
+          <div class="uploadPlanBar">
+            <div id="planLine" class="planLine"><span>3 free photos left today</span></div>
+            <a id="upgradeLink" class="planLineLink" href="/payment">Buy Pro for $0.99 for unlimited photos <span aria-hidden="true">→</span></a>
+            <div class="proExpiredNote hidden" data-pro-expired>
+              Your Pro membership expired on <strong data-pro-expired-date>—</strong>.
+              <a class="planLineLink" href="/payment">Renew for $0.99</a>
             </div>
-
-            <form class="reviewChatForm" data-review-form>
-              <fieldset class="reviewRatingField">
-                <legend>How was your experience?</legend>
-                <div class="reviewStars" data-review-stars role="radiogroup" aria-label="Your rating">
-                  <button type="button" class="reviewStar" data-star="1" role="radio" aria-checked="false" aria-label="Disappointed, 1 star"><span aria-hidden="true">😡</span><small>Disappointed</small></button>
-                  <button type="button" class="reviewStar" data-star="2" role="radio" aria-checked="false" aria-label="Sad, 2 stars"><span aria-hidden="true">😢</span><small>Sad</small></button>
-                  <button type="button" class="reviewStar" data-star="3" role="radio" aria-checked="false" aria-label="Confused, 3 stars"><span aria-hidden="true">🤔</span><small>Confused</small></button>
-                  <button type="button" class="reviewStar" data-star="4" role="radio" aria-checked="false" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
-                  <button type="button" class="reviewStar" data-star="5" role="radio" aria-checked="false" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
-                </div>
-              </fieldset>
-              <label class="reviewInputLabel" for="reviewText">Tell us more</label>
-              <div class="reviewChatInputRow">
-                <textarea
-                  id="reviewText"
-                  class="reviewChatInput"
-                  data-review-text
-                  maxlength="300"
-                  rows="3"
-                  placeholder="Write your review…"
-                ></textarea>
-                <button type="submit" class="reviewSendBtn" data-review-send>Submit review</button>
-              </div>
-              <div class="reviewNote muted small" data-review-note></div>
-            </form>
-          </section>
+            <div class="proRenewNote hidden" data-pro-renew-soon>
+              Your Pro membership ends in <strong data-pro-days-left>0</strong> days.
+              <a class="planLineLink" href="/payment">Renew now</a>
+            </div>
+          </div>
+          <div id="uploadError" class="err hidden"></div>
         </div>
       </section>
 
@@ -446,11 +404,11 @@
         <div id="procTitle" class="procTitle">Warming up the AI…</div>
         <div id="procSub" class="procSub">Preparing your photo studio.</div>
 
-        <!-- Reserved hidden ad placement -->
-        <div class="pr-ad pr-ad-proc pr-hta" data-ad-placement="processing" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="processing"></div>
-            </div>
+        <!-- Adsterra banner under the AI loading animation -->
+<div class="pr-ad pr-ad-proc">
+  <div class="cubit-ad-label">Advertisement</div>
+  <div class="pr-ad-slot" data-pr-ad></div>
+</div>
       </section>
 
       <section id="resultView" class="view hidden">
@@ -485,11 +443,6 @@
                 <canvas id="previewCanvas"></canvas>
                 <img id="tryOnResult" class="tryOnResult hidden" alt="AI dress try-on result" />
               </div>
-            </div>
-            <!-- Reserved hidden ad placement -->
-            <div class="pr-ad pr-ad-preview pr-hta" data-ad-placement="preview" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="preview"></div>
             </div>
           </div>
 
@@ -977,24 +930,84 @@
       </div>
 
       <!-- Daily free limit reached -->
-      
-
-      <div id="downloadModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="downloadTitle" aria-describedby="downloadDescription">
-        <div class="modalBox pr-download-box">
-          <button id="prDownloadClose" type="button" class="pr-download-close" aria-label="Close download dialog" title="Close">×</button>
-          <div class="pr-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg></div>
-          <h2 id="downloadTitle" class="modalTitle">Download Your Picture</h2>
-          <p id="downloadDescription" class="pr-download-description">To save your picture, click Download Your Picture. Thank you!</p>
-          <div class="pr-ad pr-download-ad" data-ad-placement="download" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="download"></div>
-            </div>
-          <button id="prDownloadConfirm" type="button" class="btn primary pr-download-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5"/></svg><span>Download Your Picture</span></button>
-          <p id="prDownloadStatus" class="pr-download-status" role="status" aria-live="polite"></p>
+      <div id="proLimitModal" class="modalOverlay hidden">
+        <div class="modalBox">
+          <button type="button" class="cubit-download-modal-close" data-close-pro-modal aria-label="Close dialog" title="Close">×</button>
+          <div class="modalTitle">Go unlimited for 30 days — $0.99</div>
+          <p class="modalSub muted small">
+            You have used your 3 free photos for today. Come back tomorrow, or get Pro for $0.99 and
+            create unlimited photos for 30 days — with no ads.
+          </p>
+          <div class="modalBtns">
+            <a class="btn primary" href="/payment">Get Pro — $0.99</a>
+            <button type="button" class="btn ghost" data-close-pro-modal>Maybe later</button>
+          </div>
         </div>
       </div>
 
-      <!-- Direct Print pre-print popup -->
+      <div id="downloadModal" class="modalOverlay hidden">
+        <div class="modalBox">
+          <div class="modalIcon">
+          <button id="downloadModalClose" type="button" class="cubit-download-modal-close" aria-label="Close dialog" title="Close">×</button>
+
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3v12" />
+              <path d="m7 10 5 5 5-5" />
+              <path d="M4 21h16" />
+            </svg>
+          </div>
+          <div class="modalTitle">Your image is downloading…</div>
+
+<!-- Adsterra banner in the download popup -->
+<div class="pr-ad pr-ad-modal">
+  <div class="cubit-ad-label">Advertisement</div>
+  <div class="pr-ad-slot" data-pr-ad></div>
+</div>
+
+          <p class="modalSub muted small">Check your device's downloads folder for the file.</p>
+
+          <!-- Pro offer: free visitors only. Pro members never see this. -->
+          <div class="proBox" data-pro-offer>
+            <div class="proBoxTitle">Go unlimited for 30 days — $0.99</div>
+            <p class="proBoxText muted small">
+              You have <strong data-free-left>3</strong> free photos left today. One $0.99 payment
+              gives you 30 days of unlimited photos with no ads at all.
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Get Pro — $0.99 for 30 days</a>
+          </div>
+          <div class="proBox proBoxWarn hidden" data-pro-expired>
+            <div class="proBoxTitle">Your Pro membership expired</div>
+            <p class="proBoxText muted small">
+              Unlimited access ended on <strong data-pro-expired-date>—</strong>. You are back on the
+              free plan (3 photos a day).
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Renew Pro — $0.99</a>
+          </div>
+          <div class="proBox proBoxWarn hidden" data-pro-renew-soon>
+            <div class="proBoxTitle">Renew soon</div>
+            <p class="proBoxText muted small">
+              Your Pro membership ends in <strong data-pro-days-left>0</strong> days. Renewing adds
+              30 days on top of the days you still have.
+            </p>
+            <a class="btn primary proBoxBtn" href="/payment">Renew Pro — $0.99</a>
+          </div>
+
+          <div class="modalBtns">
+            <button id="modalHome" class="btn primary">Home</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Print pre-print popup with ad unit -->
       <div id="printAdModal" class="modalOverlay hidden">
         <div class="modalBox">
           <button
@@ -1008,10 +1021,10 @@
           </button>
           <div class="modalTitle">Ready to print</div>
 
-<div class="pr-ad pr-ad-modal pr-hta" data-ad-placement="print" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="print"></div>
-            </div>
+<div class="pr-ad pr-ad-modal">
+  <div class="cubit-ad-label">Advertisement</div>
+  <div class="pr-ad-slot" data-pr-ad></div>
+</div>
 
           <p class="modalSub muted small">Your print sheet has been sent to the print dialog.</p>
           <div class="modalBtns">
@@ -1029,7 +1042,7 @@
       <aside id="menuDrawer" class="slideDrawer right hidden" aria-label="Main navigation menu">
         <div class="drawerHeader">
           <div class="drawerHeaderTitle">
-            <img src="/logo.png" alt="Passport Room" class="drawerLogo" />
+            <img src="logo.png" alt="Passport Room" class="drawerLogo" />
             <span class="drawerBadge">v2.5</span>
           </div>
           <button class="drawerCloseBtn" data-close-drawer title="Close menu">
@@ -1116,7 +1129,33 @@
             </span>
             <span>Passport Size Specs</span>
           </button>
-          
+          <button class="drawerNavItem" data-menu-action="history">
+            <span class="navIcon">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            </span>
+            <span>My Saved Photos</span>
+          </button>
+          <a class="drawerNavItem" href="/payment">
+            <span class="navIcon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 15 8.5 22 9.5l-5 4.9 1.2 7.1L12 18l-6.2 3.5L7 14.4 2 9.5l7-1z" />
+              </svg>
+            </span>
+            <span>Pro Membership &amp; Payment</span>
+          </a>
           <button class="drawerNavItem" data-menu-action="account">
             <span class="navIcon">
               <svg
@@ -1268,7 +1307,7 @@
         <div class="drawerContent">
           <!-- Profile Card -->
           <div class="profileCard">
-            <div class="profileAvatarBox localProfileUi" aria-hidden="true">
+            <div class="profileAvatarBox">
               <img id="accAvatarImg" class="profileAvatarImg hidden" alt="Avatar" />
               <div id="accAvatarInitials" class="profileAvatarInitials">P</div>
               <label class="avatarEditBadge" title="Change Avatar Photo">
@@ -1289,12 +1328,7 @@
               </label>
             </div>
             <div class="profileInfoGroup">
-              <div id="visitorProfile" aria-live="polite">
-                <strong id="visitorName">Guest</strong>
-                <div class="profileSubText">User ID: <span id="visitorUid" style="overflow-wrap:anywhere">Not assigned</span></div>
-                <div id="visitorStatus" class="profileSubText">Visitor tracking is off until you accept cookies.</div>
-              </div>
-              <div class="profileNameRow localProfileUi" aria-hidden="true">
+              <div class="profileNameRow">
                 <input
                   type="text"
                   id="accNameInput"
@@ -1304,15 +1338,12 @@
                 />
                 <button id="accSaveNameBtn" class="accSaveBtn" title="Save name">Save</button>
               </div>
-              <div id="accCreatedDate" class="profileSubText localProfileUi" aria-hidden="true">Member since July 2026</div>
-              <div class="profileBadgeTag localProfileUi" aria-hidden="true">Pro Citizen • Local Account</div>
-              <div class="profileSubText localProfileUi" aria-hidden="true" title="Your permanent user number — it never changes">
+              <div id="accCreatedDate" class="profileSubText">Member since July 2026</div>
+              <div class="profileBadgeTag">Pro Citizen • Local Account</div>
+              <div class="profileSubText" title="Your permanent user number — it never changes">
                 User number:
                 <strong data-customer-code style="font-family: ui-monospace, monospace">—</strong>
               </div>
-
-              
-              
 
             </div>
           </div>
@@ -1436,7 +1467,106 @@
         </div>
       </div>
 
-      
+      <!-- Saved Photos History Modal -->
+      <div id="historyModal" class="appModalOverlay hidden">
+        <div class="appModalBox">
+          <header class="appModalHeader">
+            <div>
+              <h2 class="appModalTitle">My Recent Saved Photos</h2>
+              <p class="muted small">Local session history saved on this device.</p>
+            </div>
+            <button class="appModalCloseBtn" data-close-modal title="Close history">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </header>
+          <div class="historySettingBar">
+            <label class="historySettingLabel">
+              <input id="historyAutoSaveToggle" type="checkbox" checked />
+              <span class="historySettingText">
+                <strong>Save created photos to history</strong>
+                <span class="muted small displayBlock"
+                  >Store photo history locally on this device. Disabling saves memory &amp; disk
+                  space.</span
+                >
+              </span>
+            </label>
+          </div>
+          <div id="historyList" class="historyList"></div>
+        </div>
+      </div>
+
+      <!-- First Time Save Photo Notice Modal -->
+      <div id="savePhotosNoticeModal" class="appModalOverlay hidden">
+        <div class="appModalBox noticeModalBox">
+          <header class="appModalHeader">
+            <div class="noticeHeaderTitle">
+              <div class="noticeHeaderIcon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="appModalTitle">Save Created Photos to History?</h2>
+                <p class="muted small">Local storage preference notice</p>
+              </div>
+            </div>
+          </header>
+          <div class="noticeModalBody">
+            <p class="noticeBodyMsg">
+              Would you like Passport Room to automatically save your created photos locally in your
+              browser history?
+            </p>
+            <div class="noticeWarningCard">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                class="noticeWarnIcon"
+              >
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <div class="noticeWarnText">
+                <strong>Important Storage Note:</strong> Saving many high-resolution photos locally
+                can accumulate data and may slow down your browser or computer over time. You can
+                change this setting anytime under <em>Menu &rarr; My Saved Pictures</em>.
+              </div>
+            </div>
+            <label class="noticeCheckboxOption">
+              <input id="noticeSaveCheckbox" type="checkbox" checked />
+              <span><strong>Yes, save my created photos in local history</strong></span>
+            </label>
+            <button id="noticeConfirmBtn" class="btn primary fullWidth noticeBtn">
+              Confirm &amp; Continue
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- How It Works Modal -->
       <div id="howItWorksModal" class="appModalOverlay hidden">
@@ -1560,7 +1690,7 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Terms of Service</h2>
-              <p class="muted small">Updated: 19 October 2026 · Passport Room Legal Terms</p>
+              <p class="muted small">Effective Date: July 2026 · Passport Room Legal Terms</p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close Terms of Service">
               <svg
@@ -1594,16 +1724,12 @@
             <h3>3. Local Privacy &amp; Data Ownership</h3>
             <p>
               You retain full intellectual property rights to all images you upload and process.
-              Passport Room does not upload or store photos opened in the editor on its servers. All image processing occurs strictly within your device's browser
+              Passport Room does not store, transmit, transmit, or retain your personal facial images
+              on external servers. All image processing occurs strictly within your device's browser
               memory.
             </p>
 
-            <h3>4. Optional Accounts</h3>
-            <p>
-              The free tools do not require registration. With cookie consent, Firebase Anonymous Authentication assigns a persistent visitor ID, shown in your profile, to recognise return visits. Photos are unlimited and no payments are taken. See the full <a href="/terms-of-service">Terms of Service</a>.
-            </p>
-
-            <h3>5. Government Compliance Disclaimer</h3>
+            <h3>4. Government Compliance Disclaimer</h3>
             <p>
               While Passport Room implements strict millimeter dimensions and face height ratios
               recommended by passport authorities (including Bangladesh, United States, UK, and
@@ -1612,7 +1738,7 @@
               lighting, expression, and posture requirements.
             </p>
 
-            <h3>6. Limitation of Liability</h3>
+            <h3>5. Limitation of Liability</h3>
             <p>
               In no event shall Passport Room or its operators be liable for any indirect, incidental,
               or consequential damages resulting from the use or inability to use the application.
@@ -1627,7 +1753,7 @@
           <header class="appModalHeader">
             <div>
               <h2 class="appModalTitle">Privacy Policy</h2>
-              <p class="muted small">Updated: 19 October 2026 · Read the full policy for details</p>
+              <p class="muted small">GDPR &amp; advertising compliant privacy statement</p>
             </div>
             <button class="appModalCloseBtn" data-close-modal title="Close Privacy Policy">
               <svg
@@ -1646,22 +1772,23 @@
           <div class="legalContent">
             <h3>1. Privacy-First Commitment</h3>
             <p>
-              Photos opened in Passport Room are not uploaded to our servers. Your images are processed 100% locally on
+              At Passport Room, user privacy is our fundamental principle. We do not collect, upload,
+              store, or sell your personal photo data. Your images are processed 100% locally on
               your computer or mobile device using WebGPU and WebAssembly machine learning models.
             </p>
 
             <h3>2. Local Storage &amp; Cookies</h3>
             <p>
-              Browser storage remembers your preferences and optional saved photo history. If you accept cookies, Firebase Anonymous Authentication stores a visitor session to recognise this browser. A random display name, visit count and dates stay in your browser; Firebase receives authentication requests and holds the visitor account. Google AdSense may use advertising cookies. Rejecting cookies turns this visitor tracking off.
-              Google's <a href="https://policies.google.com/privacy" rel="nofollow noopener">privacy policy</a> applies to requests to Google.
+              We use local browser storage (localStorage) solely to remember your user preferences
+              (such as default export format, passport size selection, and local user display name).
+              No tracking cookies or cross-site fingerprinting tools are used.
             </p>
 
-            <h3>3. Your Data Rights</h3>
+            <h3>3. GDPR &amp; CCPA Compliance</h3>
             <p>
-              Photos opened in the editor are not uploaded to our servers. Account information, visitor
-              identifiers and submitted reviews may be processed by our providers. A visitor ID is pseudonymous, not a guarantee of anonymity; we do not publish your authentication session.
-              Clearing browser data does not delete remote records; contact us to request access
-              or deletion. Read the full <a href="/privacy-policy">Privacy Policy</a>.
+              Because no personal data or facial biometric data is stored on remote servers, your
+              rights under GDPR and CCPA are natively protected. You can clear all local application
+              data at any time via the Account Settings panel.
             </p>
 
             <h3>4. Contact &amp; Inquiries</h3>
@@ -1825,7 +1952,14 @@
           <div class="seoFaq">
             <details>
               <summary>Is Passport Room really free?</summary>
-              <p> Passport Room is 100% free forever — unlimited photos, no account, no sign-up, no payment and no watermark. </p>
+              <p>
+                Passport Room is free to use with no account, and no export ever carries a
+                watermark. The free plan includes 3 finished photos per day. If you need more, the
+                optional Passport Room Pro pass is a one-off US$0.99 payment that unlocks 30 days
+                of unlimited, ad-free exports — it is not a subscription, nothing renews
+                automatically, and there is nothing to cancel. See the
+                <a href="/pricing">pricing page</a>.
+              </p>
             </details>
             <details>
               <summary>Are my photos uploaded to a server?</summary>
@@ -1886,14 +2020,6 @@
               </p>
             </details>
           </div>
-        </section>
-
-        <section class="seoSec" data-home-only aria-label="Visitor statistics" style="text-align:center">
-          <a href="/stats" style="display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:1.1rem;text-decoration:none;color:inherit;padding:14px 22px;border:1px solid currentColor;border-radius:999px;opacity:.9">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            See how many people visit us
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </a>
         </section>
 
         <section class="articles" data-home-only aria-labelledby="articlesTitle">
@@ -2020,12 +2146,15 @@
             Passport Room is a fully in-browser passport and visa photo studio. Our AI segmentation
             model runs locally on your device using WebGPU (with a WebAssembly fallback), so your
             photo never leaves your computer or phone. There are no uploads and no cloud processing, and
-            we never track or store your images. Everything is free forever — unlimited photos, no account needed.
+            we never track or store your images. You can use the free plan — 3 finished photos a day
+            — without creating an account; an account is only needed if you buy the optional
+            <a href="/pricing">Pro pass</a> so your 30 days of access can be restored on another
+            device.
           </p>
 
           <div class="aboutDemoBox">
             <img
-              src="/assets/how-it-works.jpg"
+              src="assets/how-it-works.jpg"
               loading="lazy"
               width="720"
               height="593"
@@ -2071,7 +2200,7 @@
                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
               />
             </svg>
-            100% free forever — unlimited photos, no account needed
+            Free to start — 3 photos a day, no account · Pro: one-off $0.99 for 30 days
           </div>
 
           <ul class="aboutList">
@@ -2254,9 +2383,9 @@
           <div class="homeFooterDivider"></div>
           <div class="homeFooterBottom">
             <div class="homeFooterLinks">
-              <a href="/features">Features</a> | <a href="/about">About</a> |
+              <a href="/features">Features</a> | <a href="/pricing">Pricing</a> | <a href="/about">About</a> |
               <a href="/privacy-policy">Privacy Policy</a> |
-              <a href="/terms-of-service">Terms of Service</a> | <a href="/contact">Contact</a>
+              <a href="/terms-of-service">Terms of Service</a> | <a href="/refund-policy">Refund Policy</a> | <a href="/contact">Contact</a>
             </div>
           </div>
 
@@ -2282,63 +2411,60 @@
         if (yr) yr.textContent = new Date().getFullYear();
       })();
     </script>
-    <!-- Sign in / create account (Firebase) -->
-    
-
-    <script>try{localStorage.setItem("cubit_save_photos_enabled","false");localStorage.setItem("cubit_save_notice_prompted","true");localStorage.removeItem("cubit_history_v1");Object.keys(localStorage).forEach(function(k){if(k.indexOf("cubit_history")===0)localStorage.removeItem(k)})}catch(e){}</script>
-    <script src="download-flow.js?v=20261014"></script>
-    <script>window.__prRevName=function(r){var n=String((r&&r.name)||"").trim();if(!n||/^(guest|t|test|test user)$/i.test(n)||/^Passpo/i.test(n))return r&&r.customerId&&/^CUS-\d+$/.test(r.customerId)?"Customer "+r.customerId.slice(4):"Verified customer";return n;};</script>
-    <script type="module" src="assets/app.min.js?v=20261024"></script>
-  
-    <!-- "Free forever" notice (shown after Accept all) -->
-    <div id="prFreeNotice" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prFreeTitle">
-      <div class="prFreeCard">
-        <div class="prFreeBadge"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
-        <h2 id="prFreeTitle" class="prFreeTitle">Passport Room is <span class="grad">free forever</span></h2>
-        <ul class="prFreeList">
-          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span><strong>Unlimited free photos</strong> — passport, visa &amp; print sheets</span></li>
-          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span><strong>Device-only privacy</strong> — your photos never leave your device</span></li>
-          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></svg><span><strong>No paywalls</strong> — no sign-up, no payment, no limits</span></li>
-        </ul>
-        <button id="prFreeNoticeOk" type="button" class="btn primary prFreeBtn">Got it</button>
-      </div>
-    </div>
-
-    <!-- Post-creation survey (once only) -->
-    <div id="prSurvey" class="prFreeBanner hidden" role="dialog" aria-modal="true" aria-labelledby="prSurveyTitle">
-      <div class="prFreeCard prSurveyCard">
-        <div class="prSurveyStep" data-step="1">
-          <div class="prSurveyProg">Step 1 of 2</div>
-          <h2 id="prSurveyTitle" class="prFreeTitle">How did you find us?</h2>
-          <div class="prSurveyOpts" role="radiogroup">
-            <label><input type="radio" name="prSrc" value="search"><span>Search engine (Google, Bing, etc.)</span></label>
-            <label><input type="radio" name="prSrc" value="social"><span>Social media (Facebook, Instagram, TikTok, YouTube)</span></label>
-            <label><input type="radio" name="prSrc" value="ai"><span>AI agents</span></label>
-            <label><input type="radio" name="prSrc" value="other"><span>Other*</span></label>
-          </div>
-          <input id="prSrcOther" class="prSurveyInput hidden" type="text" maxlength="120" placeholder="Please tell us where you found us">
-          <div class="prSurveyErr" id="prSurveyErr1"></div>
-          <button id="prSurveyNext" type="button" class="btn primary prFreeBtn">Next</button>
-        </div>
-        <div class="prSurveyStep hidden" data-step="2">
-          <div class="prSurveyProg">Step 2 of 2</div>
-          <h2 class="prFreeTitle">Rate your experience</h2>
-          <div class="reviewStars prSurveyStars" role="radiogroup" aria-label="Your rating">
-            <button type="button" class="reviewStar" data-sv="1" aria-label="Disappointed, 1 star"><span aria-hidden="true">😡</span><small>Disappointed</small></button>
-            <button type="button" class="reviewStar" data-sv="2" aria-label="Sad, 2 stars"><span aria-hidden="true">😢</span><small>Sad</small></button>
-            <button type="button" class="reviewStar" data-sv="3" aria-label="Confused, 3 stars"><span aria-hidden="true">🤔</span><small>Confused</small></button>
-            <button type="button" class="reviewStar" data-sv="4" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
-            <button type="button" class="reviewStar" data-sv="5" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
-          </div>
-          <textarea id="prSurveyText" class="reviewChatInput prSurveyInput" maxlength="300" rows="3" placeholder="Write your review…"></textarea>
-          <div class="prSurveyErr" id="prSurveyErr2"></div>
-          <button id="prSurveySend" type="button" class="btn primary prFreeBtn">Submit review*</button>
-        </div>
-      </div>
-    </div>
-
-<script src="/cookie-consent.js?v=20261021" defer></script>
-<script type="module" src="/visitor-profile.js?v=20261024"></script>
-<script type="module" src="/survey.js?v=20261024"></script>
-</body>
+    <script>
+      /* Adsterra 320x50 banners. Each slot renders inside its own sandboxed
+         iframe so the network's document.write loader cannot touch the page,
+         and it is only mounted once the slot is actually visible. */
+      (function () {
+        var KEY = "6c8160f0e3e2be5ae6abe47272f687da";
+        var W = 320,
+          H = 50;
+        var doc =
+          '<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body>' +
+          '<scr' + 'ipt>atOptions={"key":"' + KEY + '","format":"iframe","height":' + H + ',"width":' + W + ',"params":{}};</scr' + 'ipt>' +
+          '<scr' + 'ipt src="https://www.highrevenueformat.com/' + KEY + '/invoke.js"></scr' + 'ipt>' +
+          '</body></html>';
+        function mount(el) {
+          /* Pro members never see a single ad. */
+          if (document.body && document.body.classList.contains("is-pro")) return;
+          if (el.dataset.prAdMounted === "1") return;
+          if (!el.isConnected || el.clientWidth < 20) return;
+          el.dataset.prAdMounted = "1";
+          var f = document.createElement("iframe");
+          f.title = "Advertisement";
+          f.width = W;
+          f.height = H;
+          f.scrolling = "no";
+          f.setAttribute("frameborder", "0");
+          f.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+          f.style.cssText =
+            "display:block;border:0;margin:0 auto;width:" + W + "px;height:" + H + "px;max-width:100%";
+          f.srcdoc = doc;
+          el.appendChild(f);
+        }
+        var sweep = function () {
+          document.querySelectorAll("[data-pr-ad]").forEach(mount);
+        };
+        var start = function () {
+          sweep();
+          if (typeof ResizeObserver !== "undefined") {
+            var ro = new ResizeObserver(function (entries) {
+              for (var i = 0; i < entries.length; i++) mount(entries[i].target);
+            });
+            document.querySelectorAll("[data-pr-ad]").forEach(function (el) {
+              ro.observe(el);
+            });
+          }
+          window.addEventListener("resize", sweep, { passive: true });
+          document.addEventListener("click", function () {
+            setTimeout(sweep, 250);
+          }, true);
+        };
+        if (document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", start);
+        else start();
+      })();
+    </script>
+    <script type="module" src="assets/app.min.js?v=7c95fa85a0"></script>
+  </body>
 </html>
