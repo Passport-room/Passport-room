@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}(function(){var c=null;try{c=localStorage.getItem("pr_cookie_consent");}catch(e){}var g=c==="accepted"?"granted":"denied";gtag("consent","default",{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:g,wait_for_update:500});(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=c==="accepted"?0:1;})();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2279678646698716" crossorigin="anonymous"></script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Passport Room Features — AI Background Removal, ID Sizing & Print Sheets</title>
@@ -21,7 +23,6 @@
       property="og:description"
       content="Every Passport Room feature explained: in-browser AI background removal, country passport sizes, print sheets, outfit try-on, face enhance and the photo editor."
     />
-    <meta property="og:image" content="https://passport-room.com/assets/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -31,7 +32,6 @@
       name="twitter:description"
       content="Every Passport Room feature explained: in-browser AI background removal, country passport sizes, print sheets, outfit try-on, face enhance and the photo editor."
     />
-    <meta name="twitter:image" content="https://passport-room.com/assets/og-image.png" />
     <meta name="author" content="Passport Room" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -144,22 +144,20 @@
         starts where you left off.
       </p>
 
-      <h2>Local account and photo history</h2>
+      <h2>Accounts and local photo history</h2>
       <p>
-        The profile area stores a display name, avatar and preferences, and can keep recently
-        created photos so you can reopen them later. This data is written to your browser's
-        localStorage and IndexedDB on the device you are using, not to a Passport Room server, so there
-        is no password, no email address and no sync between devices. Saving photo history is
-        optional and can be switched off in the save-history prompt or in your profile, and clearing
-        your browser data deletes everything the app has stored.
+        You can use the photo tools without signing in or optionally create an account using email
+        and password or Google. Account sign-in is handled by Google Firebase. The profile area
+        keeps local display details, preferences and recent photo thumbnails on this device;
+        photo history is optional and is not synced to your account. Clearing browser site data
+        deletes local history but does not delete an online account or remote visitor records.
+        See our <a href="/privacy-policy">privacy policy</a> for details.
       </p>
 
       <h2>Export</h2>
       <p>
         Finished photos download as JPEG or PNG at the full resolution implied by the chosen preset
-        and 300 DPI, with no watermark. The free plan allows 3 finished exports per day; the optional
-        Pro pass (one-off US$0.99, 30 days) removes that limit and the ads — see the
-        <a href="/pricing">pricing page</a>. Downloads are generated in the browser
+        and 300 DPI, with no watermark. Exports are unlimited and free forever. Downloads are generated in the browser
         from the canvas, so the file goes straight to your device's downloads folder.
       </p>
 
@@ -172,14 +170,14 @@
       <nav aria-label="Footer">
         <a href="/">Passport photo maker</a>
         <a href="/features">Features</a>
-        <a href="/pricing">Pricing</a>
           <a href="/about">About</a>
         <a href="/privacy-policy">Privacy Policy</a>
         <a href="/terms-of-service">Terms of Service</a>
-        <a href="/refund-policy">Refund Policy</a>
         <a href="/contact">Contact</a>
       </nav>
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
     </footer>
-  </body>
+  <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261024"></script>
+</body>
 </html>

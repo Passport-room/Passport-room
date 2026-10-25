@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Passport Room Admin</title>
+<link rel="icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/page.css" />
+<style>
+.adWrap{max-width:1200px;margin:0 auto;padding:24px 20px 72px}
+.adCard{background:var(--pg-panel);border:1px solid var(--pg-border);border-radius:14px;padding:20px}
+.adLogin{max-width:380px;margin:12vh auto 0}
+.adLogin input{width:100%;margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--pg-border);background:var(--pg-bg);color:var(--pg-text);font:inherit}
+.adBtn{margin-top:14px;padding:10px 16px;border:0;border-radius:8px;background:var(--pg-accent);color:#0b0d12;font-weight:600;cursor:pointer}
+.adBtn.ghost{background:transparent;color:var(--pg-muted);border:1px solid var(--pg-border);margin:0}
+.adErr{color:#ff8a8a;font-size:14px;min-height:1.2em;margin-top:8px}
+.adStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.adStats b{display:block;font-size:24px}.adStats span{font-size:12px;color:var(--pg-muted);text-transform:uppercase;letter-spacing:.05em}
+.adTabs{display:flex;gap:8px;margin:18px 0 10px;flex-wrap:wrap}
+.adTabs button{padding:8px 14px;border-radius:999px;border:1px solid var(--pg-border);background:transparent;color:var(--pg-muted);cursor:pointer;font:inherit;font-size:14px}
+.adTabs button[aria-selected=true]{background:var(--pg-accent);color:#0b0d12;border-color:var(--pg-accent)}
+.adTable{overflow-x:auto;border:1px solid var(--pg-border);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 10px;text-align:left;border-top:1px solid var(--pg-border);vertical-align:top}
+th{background:var(--pg-panel);color:var(--pg-muted);font-weight:500;white-space:nowrap;border-top:0}
+td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
+.adNote{color:var(--pg-muted);font-size:13px}
+.adTop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.adTopActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="adWrap">
+  <section id="login" class="adCard adLogin">
+    <h1 style="margin:0;font-size:22px">Admin sign in</h1>
+    <p class="adNote">Only Firebase accounts listed as admins can see customer records.</p>
+    <form id="loginForm">
+      <input id="email" type="email" autocomplete="username" placeholder="Admin email" required />
+      <input id="password" type="password" autocomplete="current-password" placeholder="Password" required />
+      <button class="adBtn" type="submit" id="loginBtn">Sign in</button>
+      <div class="adErr" id="loginErr" role="alert"></div>
+    </form>
+  </section>
+
+  <section id="panel" hidden>
+    <div class="adTop">
+      <div>
+        <h1 style="margin:0;font-size:24px">Passport Room admin</h1>
+        <span class="adNote" id="syncStatus" style="color:var(--pg-accent);font-size:12px">Public stats matched with admin totals</span>
+      </div>
+      <div class="adTopActions">
+        <span class="adNote" id="who"></span>
+        <button class="adBtn ghost" id="syncBtn" title="Sync live stats to public visitors page">Sync public stats</button>
+        <button class="adBtn ghost" id="refresh">Refresh</button>
+        <button class="adBtn ghost" id="logout">Sign out</button>
+      </div>
+    </div>
+    <div class="adStats" id="stats"></div>
+    <div class="adTabs" role="tablist">
+      <button role="tab" data-tab="customers" aria-selected="true">Historical customers</button>
+      <button role="tab" data-tab="reviews" aria-selected="false">Reviews</button>
+      <button role="tab" data-tab="referrals" aria-selected="false">Where did you hear about us?</button>
+    </div>
+    <p class="adNote" id="status"></p>
+    <div class="adTable"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+    <p class="adNote">Read-only view. This page never writes, resets or deletes customer records.</p>
+  </section>
+</main>
+<script type="module" src="/admin/admin.js"></script>
+</body>
+</html>
