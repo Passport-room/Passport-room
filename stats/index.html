@@ -25,9 +25,6 @@
       .stCard svg{color:var(--pg-accent)}
       .stNum{font-family:Sora,Inter,sans-serif;font-size:2.4rem;font-weight:700;margin-top:8px;background:linear-gradient(90deg,var(--pg-accent),var(--pg-accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
       .stLabel{color:var(--pg-muted);font-size:.95rem}
-      .stSecure{position:fixed;right:16px;bottom:16px;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--pg-panel);border:1px solid var(--pg-border);color:var(--pg-text);font-size:.82rem;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.25)}
-      .stSecure svg{color:#ffca28}
-      @media(max-width:520px){.stSecure{right:10px;bottom:10px;font-size:.75rem}}
     </style>
   </head>
   <body>
@@ -39,8 +36,8 @@
           <a href="/features">Features</a>
           <a href="/about">About</a>
           <a href="/contact">Contact</a>
-          <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
-          <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
         </div>
       </div>
     </nav>
@@ -50,18 +47,11 @@
       <h1>Know how many people visit us</h1>
       <p class="pgLead">Real totals from our community, updated live.</p>
       <div class="stGrid">
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="stNum" id="stCustomers">…</div><div class="stLabel">Total customers</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="stNum" id="stUsers">…</div><div class="stLabel">Total visitors</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><div class="stNum" id="stVisits">…</div><div class="stLabel">Total visits</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><div class="stNum" id="stPhotos">…</div><div class="stLabel">Total photos created</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="stNum" id="stTodayVisitors">…</div><div class="stLabel">Today's visitors</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="stNum" id="stTodayVisits">…</div><div class="stLabel">Today's visits</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><div class="stNum" id="stTodayPhotos">…</div><div class="stLabel">Photos created today</div></div>
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div class="stNum" id="stTime">…</div><div class="stLabel">Total time spent</div></div>
+        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><div class="stNum" id="stUsers">…</div><div class="stLabel">Total users</div></div>
+        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><div class="stNum" id="stPhotos">…</div><div class="stLabel">Pictures created</div></div>
         <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div class="stNum" id="stReviews">…</div><div class="stLabel">Community reviews</div></div>
       </div>
-      <p class="pgNote" id="stUpdated" style="color:var(--pg-muted);font-size:.9rem">Loading live data…</p>
-      <p>These are the same live numbers our admin team sees. Each browser that accepts cookies counts once as a visitor; "today" uses UTC. A picture is counted when a photo is downloaded. Your photos never leave your device; we only count them.</p>
+      <p>Each browser that accepts cookies counts once as a user. A picture is counted when a photo is downloaded. Your photos never leave your device; we only count them.</p>
       <p><a href="/">Create your passport photo</a> · <a href="/privacy-policy">Privacy Policy</a></p>
     </main>
 
@@ -69,77 +59,20 @@
       <nav aria-label="Footer">
         <a href="/">Passport photo maker</a>
         <a href="/features">Features</a>
-        <a href="/about">About</a>
+          <a href="/about">About</a>
         <a href="/privacy-policy">Privacy Policy</a>
         <a href="/terms-of-service">Terms of Service</a>
         <a href="/contact">Contact</a>
       </nav>
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
     </footer>
-    <div class="stSecure" role="note" aria-label="Secured by Firebase Authentication"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Secured by Firebase Authentication</span></div>
-    <script>
-    (function(){
-      var U = "https://passport-48389-default-rtdb.firebaseio.com/";
-      var BASE = {
-        customers: 2257,
-        visitors: 2241,
-        visits: 3649,
-        photos: 983,
-        totalMs: 2058480000,
-        reviews: 17
-      };
-      function el(id){ return document.getElementById(id); }
-      function num(id, v){ var e = el(id); if (e) e.textContent = (v == null || isNaN(Number(v))) ? "0" : Number(v).toLocaleString(); }
-      function dur(ms){
-        var s = Math.round((Number(ms) || 0) / 1000);
-        if (s < 60) return s + "s";
-        var m = Math.floor(s / 60);
-        return m < 60 ? m + "m " + (s % 60) + "s" : Math.floor(m / 60).toLocaleString() + "h " + (m % 60) + "m";
-      }
-      function combine(live, base){
-        var l = Number(live) || 0;
-        return l >= base ? l : base + l;
-      }
-      function get(p){
-        return fetch(U + p + ".json", { cache: "no-store" })
-          .then(function(r){ return r.ok ? r.json() : null; })
-          .catch(function(){ return null; });
-      }
-      function load(){
-        var d = new Date().toISOString().slice(0, 10);
-        Promise.all([
-          get("stats"),
-          get("counters/customerNumber"),
-          get("reviews").then(function(v){ return v ? Object.keys(v).length : 0; })
-        ]).then(function(x){
-          var s = x[0] || {}, t = (s.days && s.days[d]) || {};
-          var cn = x[1];
-          var totalCustomers = Math.max(BASE.customers, Number(cn) || 0, Number(s.customers) || 0);
-          var totalVisitors = combine(s.visitors, BASE.visitors);
-          var totalVisits = combine(s.visits, BASE.visits);
-          var totalPhotos = combine(s.photos, BASE.photos);
-          var totalTimeMs = combine(s.totalMs, BASE.totalMs);
-          var totalReviews = Math.max(BASE.reviews, Number(x[2]) || 0);
-
-          num("stCustomers", totalCustomers);
-          num("stUsers", totalVisitors);
-          num("stVisits", totalVisits);
-          num("stPhotos", totalPhotos);
-          num("stTodayVisitors", t.visitors || 0);
-          num("stTodayVisits", t.visits || 0);
-          num("stTodayPhotos", t.photos || 0);
-          var te = el("stTime");
-          if (te) te.textContent = dur(totalTimeMs);
-          num("stReviews", totalReviews);
-          var u = el("stUpdated");
-          if (u) u.textContent = "Live data · updated " + new Date().toLocaleTimeString();
-        });
-      }
-      load();
-      setInterval(load, 30000);
-    })();
-    </script>
-    <script src="/cookie-consent.js" defer></script>
-    <script type="module" src="/visitor-profile.js?v=20261024"></script>
-  </body>
+  <script>
+  (function(){{var U="https://passport-48389-default-rtdb.firebaseio.com/";
+  function put(id,v){{var e=document.getElementById(id);if(e)e.textContent=v==null?"—":Number(v).toLocaleString();}}
+  fetch(U+"stats.json").then(function(r){{return r.ok?r.json():null}}).then(function(s){{put("stUsers",s&&s.visitors);put("stPhotos",s&&s.photos);}}).catch(function(){{put("stUsers");put("stPhotos");}});
+  fetch(U+"reviews.json?shallow=true").then(function(r){{return r.ok?r.json():null}}).then(function(s){{put("stReviews",s?Object.keys(s).length:null);}}).catch(function(){{put("stReviews");}});}})();
+  </script>
+  <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261020"></script>
+</body>
 </html>

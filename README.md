@@ -27,22 +27,13 @@ For visitors in the EEA/UK/Switzerland, configure a Google-certified consent
 management platform in AdSense Privacy & messaging. This custom banner alone does
 not establish compliance with Google's certified CMP requirements or guarantee approval.
 
-Admin panel update — 21 October 2026
-Added /admin (read-only; Firebase Email/Password sign-in + /admins/{uid} allowlist).
-See ADMIN-SETUP.md and database.rules.json. No secrets are included.
-
-
-Update - 24 October 2026 (tracking fix)
-
-1. IMPORTANT: open Firebase Console -> Realtime Database -> Rules, paste the full
-   contents of database.rules.json from this ZIP and click Publish. The previous
-   rules denied most counter writes, which froze the customer number, visitor,
-   visit, photo and daily totals. The new file grants every path the site uses
-   (public counter increments are +1-only; customers stay admin-readable).
-   Keep Anonymous sign-in enabled in Authentication -> Sign-in method.
-2. Review names: both review forms no longer ask for a name. The name comes from
-   the visitor profile, and profile names are now words only (no numbers).
-   Existing stored profiles are upgraded automatically on next visit.
-3. The "free forever" notice now appears 1.5 seconds after the cookie box.
-4. Admin panel "Sync public stats" now writes each /stats child separately
-   (the rules grant admin writes per child).
+Connectivity fixes — 25 October 2026
+AI model downloads now detect stalled connections and retry automatically (five
+attempts with increasing waits, including rate-limit responses). Review and
+"How did you find us?" submissions have an 8-second timeout, three automatic
+retries, and an offline queue: if sending fails completely, the message is kept
+on the device and delivered automatically on the next visit or when the
+connection returns — the "Could not send your review" dead end is gone.
+After submitting, the review appears instantly; the reviews list loads only the
+latest 60 entries. Optional speed-up: add ".indexOn": "ts" to the /reviews rule
+in the Firebase Realtime Database rules so the latest-60 query uses an index.
