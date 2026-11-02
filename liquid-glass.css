@@ -1,58 +1,152 @@
 /* ============================================================
-   Passport Room — Restrained Glass (override layer)
+   Purple Liquid Glass — override layer (v2)
    Loaded AFTER style.css (app pages) and page.css (static pages).
-   Recolors and re-textures only; no layout or logic changes.
+   Recolors and re-textures the UI only; no layout or logic changes.
 
-   Direction: deep neutral-plum surfaces, one muted violet accent,
-   hairline borders, small neutral shadows, uniform cards.
-   Performance: no animated blurred layers; backdrop blur limited to
-   floating chrome (topbar, nav, modals). Cards use tinted translucent
-   fills without blur. Transitions animate transform/opacity only.
+   v2: darker backdrop, one unified glass recipe for every box and
+   button, subtle entrance animations, lighter effects on mobile.
    ============================================================ */
 
-/* ---------- Design tokens (app pages, style.css) ---------- */
+/* ---------- App tokens (style.css pages) ---------- */
 :root {
-  --bg: oklch(0.15 0.02 300);
-  --fg: oklch(0.96 0.01 300);
-  --card: oklch(0.22 0.03 300 / 0.6);
-  --surface-raised: oklch(0.26 0.03 300 / 0.75);
-  --muted: oklch(0.72 0.02 300);
-  --border: oklch(0.78 0.02 300 / 0.14);
-  --border-strong: oklch(0.82 0.03 300 / 0.3);
-  --primary: oklch(0.6 0.12 300);
-  --accent: oklch(0.6 0.12 300);
-  --accent-soft: oklch(0.6 0.12 300 / 0.16);
-  --brand-gradient: linear-gradient(135deg, oklch(0.62 0.09 295), oklch(0.66 0.11 308));
-  --neon-glow: 0 1px 2px oklch(0 0 0 / 0.3);
+  --lg-blur: 20px;
+  --lg-blur-sm: 10px;
+  --bg: oklch(0.1 0.04 295);
+  --fg: oklch(0.97 0.015 305);
+  --card: oklch(0.3 0.09 300 / 0.42);
+  --muted: oklch(0.74 0.05 305);
+  --border: oklch(0.82 0.06 300 / 0.16);
+  --primary: oklch(0.66 0.25 298);
+  --accent: oklch(0.72 0.24 318);
+  --brand-gradient: linear-gradient(135deg, oklch(0.58 0.24 288), oklch(0.62 0.26 302), oklch(0.66 0.25 318));
+  --neon-glow:
+    0 0 22px oklch(0.62 0.26 300 / 0.45),
+    0 0 52px oklch(0.55 0.24 310 / 0.28);
   --shadow-card:
-    0 1px 2px oklch(0 0 0 / 0.3),
-    0 12px 32px -16px oklch(0 0 0 / 0.4);
-  --shadow-hover:
-    0 1px 2px oklch(0 0 0 / 0.3),
-    0 16px 40px -18px oklch(0 0 0 / 0.5);
+    inset 0 1px 0 oklch(0.95 0.03 300 / 0.16),
+    inset 0 -1px 0 oklch(0.4 0.12 300 / 0.12),
+    0 1px 2px oklch(0.05 0.02 300 / 0.45),
+    0 24px 60px -24px oklch(0.35 0.18 300 / 0.55);
 }
 
-/* ---------- Static page tokens (page.css) ---------- */
+/* ---------- Static page tokens (page.css pages) ---------- */
 :root {
-  --pg-bg: #14101b;
-  --pg-panel: rgba(48, 38, 62, 0.55);
-  --pg-border: rgba(216, 202, 238, 0.15);
-  --pg-text: #f1eef5;
-  --pg-muted: #a89fb0;
-  --pg-accent: #a695c9;
-  --pg-accent-2: #c3b2da;
+  --pg-bg: #0b0416;
+  --pg-panel: rgba(103, 60, 176, 0.14);
+  --pg-border: rgba(196, 165, 255, 0.22);
+  --pg-text: #f1ecff;
+  --pg-muted: #b9a8e0;
+  --pg-accent: #a78bfa;
+  --pg-accent-2: #d8b4fe;
 }
 
-/* ---------- Static backdrop (replaces animated aurora blobs) ---------- */
+/* ---------- Liquid aurora backdrop (darkened) ---------- */
 body {
-  background-color: var(--bg);
   background-image:
-    radial-gradient(60% 42% at 50% 0%, oklch(0.25 0.04 300 / 0.5), transparent 70%),
-    radial-gradient(50% 40% at 100% 100%, oklch(0.21 0.03 310 / 0.32), transparent 70%);
-  /* background-attachment intentionally NOT fixed: avoids scroll repaints */
+    radial-gradient(55% 45% at 50% 0%, oklch(0.34 0.14 300 / 0.32), transparent 70%),
+    radial-gradient(45% 40% at 100% 100%, oklch(0.3 0.12 318 / 0.22), transparent 70%),
+    radial-gradient(40% 35% at 0% 80%, oklch(0.28 0.11 285 / 0.2), transparent 70%);
+  background-attachment: fixed;
 }
 
-/* ---------- Uniform card surface (no backdrop blur) ---------- */
+/* Fixed-attachment backgrounds are slow on mobile; drop it there. */
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+    --lg-blur: 14px;
+  }
+  :root {
+    --lg-blur: 14px;
+    --lg-blur-sm: 8px;
+  }
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.32;
+  will-change: transform;
+}
+
+body::before {
+  width: 46vw;
+  height: 46vw;
+  min-width: 320px;
+  min-height: 320px;
+  left: -12vw;
+  top: -14vw;
+  background: radial-gradient(circle at 35% 35%, oklch(0.5 0.22 298 / 0.45), transparent 70%);
+  animation: lgDriftA 26s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 52vw;
+  height: 52vw;
+  min-width: 360px;
+  min-height: 360px;
+  right: -16vw;
+  bottom: -18vw;
+  background: radial-gradient(circle at 60% 60%, oklch(0.45 0.2 318 / 0.38), transparent 70%);
+  animation: lgDriftB 32s ease-in-out infinite alternate;
+}
+
+@media (max-width: 768px) {
+  body::before,
+  body::after {
+    filter: blur(48px);
+    opacity: 0.26;
+  }
+  body::before {
+    width: 68vw;
+    height: 68vw;
+    min-width: 260px;
+    min-height: 260px;
+  }
+  body::after {
+    width: 74vw;
+    height: 74vw;
+    min-width: 280px;
+    min-height: 280px;
+  }
+}
+
+@keyframes lgDriftA {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6vw, 5vh, 0) scale(1.12); }
+}
+
+@keyframes lgDriftB {
+  from { transform: translate3d(0, 0, 0) scale(1.08); }
+  to   { transform: translate3d(-7vw, -6vh, 0) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+
+/* Soften the hero crystal glow so it never outshines the cards */
+.crystalGlow {
+  background: oklch(0.5 0.24 305 / 0.16);
+  filter: blur(70px);
+}
+#crystalCanvas {
+  opacity: 0.55;
+}
+@media (min-width: 640px) {
+  #crystalCanvas {
+    opacity: 0.65;
+  }
+}
+
+/* ---------- The liquid glass recipe (shared by every panel) ---------- */
 .topbar,
 .panel,
 .dropdown,
@@ -76,187 +170,186 @@ body {
 .enhancePanel,
 .noticeWarningCard,
 .seoSec,
-.pgCard,
-.pgForm,
-.reviewChat {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow-card);
+/* Boxes that previously sat outside the glass layer */
+.feat,
+.drop,
+.reviewChat,
+.tryOnModalCard,
+.proBox,
+.proExpiredNote,
+.proRenewNote,
+.printEditorModalBox,
+.printEditorControls,
+.profileCard,
+.editRow,
+.previewBox,
+.dropdown,
+.ddItem,
+.qtyBtn,
+.printSeg,
+.printQtyBox,
+.presetCard,
+.gridSlot,
+.statCard,
+.aboutList li,
+.emptyNotice {
+  background:
+    linear-gradient(150deg, oklch(0.46 0.12 300 / 0.34), oklch(0.24 0.08 298 / 0.46) 55%, oklch(0.2 0.07 295 / 0.52));
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+  backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+  border: 1px solid oklch(0.84 0.06 300 / 0.18);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0 oklch(0.96 0.03 300 / 0.22),
+    inset 0 -1px 0 oklch(0.45 0.14 300 / 0.1),
+    0 24px 60px -24px oklch(0.35 0.2 300 / 0.55);
 }
 
-/* ---------- Floating chrome only: limited 10–12px blur ---------- */
-.topbar,
-.pgNav {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: oklch(0.15 0.02 300 / 0.72);
+/* Keep the upload box's dashed outline */
+.drop {
+  border: 2px dashed oklch(0.62 0.26 305 / 0.45);
+  border-radius: 20px;
+}
+.drop:hover {
+  border-color: oklch(0.66 0.26 305 / 0.6);
 }
 
-.pgNav {
-  border-bottom: 1px solid var(--border);
+/* Compact elements get a lighter slice of the same glass */
+.ddItem,
+.qtyBtn,
+.printSeg,
+.printSegBtn,
+.gridSlot,
+.statCard,
+.aboutList li,
+.emptyNotice,
+.reviewStar {
+  background: linear-gradient(150deg, oklch(0.42 0.11 300 / 0.3), oklch(0.24 0.08 298 / 0.42));
+  -webkit-backdrop-filter: blur(var(--lg-blur-sm)) saturate(140%);
+  backdrop-filter: blur(var(--lg-blur-sm)) saturate(140%);
+  border: 1px solid oklch(0.84 0.06 300 / 0.16);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 oklch(0.96 0.03 300 / 0.16),
+    0 8px 24px -12px oklch(0.35 0.2 300 / 0.45);
 }
 
-.modalBox,
-.appModalBox,
-.noticeModalBox,
-.legalModal,
-.drawerContent,
-.dropdown {
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  background: var(--surface-raised);
+/* The review box reads as one glass panel */
+.reviewChatHead,
+.reviewChatBody,
+.reviewChatForm {
+  background: transparent;
+}
+.reviewChatHead {
+  border-bottom: 1px solid oklch(0.84 0.06 300 / 0.12);
+}
+.reviewChatForm {
+  border-top: 1px solid oklch(0.84 0.06 300 / 0.12);
+}
+@media (min-width: 800px) {
+  .reviewChatForm {
+    border-top: 0;
+    border-left: 1px solid oklch(0.84 0.06 300 / 0.12);
+  }
 }
 
-/* ---------- Soft interactive lift for main cards ---------- */
+/* Soft interactive lift for main cards */
 .historyCard,
 .howStepCard,
 .aboutCard,
 .faqItem,
-.articleCard {
+.articleCard,
+.feat,
+.presetCard {
   transition:
     transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .historyCard:hover,
 .howStepCard:hover,
 .aboutCard:hover,
-.faqItem:hover,
-.articleCard:hover {
+.articleCard:hover,
+.feat:hover,
+.presetCard:hover {
   transform: translateY(-2px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-hover);
-}
-
-/* ---------- Hero feature chips: same card language ---------- */
-.feat {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.feat:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
-}
-
-.featI {
-  color: var(--accent);
-  filter: none;
-}
-
-/* ---------- Upload dropzone: matches the cards ---------- */
-.drop {
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--card);
-  box-shadow: var(--shadow-card);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-.drop.drag {
-  border-color: oklch(0.6 0.12 300 / 0.6);
-  background: oklch(0.6 0.12 300 / 0.1);
-}
-
-.dropIcon {
-  color: var(--accent);
-  filter: none;
-}
-
-/* ---------- Review panel: dim, desaturated ---------- */
-.reviewChatHead {
-  background: var(--surface-raised);
-}
-
-.reviewChatBody {
-  background: var(--card);
-}
-
-.reviewChatForm {
-  background: var(--card);
-}
-
-.reviewStar {
-  background: oklch(0.2 0.02 300 / 0.5);
-}
-
-.reviewStar.on {
-  border-color: oklch(0.6 0.12 300 / 0.55);
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 2px oklch(0.6 0.12 300 / 0.25);
-}
-
-.reviewChatInput:focus {
-  border-color: oklch(0.6 0.12 300 / 0.7);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.reviewSendBtn {
-  background: var(--accent);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
-}
-
-.reviewSendBtn:hover {
-  background: oklch(0.65 0.13 300);
+  border-color: oklch(0.84 0.07 300 / 0.3);
+  box-shadow:
+    inset 0 1px 0 oklch(0.96 0.03 300 / 0.24),
+    0 30px 70px -26px oklch(0.4 0.22 300 / 0.6);
 }
 
 /* ---------- Buttons ---------- */
 .btn.primary,
-.btn.primarySmall,
-.btn.primary.alt,
 .iconBtn.brand,
 .pgBtn,
-.reviewSendBtn {
-  background: var(--accent);
-  color: oklch(0.98 0.005 300);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
+.reviewSendBtn,
+.printBtn,
+.tryOnBtn.primary {
+  background:
+    linear-gradient(150deg, oklch(0.62 0.24 292 / 0.95), oklch(0.6 0.26 305 / 0.92) 55%, oklch(0.62 0.24 318 / 0.9));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 oklch(0.97 0.03 300 / 0.4),
+    inset 0 -2px 6px oklch(0.3 0.14 300 / 0.35),
+    0 10px 30px -8px oklch(0.55 0.26 300 / 0.6);
 }
 
 .btn.primary:hover,
-.btn.primarySmall:hover,
-.btn.primary.alt:hover,
-.iconBtn.brand:hover,
-.pgBtn:hover {
-  background: oklch(0.65 0.13 300);
-}
-
-.btn.primary.alt {
-  background: oklch(0.52 0.07 260);
-}
-
-.btn.primary.alt:hover {
-  background: oklch(0.57 0.08 260);
+.iconBtn.brand:hover {
+  background:
+    linear-gradient(150deg, oklch(0.67 0.24 292 / 0.97), oklch(0.65 0.26 305 / 0.95) 55%, oklch(0.67 0.24 318 / 0.93));
 }
 
 .btn.ghost,
 .iconBtn.ghost,
-.pgNavLinks a {
-  background: var(--accent-soft);
-  border: 1px solid var(--border);
+.pgNavLinks a,
+.printBtn.outline,
+.printSegBtn,
+.qtyBtn,
+.tryOnBtn.ghost,
+.iconBtn {
+  background: oklch(0.66 0.25 300 / 0.08);
+  border: 1px solid oklch(0.84 0.06 300 / 0.24);
+  -webkit-backdrop-filter: blur(var(--lg-blur-sm));
+  backdrop-filter: blur(var(--lg-blur-sm));
 }
 
 .btn.ghost:hover,
-.iconBtn.ghost:hover {
-  background: oklch(0.6 0.12 300 / 0.26);
-  border-color: var(--border-strong);
+.iconBtn.ghost:hover,
+.printBtn.outline:hover,
+.printSegBtn:hover,
+.qtyBtn:hover {
+  background: oklch(0.66 0.25 300 / 0.18);
+  border-color: oklch(0.86 0.08 300 / 0.45);
 }
 
 .iconBtn,
 .btn,
-.reviewSendBtn,
-.pgBtn {
+.printBtn,
+.tryOnBtn,
+.qtyBtn,
+.printSegBtn {
   transition:
     transform 0.2s ease,
-    opacity 0.2s ease,
     background 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Header pill + drawers share the same glass */
+.btnGroup {
+  background: oklch(0.14 0.05 300 / 0.4);
+  border: 1px solid oklch(0.84 0.06 300 / 0.18);
+  -webkit-backdrop-filter: blur(var(--lg-blur-sm)) saturate(150%);
+  backdrop-filter: blur(var(--lg-blur-sm)) saturate(150%);
+}
+
+.slideDrawer {
+  background: oklch(0.14 0.05 300 / 0.78);
+  border-left: 1px solid oklch(0.84 0.06 300 / 0.14);
 }
 
 /* ---------- Inputs ---------- */
@@ -264,48 +357,101 @@ body {
 select,
 .controls input[type="text"],
 .prSurveyInput,
-.accNameInput,
-.reviewChatInput {
-  background: oklch(0.2 0.02 300 / 0.5);
-  border: 1px solid var(--border);
+.accNameInput {
+  background: oklch(0.24 0.08 298 / 0.45);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid oklch(0.84 0.06 300 / 0.2);
   border-radius: 12px;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .authInput:focus,
 select:focus,
 .controls input[type="text"]:focus,
 .prSurveyInput:focus,
-.accNameInput:focus,
-.reviewChatInput:focus {
-  border-color: oklch(0.6 0.12 300 / 0.7);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+.accNameInput:focus {
+  border-color: oklch(0.72 0.2 300 / 0.65);
+  box-shadow: 0 0 0 3px oklch(0.62 0.24 300 / 0.22);
 }
 
-/* ---------- Hero crystal glow: static, cheap ---------- */
-.crystalGlow {
-  background: radial-gradient(circle, oklch(0.32 0.05 300 / 0.45), transparent 65%);
-  filter: none;
+/* ---------- Sticky nav glass ---------- */
+.topbar,
+.pgNav {
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  backdrop-filter: blur(26px) saturate(160%);
+}
+
+.pgNav {
+  background: oklch(0.14 0.055 295 / 0.72);
+  border-bottom: 1px solid oklch(0.84 0.06 300 / 0.14);
 }
 
 /* ---------- Static page cards ---------- */
 .pgCard,
 .pgForm {
-  background: var(--pg-panel);
-  border: 1px solid var(--pg-border);
+  background:
+    linear-gradient(150deg, rgba(126, 82, 208, 0.24), rgba(56, 30, 100, 0.4) 60%);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+  backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+  border: 1px solid rgba(196, 165, 255, 0.22);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(238, 226, 255, 0.18),
+    0 24px 60px -24px rgba(60, 20, 120, 0.6);
 }
 
 .pgFooter {
-  border-top: 1px solid var(--pg-border);
-  background: transparent;
+  border-top: 1px solid rgba(196, 165, 255, 0.16);
+  background: linear-gradient(180deg, transparent, rgba(103, 60, 176, 0.1));
+}
+
+/* ---------- Smooth entrances (replay when a hidden box is shown) ---------- */
+@keyframes lgFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.view,
+.modalBox,
+.printEditorModalBox,
+.authCard,
+.noticeModalBox,
+.legalModal,
+.prFreeCard,
+.prSurveyCard,
+.itemInspectorBox,
+.enhancePanel,
+.drawerContent {
+  animation: lgFadeUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view,
+  .modalBox,
+  .printEditorModalBox,
+  .authCard,
+  .noticeModalBox,
+  .legalModal,
+  .prFreeCard,
+  .prSurveyCard,
+  .itemInspectorBox,
+  .enhancePanel,
+  .drawerContent {
+    animation: none;
+  }
 }
 
 /* ---------- Details ---------- */
 ::selection {
-  background: oklch(0.6 0.12 300 / 0.45);
-  color: oklch(0.98 0.005 300);
+  background: oklch(0.55 0.26 300 / 0.55);
+  color: oklch(0.98 0.01 305);
 }
 
 ::-webkit-scrollbar {
@@ -318,31 +464,19 @@ select:focus,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.45 0.03 300 / 0.55);
+  background: linear-gradient(180deg, oklch(0.55 0.2 298 / 0.6), oklch(0.45 0.18 312 / 0.6));
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.52 0.04 300 / 0.7);
+  background: linear-gradient(180deg, oklch(0.62 0.22 298 / 0.75), oklch(0.52 0.2 312 / 0.75));
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 :focus-visible {
-  outline: 2px solid oklch(0.65 0.11 300 / 0.8);
+  outline: 2px solid oklch(0.7 0.2 300 / 0.8);
   outline-offset: 2px;
-}
-
-/* ---------- Reduced motion: honor everywhere ---------- */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
