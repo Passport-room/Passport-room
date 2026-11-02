@@ -1,9 +1,0 @@
-{
-  "name": "Passport Room — Passport Photo Maker",
-  "short_name": "Passport Room",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#150a2c",
-  "theme_color": "#7a58ff",
-  "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
-}
