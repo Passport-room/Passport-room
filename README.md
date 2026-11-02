@@ -46,3 +46,9 @@ Update - 24 October 2026 (tracking fix)
 3. The "free forever" notice now appears 1.5 seconds after the cookie box.
 4. Admin panel "Sync public stats" now writes each /stats child separately
    (the rules grant admin writes per child).
+
+Purple liquid glass theme — 2 November 2026
+Added liquid-glass.css, a theme-only override stylesheet now linked last on every page
+(home, about, features, contact, privacy, terms, stats, admin). It recolors the UI to a
+purple liquid glass look (blurred translucent panels, violet aurora background, glass
+buttons and inputs). No content, markup structure, scripts or settings were changed.
