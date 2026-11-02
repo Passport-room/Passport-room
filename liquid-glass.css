@@ -1,16 +1,17 @@
 /* ============================================================
-   Purple Liquid Glass — override layer (v2)
+   Purple Liquid Glass — override layer (v3, light)
    Loaded AFTER style.css (app pages) and page.css (static pages).
    Recolors and re-textures the UI only; no layout or logic changes.
 
-   v2: darker backdrop, one unified glass recipe for every box and
-   button, subtle entrance animations, lighter effects on mobile.
+   v3: same look, far cheaper to render — smaller blur radii,
+   no blur on small elements, static soft glows (no giant blur
+   filters), no fixed-attachment backdrop, lighter overlay blurs.
    ============================================================ */
 
 /* ---------- App tokens (style.css pages) ---------- */
 :root {
-  --lg-blur: 20px;
-  --lg-blur-sm: 10px;
+  --lg-blur: 10px;
+  --lg-blur-sm: 4px;
   --bg: oklch(0.1 0.04 295);
   --fg: oklch(0.97 0.015 305);
   --card: oklch(0.3 0.09 300 / 0.42);
@@ -40,27 +41,27 @@
   --pg-accent-2: #d8b4fe;
 }
 
-/* ---------- Liquid aurora backdrop (darkened) ---------- */
+@media (max-width: 768px) {
+  :root {
+    --lg-blur: 6px;
+    --lg-blur-sm: 3px;
+  }
+}
+
+/* ---------- Liquid aurora backdrop (darkened) ----------
+   Plain scrolling gradient: "fixed" attachment forces a full-screen
+   repaint on every scroll frame and is one of the biggest lag sources. */
 body {
   background-image:
     radial-gradient(55% 45% at 50% 0%, oklch(0.34 0.14 300 / 0.32), transparent 70%),
     radial-gradient(45% 40% at 100% 100%, oklch(0.3 0.12 318 / 0.22), transparent 70%),
     radial-gradient(40% 35% at 0% 80%, oklch(0.28 0.11 285 / 0.2), transparent 70%);
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
-/* Fixed-attachment backgrounds are slow on mobile; drop it there. */
-@media (max-width: 768px) {
-  body {
-    background-attachment: scroll;
-    --lg-blur: 14px;
-  }
-  :root {
-    --lg-blur: 14px;
-    --lg-blur-sm: 8px;
-  }
-}
-
+/* Soft glow orbs. The 70px blur() filters were rasterizing two
+   huge layers nonstop; the gradients below are soft on their own
+   and drift with transform-only animations (compositor-cheap). */
 body::before,
 body::after {
   content: "";
@@ -68,9 +69,8 @@ body::after {
   z-index: 0;
   pointer-events: none;
   border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.32;
-  will-change: transform;
+  filter: none;
+  will-change: auto;
 }
 
 body::before {
@@ -80,7 +80,7 @@ body::before {
   min-height: 320px;
   left: -12vw;
   top: -14vw;
-  background: radial-gradient(circle at 35% 35%, oklch(0.5 0.22 298 / 0.45), transparent 70%);
+  background: radial-gradient(circle at 35% 35%, oklch(0.5 0.22 298 / 0.34), oklch(0.5 0.22 298 / 0.12) 45%, transparent 72%);
   animation: lgDriftA 26s ease-in-out infinite alternate;
 }
 
@@ -91,15 +91,14 @@ body::after {
   min-height: 360px;
   right: -16vw;
   bottom: -18vw;
-  background: radial-gradient(circle at 60% 60%, oklch(0.45 0.2 318 / 0.38), transparent 70%);
+  background: radial-gradient(circle at 60% 60%, oklch(0.45 0.2 318 / 0.28), oklch(0.45 0.2 318 / 0.1) 45%, transparent 72%);
   animation: lgDriftB 32s ease-in-out infinite alternate;
 }
 
 @media (max-width: 768px) {
   body::before,
   body::after {
-    filter: blur(48px);
-    opacity: 0.26;
+    opacity: 0.85;
   }
   body::before {
     width: 68vw;
@@ -132,10 +131,11 @@ body::after {
   }
 }
 
-/* Soften the hero crystal glow so it never outshines the cards */
+/* Soften the hero crystal glow so it never outshines the cards
+   (gradient falloff replaces the expensive blur filter) */
 .crystalGlow {
-  background: oklch(0.5 0.24 305 / 0.16);
-  filter: blur(70px);
+  background: radial-gradient(circle at 50% 50%, oklch(0.5 0.24 305 / 0.2), oklch(0.5 0.24 305 / 0.07) 55%, transparent 75%);
+  filter: none;
 }
 #crystalCanvas {
   opacity: 0.55;
@@ -146,7 +146,11 @@ body::after {
   }
 }
 
-/* ---------- The liquid glass recipe (shared by every panel) ---------- */
+/* ---------- The liquid glass recipe (shared by every panel) ----------
+   Panels in the scroll flow use tint-only glass: over this dark
+   backdrop the translucent tint + highlight reads identically, and
+   skipping dozens of per-frame blur passes is the single biggest
+   speed win. Real blur is kept only for popups and the sticky nav. */
 .topbar,
 .panel,
 .dropdown,
@@ -194,15 +198,46 @@ body::after {
 .aboutList li,
 .emptyNotice {
   background:
-    linear-gradient(150deg, oklch(0.46 0.12 300 / 0.34), oklch(0.24 0.08 298 / 0.46) 55%, oklch(0.2 0.07 295 / 0.52));
-  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(150%);
-  backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+    linear-gradient(150deg, oklch(0.44 0.12 300 / 0.44), oklch(0.24 0.08 298 / 0.56) 55%, oklch(0.2 0.07 295 / 0.62));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border: 1px solid oklch(0.84 0.06 300 / 0.18);
   border-radius: 20px;
   box-shadow:
     inset 0 1px 0 oklch(0.96 0.03 300 / 0.22),
     inset 0 -1px 0 oklch(0.45 0.14 300 / 0.1),
     0 24px 60px -24px oklch(0.35 0.2 300 / 0.55);
+}
+
+/* Popups, dialogs and the drawer float above the page and are only
+   visible while open — they keep a light, real blur. */
+.modalBox,
+.appModalBox,
+.noticeModalBox,
+.legalModal,
+.authCard,
+.printEditorModalBox,
+.tryOnModalCard,
+.dropdown,
+.drawerContent {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Small, numerous elements drop the blur entirely — over the dark
+   backdrop the translucent tint alone looks identical, and skipping
+   dozens of blur passes is the single biggest scroll-speed win. */
+.ddItem,
+.qtyBtn,
+.printSeg,
+.printSegBtn,
+.gridSlot,
+.statCard,
+.aboutList li,
+.emptyNotice,
+.reviewStar {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* Keep the upload box's dashed outline */
@@ -214,7 +249,7 @@ body::after {
   border-color: oklch(0.66 0.26 305 / 0.6);
 }
 
-/* Compact elements get a lighter slice of the same glass */
+/* Compact elements get a lighter slice of the same glass (no blur) */
 .ddItem,
 .qtyBtn,
 .printSeg,
@@ -224,9 +259,7 @@ body::after {
 .aboutList li,
 .emptyNotice,
 .reviewStar {
-  background: linear-gradient(150deg, oklch(0.42 0.11 300 / 0.3), oklch(0.24 0.08 298 / 0.42));
-  -webkit-backdrop-filter: blur(var(--lg-blur-sm)) saturate(140%);
-  backdrop-filter: blur(var(--lg-blur-sm)) saturate(140%);
+  background: linear-gradient(150deg, oklch(0.42 0.11 300 / 0.34), oklch(0.24 0.08 298 / 0.46));
   border: 1px solid oklch(0.84 0.06 300 / 0.16);
   border-radius: 14px;
   box-shadow:
@@ -253,7 +286,8 @@ body::after {
   }
 }
 
-/* Soft interactive lift for main cards */
+/* Soft interactive lift for main cards (transform/border only —
+   animating box-shadow forces a repaint on every hover frame) */
 .historyCard,
 .howStepCard,
 .aboutCard,
@@ -263,7 +297,6 @@ body::after {
 .presetCard {
   transition:
     transform 0.25s ease,
-    box-shadow 0.25s ease,
     border-color 0.25s ease;
 }
 
@@ -289,8 +322,8 @@ body::after {
 .tryOnBtn.primary {
   background:
     linear-gradient(150deg, oklch(0.62 0.24 292 / 0.95), oklch(0.6 0.26 305 / 0.92) 55%, oklch(0.62 0.24 318 / 0.9));
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
     inset 0 1px 0 oklch(0.97 0.03 300 / 0.4),
     inset 0 -2px 6px oklch(0.3 0.14 300 / 0.35),
@@ -313,8 +346,8 @@ body::after {
 .iconBtn {
   background: oklch(0.66 0.25 300 / 0.08);
   border: 1px solid oklch(0.84 0.06 300 / 0.24);
-  -webkit-backdrop-filter: blur(var(--lg-blur-sm));
-  backdrop-filter: blur(var(--lg-blur-sm));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .btn.ghost:hover,
@@ -334,22 +367,22 @@ body::after {
 .printSegBtn {
   transition:
     transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.2s ease;
 }
 
 /* Header pill + drawers share the same glass */
 .btnGroup {
-  background: oklch(0.14 0.05 300 / 0.4);
+  background: oklch(0.14 0.05 300 / 0.55);
   border: 1px solid oklch(0.84 0.06 300 / 0.18);
-  -webkit-backdrop-filter: blur(var(--lg-blur-sm)) saturate(150%);
-  backdrop-filter: blur(var(--lg-blur-sm)) saturate(150%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .slideDrawer {
-  background: oklch(0.14 0.05 300 / 0.78);
+  background: oklch(0.14 0.05 300 / 0.86);
   border-left: 1px solid oklch(0.84 0.06 300 / 0.14);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* ---------- Inputs ---------- */
@@ -358,9 +391,9 @@ select,
 .controls input[type="text"],
 .prSurveyInput,
 .accNameInput {
-  background: oklch(0.24 0.08 298 / 0.45);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: oklch(0.24 0.08 298 / 0.5);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border: 1px solid oklch(0.84 0.06 300 / 0.2);
   border-radius: 12px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -378,8 +411,8 @@ select:focus,
 /* ---------- Sticky nav glass ---------- */
 .topbar,
 .pgNav {
-  -webkit-backdrop-filter: blur(26px) saturate(160%);
-  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .pgNav {
@@ -387,13 +420,42 @@ select:focus,
   border-bottom: 1px solid oklch(0.84 0.06 300 / 0.14);
 }
 
+/* ---------- Heavy site originals, lightened ----------
+   Full-viewport overlays and the footer blur the entire page behind
+   them; a 4–8px blur keeps the dim-glass read at a fraction of the cost. */
+.modalOverlay,
+.printEditorOverlay,
+.drawerBackdrop,
+.dressEditorOverlay,
+.authView,
+.prFreeBanner {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.homeFooter {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Floating toasts and the hero ticker keep a whisper of blur */
+.toastItem {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.heroTickerText {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
 /* ---------- Static page cards ---------- */
 .pgCard,
 .pgForm {
   background:
-    linear-gradient(150deg, rgba(126, 82, 208, 0.24), rgba(56, 30, 100, 0.4) 60%);
-  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(150%);
-  backdrop-filter: blur(var(--lg-blur)) saturate(150%);
+    linear-gradient(150deg, rgba(126, 82, 208, 0.32), rgba(56, 30, 100, 0.5) 60%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border: 1px solid rgba(196, 165, 255, 0.22);
   border-radius: 20px;
   box-shadow:
