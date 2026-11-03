@@ -51,7 +51,6 @@
       <h1>Know how many people visit us</h1>
       <p class="pgLead">Real totals from our community, updated live.</p>
       <div class="stGrid">
-        <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="stNum" id="stCustomers">…</div><div class="stLabel">Total customers</div></div>
         <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="stNum" id="stUsers">…</div><div class="stLabel">Total visitors</div></div>
         <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><div class="stNum" id="stVisits">…</div><div class="stLabel">Total visits</div></div>
         <div class="stCard"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><div class="stNum" id="stPhotos">…</div><div class="stLabel">Total photos created</div></div>
@@ -110,19 +109,15 @@
         var d = new Date().toISOString().slice(0, 10);
         Promise.all([
           get("stats"),
-          get("counters/customerNumber"),
           get("reviews").then(function(v){ return v ? Object.keys(v).length : 0; })
         ]).then(function(x){
           var s = x[0] || {}, t = (s.days && s.days[d]) || {};
-          var cn = x[1];
-          var totalCustomers = Math.max(BASE.customers, Number(cn) || 0, Number(s.customers) || 0);
           var totalVisitors = combine(s.visitors, BASE.visitors);
           var totalVisits = combine(s.visits, BASE.visits);
           var totalPhotos = combine(s.photos, BASE.photos);
           var totalTimeMs = combine(s.totalMs, BASE.totalMs);
-          var totalReviews = Math.max(BASE.reviews, Number(x[2]) || 0);
+          var totalReviews = Number(x[1]) || 0;
 
-          num("stCustomers", totalCustomers);
           num("stUsers", totalVisitors);
           num("stVisits", totalVisits);
           num("stPhotos", totalPhotos);

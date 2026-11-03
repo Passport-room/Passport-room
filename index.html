@@ -786,7 +786,7 @@
                 </svg>
               </span>
               <div>
-                <h2 class="printEditorTitle">A4 Print Sheet Editor</h2>
+                <h2 class="printEditorTitle">Print Sheet Editor</h2>
               </div>
             </div>
             <button id="closePrintEditor" class="printEditorCloseBtn" title="Close editor">
@@ -807,10 +807,27 @@
           </header>
 
           <div class="printEditorControls">
-            <div class="printCtrlGroup">
-              <label class="printCtrlLabel">Paper:</label>
-              <div class="printBadge">A4 (210×297 mm)</div>
+            <div class="printCtrlGroup printSizeGroup">
+              <label class="printCtrlLabel" for="prPaperSize">Paper:</label>
+              <select id="prPaperSize" class="printSelect" title="Sheet paper size"></select>
             </div>
+
+            <div id="prPaperCustomBox" class="printCustomSizeBox hidden">
+              <label class="printCtrlLabel">Custom:</label>
+              <input id="prPaperW" class="printCustomInput" type="number" min="1" step="any" inputmode="decimal" aria-label="Paper width" />
+              <span class="printCustomX">×</span>
+              <input id="prPaperH" class="printCustomInput" type="number" min="1" step="any" inputmode="decimal" aria-label="Paper height" />
+              <select id="prPaperUnit" class="printSelect printCustomUnit" title="Unit" aria-label="Unit">
+                <option value="mm" selected>mm</option>
+                <option value="in">in</option>
+                <option value="px">px</option>
+              </select>
+              <button id="prPaperApply" class="printBtn outline" type="button">Apply</button>
+              <input id="prPaperName" class="printCustomName" type="text" maxlength="40" placeholder="Size name" aria-label="Custom size name" />
+              <button id="prPaperSave" class="printBtn outline" type="button">Save size</button>
+              <button id="prPaperDelete" class="printBtn outline hidden" type="button" title="Delete the selected saved size">Delete</button>
+            </div>
+
 
             <div class="printCtrlGroup">
               <label class="printCtrlLabel">Selected photo size:</label>
@@ -863,6 +880,13 @@
           <div class="printEditorWorkspace">
             <div id="printSheetNote" class="printSheetNote hidden"></div>
             <div class="printSheetViewport" id="printSheetViewport">
+              <div class="printZoomBar" role="group" aria-label="Sheet zoom">
+                <button id="printZoomOut" class="printZoomBtn" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+                <button id="printZoomFit" class="printZoomBtn wide" type="button" title="Fit to screen">Fit</button>
+                <button id="printZoomIn" class="printZoomBtn" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+                <span class="printZoomLabel" id="printZoomVal">100%</span>
+              </div>
+
 
 
               <div class="printSheetScroll" id="printSheetScroll">
@@ -967,7 +991,7 @@
           <footer class="printEditorFooter">
             <div class="printFooterLeft">
               <span id="printSheetStatusText" class="muted small"
-                >300 DPI Print-Ready Standard A4 Page</span
+                >300 DPI Print-Ready A4 Page</span
               >
             </div>
             <div class="printFooterRight">

@@ -542,3 +542,14 @@ select:focus,
   outline: 2px solid oklch(0.7 0.2 300 / 0.8);
   outline-offset: 2px;
 }
+
+/* Small photo boxes: keep them proper rectangles with square corners */
+.gridSlot,
+.gridSlot.occupied,
+.gridSlot.selected,
+.printPhotoCanvas,
+.photoBadge,
+.photoHoverOverlay,
+.slotEmptyLabel {
+  border-radius: 0;
+}

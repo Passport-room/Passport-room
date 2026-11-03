@@ -2553,8 +2553,9 @@ select:focus {
 .printEditorWorkspace {
   display: grid;
   grid-template-columns: 1fr 280px;
+  grid-template-rows: minmax(0, 1fr);
   min-height: 480px;
-  max-height: 60vh;
+  height: min(78vh, 940px);
   overflow: hidden;
 }
 
@@ -4155,7 +4156,7 @@ select:focus {
   padding: 6px 8px;
   font-size: 12.5px;
   background: #fff;
-  color: inherit;
+  color: #0f172a;
   max-width: 250px;
 }
 .printCustomSizeBox {
@@ -4180,6 +4181,7 @@ select:focus {
   padding: 6px 8px;
   font-size: 12.5px;
   background: #fff;
+  color: #0f172a;
 }
 .printCustomX,
 .printCustomUnit {
