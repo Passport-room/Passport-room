@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}(function(){var c=null;try{c=localStorage.getItem("pr_cookie_consent");}catch(e){}var g=c==="accepted"?"granted":"denied";gtag("consent","default",{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:g,wait_for_update:500});(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=c==="accepted"?0:1;})();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2279678646698716" crossorigin="anonymous"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Roadmap — Current, Planned &amp; Experimental Features | Passport Room</title>
+    <meta
+      name="description"
+      content="The Passport Room AI roadmap: what the on-device AI does today (background removal, face enhance), what is planned (better edges, smarter lighting, clothing options, compliance checks) and what is still experimental. Updated transparently."
+    />
+    <link rel="canonical" href="https://passport-room.com/ai-roadmap" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:site_name" content="Passport Room" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://passport-room.com/ai-roadmap" />
+    <meta property="og:title" content="AI Roadmap — Current, Planned &amp; Experimental Features | Passport Room" />
+    <meta
+      property="og:description"
+      content="The Passport Room AI roadmap: what the on-device AI does today, what is planned, and what is still experimental — updated transparently, with available features clearly separated from plans."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AI Roadmap — Current, Planned &amp; Experimental Features | Passport Room" />
+    <meta
+      name="twitter:description"
+      content="The Passport Room AI roadmap: what the on-device AI does today, what is planned, and what is still experimental — updated transparently, with available features clearly separated from plans."
+    />
+    <meta name="author" content="Passport Room" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/page.css" />
+<link rel="stylesheet" href="/liquid-glass.css?v=20261105" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://passport-room.com/" },
+              { "@type": "ListItem", "position": 2, "name": "AI roadmap", "item": "https://passport-room.com/ai-roadmap" }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="pgNav" aria-label="Primary">
+      <div class="pgNavInner">
+        <a href="/"><img src="/logo.png" alt="Passport Room" width="120" height="28" /></a>
+        <div class="pgNavLinks">
+          <a href="/">Photo maker</a>
+          <a href="/features">Features</a>
+          <a href="/blog">Blog</a>
+          <a href="/ai-roadmap" aria-current="page">AI roadmap</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pgWrap">
+      <p class="pgCrumbs"><a href="/">Home</a> › AI roadmap</p>
+      <h1>The Passport Room AI roadmap</h1>
+      <p class="pgLead">
+        Passport Room's direction is simple to state: an AI-powered professional photo studio
+        that anyone can open in a browser, that never asks for your face to be uploaded, and
+        that keeps getting closer to a human photographer's judgement. This page separates what
+        exists today from what is planned and what is still experimental — no promises dressed
+        up as features.
+      </p>
+
+      <h2>Available today</h2>
+      <p>
+        These features are live in the <a href="/">photo maker</a> right now:
+      </p>
+      <ul>
+        <li>
+          <strong>On-device background removal.</strong> A MODNet segmentation model runs in
+          your browser through onnxruntime-web with WebGPU acceleration and a WebAssembly
+          fallback. The photo never leaves your device, and after the one-time model download
+          the tool works offline.
+        </li>
+        <li>
+          <strong>AI face enhance.</strong> A GPEN-BFR-256 restoration model improves the
+          detected face region only — sharpening a soft indoor photo while keeping you
+          recognisable — with a gentle "Natural" preset and a stronger preset for rougher
+          sources.
+        </li>
+        <li>
+          <strong>Exact size engine.</strong> Country presets rendered at exact millimetre
+          dimensions and head-height ratios at 300 DPI, with custom mm/inch sizes supported.
+        </li>
+        <li>
+          <strong>Print-sheet composition.</strong> True-scale tiled sheets with cutting guides
+          for home printers and photo kiosks.
+        </li>
+        <li>
+          <strong>Outfit try-on.</strong> A manual garment overlay editor — five bundled formal
+          garments plus your own PNGs, composited on a canvas in your browser.
+        </li>
+        <li>
+          <strong>Manual adjustment panel.</strong> Brightness, contrast, saturation, exposure,
+          shadows, highlights, sharpness, clarity and noise, applied on-device and resettable
+          at any time.
+        </li>
+      </ul>
+
+      <h2>Planned improvements</h2>
+      <p>
+        Work in progress or firmly on the list — these describe direction, not dates, and each
+        one ships only when it meets the privacy bar of running on-device:
+      </p>
+      <ul>
+        <li>
+          <strong>Better edges on difficult hair.</strong> The current segmentation struggles
+          most with fine hair against a busy background. The plan is a stronger segmentation
+          model and edge-refinement tooling, so a cut-out against a cluttered room looks as
+          clean as one shot against a studio wall.
+        </li>
+        <li>
+          <strong>Natural photo enhancement.</strong> A broader, passport-aware enhancement
+          pass beyond the face region — evening out exposure across the shoulders, cleaning
+          background colour noise, and keeping skin tones true rather than "beautified", because
+          identity photos must stay honest.
+        </li>
+        <li>
+          <strong>Identity preservation first.</strong> A principle, not a feature: any
+          enhancement must never change facial geometry. As stronger generative models appear,
+          the project's filter is that the person in the exported photo must remain the person
+          who took it.
+        </li>
+        <li>
+          <strong>More clothing options.</strong> Expanding the outfit library beyond the five
+          bundled garments, and improving the placement tools (auto-fit guides, better colour
+          matching at the collar) so the overlay looks natural without manual fiddling.
+        </li>
+        <li>
+          <strong>Intelligent lighting correction.</strong> Detecting uneven or coloured light
+          in the source photo and correcting it automatically — matching the even, neutral
+          lighting a studio would have produced — instead of leaving it entirely to manual
+          sliders.
+        </li>
+        <li>
+          <strong>Photo quality pre-checks.</strong> Warnings before you export: head height
+          outside the guides, shadows on the background, low resolution for the chosen preset,
+          or a source photo that is too small to meet the standard.
+        </li>
+        <li>
+          <strong>Passport-photo compliance checks.</strong> Automated checks against the
+          published rules of each supported country — head position, background uniformity,
+          expression cues — as an advisory layer. The final judgement always belongs to the
+          issuing office, and the tool will say so.
+        </li>
+        <li>
+          <strong>Faster processing.</strong> Reducing the time from photo selection to
+          preview — quicker model loading, lighter WebAssembly paths for older devices, and
+          caching improvements so repeat photos process near-instantly.
+        </li>
+      </ul>
+
+      <h2>Experimental</h2>
+      <p>
+        Being explored, not promised. These may change shape, ship differently, or not ship at
+        all:
+      </p>
+      <ul>
+        <li>
+          <strong>Automatic pose and head-angle guidance.</strong> Live feedback while you take
+          the source photo — telling you to raise the phone, square your shoulders, or move
+          nearer a window, so the source photo is right before any editing begins.
+        </li>
+        <li>
+          <strong>Smarter form matching.</strong> Choosing the correct preset from the name of
+          the application form you are filling in, so the guessing step between "visa" and
+          "passport" sizes disappears.
+        </li>
+        <li>
+          <strong>Multi-photo family sessions.</strong> Processing several family members in
+          one sitting with shared settings, then producing a combined print sheet.
+        </li>
+      </ul>
+
+      <h2>The principles behind the roadmap</h2>
+      <ol>
+        <li><strong>On-device by default.</strong> If a capability cannot run on your device, it does not ship until it can — or it ships server-side only if privacy can be guaranteed and stated plainly. This is why the tool works offline and why your photo has no upload step.</li>
+        <li><strong>Honesty over capability.</strong> Features are documented with their limits. No "guaranteed acceptance" claims, because no software can promise what a human clerk will decide.</li>
+        <li><strong>Free access.</strong> New AI features follow the <a href="/free-forever">free-forever</a> model — no watermarks, no export paywalls.</li>
+        <li><strong>Identity-safe enhancement.</strong> The AI improves the photo you took; it never invents the person in it.</li>
+      </ol>
+
+      <h2>How this page is maintained</h2>
+      <p>
+        This roadmap is updated as features land. When something moves from planned to
+        available, it is added to the <a href="/features">feature list</a> with the same
+        documentation style — including its limitations. When an experiment is abandoned, it
+        comes off this page rather than lingering as a phantom promise. Suggestions and bug
+        reports feed this list directly: write to
+        <a href="mailto:support.passport.room@gmail.com">support.passport.room@gmail.com</a> or
+        use the <a href="/contact">contact page</a>.
+      </p>
+
+      <p style="margin-top: 32px">
+        <a class="pgBtn" href="/">Try the current AI features free</a>
+      </p>
+    </main>
+
+    <footer class="pgFooter">
+      <nav aria-label="Footer">
+        <a href="/">Passport photo maker</a>
+        <a href="/features">Features</a>
+        <a href="/blog">Blog</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/ai-roadmap" aria-current="page">AI roadmap</a>
+        <a href="/about">About</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </nav>
+      <div>© 2026 Passport Room · Private, on-device passport photos.</div>
+    </footer>
+  <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261024"></script>
+</body>
+</html>

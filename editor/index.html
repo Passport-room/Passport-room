@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}(function(){var c=null;try{c=localStorage.getItem("pr_cookie_consent");}catch(e){}var g=c==="accepted"?"granted":"denied";gtag("consent","default",{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:g,wait_for_update:500});(window.adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds=c==="accepted"?0:1;})();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2279678646698716" crossorigin="anonymous"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Passport Room Editor — Manual Photo Controls in Your Browser | Passport Room</title>
+    <meta
+      name="description"
+      content="A walkthrough of the Passport Room editor: brightness, contrast, exposure and detail sliders, compliant background colours, outfit try-on, face enhance and the crop guides — all running on your device, free and without a watermark."
+    />
+    <link rel="canonical" href="https://passport-room.com/editor" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:site_name" content="Passport Room" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://passport-room.com/editor" />
+    <meta property="og:title" content="The Passport Room Editor — Manual Photo Controls in Your Browser | Passport Room" />
+    <meta
+      property="og:description"
+      content="A walkthrough of the Passport Room editor: brightness, contrast, exposure and detail sliders, compliant background colours, outfit try-on, face enhance and the crop guides — all running on your device, free and without a watermark."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Passport Room Editor — Manual Photo Controls in Your Browser | Passport Room" />
+    <meta
+      name="twitter:description"
+      content="A walkthrough of the Passport Room editor: brightness, contrast, exposure and detail sliders, compliant background colours, outfit try-on, face enhance and the crop guides — all running on your device, free and without a watermark."
+    />
+    <meta name="author" content="Passport Room" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/page.css" />
+<link rel="stylesheet" href="/liquid-glass.css?v=20261105" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://passport-room.com/" },
+              { "@type": "ListItem", "position": 2, "name": "Editor", "item": "https://passport-room.com/editor" }
+            ]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://passport-room.com/editor#app",
+            "name": "Passport Room In-Browser Photo Editor",
+            "url": "https://passport-room.com/",
+            "applicationCategory": "MultimediaApplication",
+            "applicationSubCategory": "Photo editor",
+            "operatingSystem": "Any modern web browser (Chrome, Edge, Safari, Firefox)",
+            "browserRequirements": "Requires JavaScript. WebGPU recommended, WebAssembly fallback supported.",
+            "description": "Free in-browser passport photo editor with manual brightness, contrast, exposure and detail sliders, compliant background colour presets, outfit try-on overlay and AI face enhance. All processing happens on your device.",
+            "isAccessibleForFree": true,
+            "publisher": { "@id": "https://passport-room.com/#organization" },
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="pgNav" aria-label="Primary">
+      <div class="pgNavInner">
+        <a href="/"><img src="/logo.png" alt="Passport Room" width="120" height="28" /></a>
+        <div class="pgNavLinks">
+          <a href="/">Photo maker</a>
+          <a href="/features">Features</a>
+          <a href="/blog">Blog</a>
+          <a href="/editor" aria-current="page">Editor</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pgWrap">
+      <p class="pgCrumbs"><a href="/">Home</a> › Editor</p>
+      <h1>Inside the Passport Room editor</h1>
+      <p class="pgLead">
+        The AI passes get a photo most of the way there; the editor is where you take it the rest
+        of the way. Every control below runs on a canvas on your own device — no upload, no
+        account, no watermark — and every change can be reset.
+      </p>
+
+      <p>
+        Open the <a href="/">photo maker</a>, drop in a portrait, and the editor is the panel you
+        land in after the automatic steps. It is deliberately split into two layers: the
+        <strong>AI passes</strong> that do heavy lifting automatically, and the
+        <strong>manual controls</strong> you use to fine-tune. Neither layer needs photography
+        knowledge — the sliders have plain names and the crop guides tell you what the passport
+        office wants to see.
+      </p>
+
+      <h2>The crop guides: where your head must sit</h2>
+      <p>
+        The most important controls are not sliders at all. After you pick a country preset —
+        US 2×2 in, UK 35×45 mm, India 35×45 mm, Canada 50×70 mm, Australia 35×45 mm, China visa
+        33×48 mm, Bangladesh sizes, or a custom size in millimetres or inches — the frame shows
+        guides for the correct head height and position. Drag to move, scroll or pinch to zoom,
+        and rotate slightly if your source photo is a degree or two off level. When your chin
+        and the top of your head sit inside the guides, the size requirement is met — at 300 DPI,
+        at the exact millimetre dimensions of the preset.
+      </p>
+
+      <h2>The adjustment panel</h2>
+      <p>
+        The manual panel exposes nine sliders over the working photo:
+      </p>
+      <table class="pgTable">
+        <thead>
+          <tr><th>Control</th><th>What it does</th><th>When you need it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Brightness</td><td>Lifts or lowers the overall light level</td><td>Indoor photos that came out dim</td></tr>
+          <tr><td>Contrast</td><td>Separates you from the background tone</td><td>Flat, hazy source photos</td></tr>
+          <tr><td>Exposure</td><td>Recovers a global over- or under-exposure</td><td>Phone photos against a bright window</td></tr>
+          <tr><td>Shadows</td><td>Lifts dark areas without brightening everything</td><td>One side of the face darker than the other</td></tr>
+          <tr><td>Highlights</td><td>Pulls back blown-out bright areas</td><td>Shiny forehead or glare on glasses</td></tr>
+          <tr><td>Saturation</td><td>Colour intensity</td><td>Correcting a warm indoor colour cast</td></tr>
+          <tr><td>Sharpness</td><td>Edge crispness</td><td>Slightly soft focus from a moving hand</td></tr>
+          <tr><td>Clarity</td><td>Mid-tone definition</td><td>Flat skin detail on older phone cameras</td></tr>
+          <tr><td>Noise</td><td>Grain reduction</td><td>Low-light shots that came out grainy</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Your last-used slider settings are remembered in your browser, so the next photo starts
+        where you left off — useful when you are processing the whole family's photos in one
+        sitting. Everything is applied to the canvas in real time on your device, and a reset
+        returns the photo to its untouched state.
+      </p>
+
+      <h2>Background colour, done compliantly</h2>
+      <p>
+        The background picker offers the colours passport offices actually ask for — white,
+        off-white, light blue and grey — plus a custom colour picker for the rare form that
+        specifies something else. Because the AI cut-out has already separated you from the
+        original scene, switching background colour is instant and does not require re-shooting.
+        If the edge around fine hair looks rough against a busy original background, reshooting
+        against a plain wall will always beat any amount of slider work.
+      </p>
+
+      <h2>Outfit try-on</h2>
+      <p>
+        The outfit editor overlays a formal garment — one of five bundled options, or your own
+        PNG — over your cut-out portrait. You drag, resize and rotate it into place, and
+        "Revert" undoes it. Two honest notes: the result is only as convincing as your placement,
+        and it is an overlay on your real photo, not a generated body. Used with a plain-collared
+        shirt photo it turns a t-shirt snapshot into a formal-looking ID picture in about a
+        minute.
+      </p>
+
+      <h2>AI face enhance, when you want it</h2>
+      <p>
+        Face enhance is optional. It runs a face-restoration model that sharpens and cleans up
+        the detected face region — with a gentle "Natural" preset and a stronger preset for
+        rougher source photos. It never changes who you are: the model is analytical, improving
+        detail rather than generating new features. A very blurred or very small source photo
+        will still look soft afterwards, because the model can only work with the detail your
+        camera captured.
+      </p>
+
+      <h2>Export</h2>
+      <p>
+        When the preview looks right, export the single photo as JPEG or PNG at the preset's
+        full 300 DPI resolution — no watermark, unlimited and free — or switch to the
+        <a href="/blog/passport-photo-printing">print-sheet editor</a> to tile multiple copies
+        for physical printing at true scale.
+      </p>
+
+      <div class="pgCard">
+        <p style="margin: 0">
+          Everything on this page is free to use, works without an account, and processes your
+          photo entirely on your device. Open the
+          <a href="/">passport photo maker</a> and try it — or read the
+          <a href="/features">full feature list</a> and the
+          <a href="/ai-roadmap">AI roadmap</a> for what is coming next.
+        </p>
+      </div>
+    </main>
+
+    <footer class="pgFooter">
+      <nav aria-label="Footer">
+        <a href="/">Passport photo maker</a>
+        <a href="/features">Features</a>
+        <a href="/blog">Blog</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/ai-roadmap">AI roadmap</a>
+        <a href="/about">About</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </nav>
+      <div>© 2026 Passport Room · Private, on-device passport photos.</div>
+    </footer>
+  <script src="/cookie-consent.js" defer></script>
+<script type="module" src="/visitor-profile.js?v=20261024"></script>
+</body>
+</html>

@@ -32,20 +32,60 @@
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
+  <url><loc>https://passport-room.com/stats</loc></url>
   <url>
-    <loc>https://passport-room.com/passport-photo-requirements</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://passport-room.com/blog</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://passport-room.com/passport-photo-requirements/us</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://passport-room.com/blog/passport-photo-size-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://passport-room.com/passport-photo-requirements/uk</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://passport-room.com/blog/baby-passport-photo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://passport-room.com/passport-photo-requirements/canada</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://passport-room.com/blog/passport-photo-at-home</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/blog/passport-photo-printing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/blog/ai-passport-photo-privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/reviews</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/editor</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/why-to-use</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/free-forever</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://passport-room.com/ai-roadmap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
