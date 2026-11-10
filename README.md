@@ -6,7 +6,7 @@ No installation or build step is required.
 
 Existing ad scripts and ad popups have been removed. All five placement containers remain in
 index.html, marked data-ad-placement and hidden. No ad units are activated.
-Google AdSense verification and ads.txt use publisher pub-2279678646698716.
+Google AdSense verification and ads.txt use publisher pub-6650727557878424.
 
 After deployment, request verification in your AdSense account. Google decides approval.
 Deployment to your Vercel account and AdSense approval cannot be guaranteed by this archive.
