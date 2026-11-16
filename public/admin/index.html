@@ -27,6 +27,13 @@ th,td{padding:8px 10px;text-align:left;border-top:1px solid var(--pg-border);ver
 th{background:var(--pg-panel);color:var(--pg-muted);font-weight:500;white-space:nowrap;border-top:0}
 td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
 .adNote{color:var(--pg-muted);font-size:13px}
+.reviewAdminCell{min-width:270px;max-width:420px}
+.reviewAdminText{min-width:250px;width:100%;min-height:82px;resize:vertical;padding:10px 12px;border:1px solid var(--pg-border);border-radius:8px;background:var(--pg-bg);color:var(--pg-text);font:inherit}
+.reviewAdminActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.reviewAdminActions .adBtn{margin:0}
+.adBtn.danger{background:transparent;color:#ff9a9a;border:1px solid var(--pg-border)}
+.reviewAdminReply{margin:0 0 8px;padding:8px 10px;border-left:2px solid var(--pg-accent);background:rgba(110,168,254,.08);border-radius:0 8px 8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.reviewAdminFeedback{min-height:1.3em;margin-top:6px;font-size:12px;color:var(--pg-muted)}
 .adTop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .adTopActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 [hidden]{display:none!important}
@@ -66,7 +73,7 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
     </div>
     <p class="adNote" id="status"></p>
     <div class="adTable"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
-    <p class="adNote">Read-only view. This page never writes, resets or deletes customer records.</p>
+    <p class="adNote">Customer and referral records remain read-only. Admins can manage replies and permanently delete reviews.</p>
   </section>
 </main>
 <script type="module" src="/admin/admin.js"></script>

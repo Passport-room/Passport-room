@@ -1,6 +1,5 @@
-/* Read-only admin panel. Sign-in uses Firebase Authentication (email/password).
-   Access to data is decided by the Realtime Database rules (admins/{uid} === true),
-   not by this file. No passwords, secrets or service-account keys are in this code. */
+/* Admin panel. Firebase Authentication signs admins in; Realtime Database rules
+   enforce admins/{uid} === true for privileged review operations. */
 const config = { apiKey: 'AIzaSyBwTzFmMTHEfdX0ZqqXNP29EcQoLud1hrM', authDomain: 'passport-48389.firebaseapp.com', projectId: 'passport-48389', appId: '1:222961536167:web:618360108d616b8f129f82' };
 const DB = 'https://passport-48389-default-rtdb.firebaseio.com';
 const $ = id => document.getElementById(id);
@@ -29,6 +28,18 @@ async function read(path, token) {
   return r.json();
 }
 
+async function writeReview(path, token, method, value) {
+  const response = await fetch(`${DB}/${path}.json?auth=${encodeURIComponent(token)}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    ...(value === undefined ? {} : { body: JSON.stringify(value) })
+  });
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(response.status === 401 || response.status === 403 ? 'Permission denied by Firebase rules.' : `Firebase request failed (${response.status}): ${message}`);
+  }
+}
+
 function combine(live, base) {
   const l = Number(live) || 0;
   return l >= base ? l : base + l;
@@ -51,7 +62,7 @@ function computeTotals() {
   const totalVisits = combine(st.visits, histVisits);
   const totalPhotos = combine(st.photos, histPhotos);
   const totalTimeMs = combine(st.totalMs, histTotalMs);
-  const totalReviews = Math.max(17, rv.length);
+  const totalReviews = rv.length;
 
   return {
     customers: totalCustomers,
@@ -126,13 +137,13 @@ function render() {
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
   const cols = {
     customers: [['Customer no.', x => `<td class="mono">${dash(x.id || x.key)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Visits', x => `<td>${dash(x.visitCount)}</td>`], ['Images', x => `<td>${dash(x.photoCount)}</td>`], ['Time spent', x => `<td>${x.totalMs === undefined ? '—' : dur(x.totalMs)}</td>`], ['Country', x => `<td>${dash(x.country)}</td>`], ['Device', x => `<td>${dash([x.deviceType, x.os, x.browser].filter(Boolean).join(' · '))}</td>`], ['First visit', x => `<td>${when(x.firstVisit)}</td>`], ['Last visit', x => `<td>${when(x.lastVisit)}</td>`]],
-    reviews: [['Time', x => `<td>${when(x.ts)}</td>`], ['Rating', x => `<td>${dash(x.rating)}</td>`], ['Review', x => `<td>${dash(x.text)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Source', x => `<td>${dash(x.source)}</td>`], ['Customer ID', x => `<td class="mono">${dash(x.customerId)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Device ID', x => `<td class="mono">${dash(x.deviceId)}</td>`]],
+    reviews: [['Time', x => `<td>${when(x.ts)}</td>`], ['Rating', x => `<td>${dash(x.rating)}</td>`], ['Review', x => `<td>${dash(x.text)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Source', x => `<td>${dash(x.source)}</td>`], ['Customer ID', x => `<td class="mono">${dash(x.customerId)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Device ID', x => `<td class="mono">${dash(x.deviceId)}</td>`], ['Admin reply', x => `<td class="reviewAdminCell"><div class="reviewAdminReply">${x.adminReply ? esc(x.adminReply) : '<span class="adNote">No reply yet</span>'}</div><textarea class="reviewAdminText" maxlength="5000" data-reply-input="${esc(x.key)}" aria-label="Reply to review from ${esc(x.name || 'visitor')}">${esc(x.adminReply || '')}</textarea><div class="reviewAdminActions"><button class="adBtn" type="button" data-review-action="save" data-review-id="${esc(x.key)}">${x.adminReply ? 'Save reply' : 'Post reply'}</button>${x.adminReply ? `<button class="adBtn ghost" type="button" data-review-action="remove-reply" data-review-id="${esc(x.key)}">Remove reply</button>` : ''}<button class="adBtn danger" type="button" data-review-action="delete" data-review-id="${esc(x.key)}">Delete review</button></div><div class="reviewAdminFeedback" data-review-feedback="${esc(x.key)}" aria-live="polite"></div></td>`]],
     referrals: [['Time', x => `<td>${when(x.ts)}</td>`], ['Answer', x => `<td>${dash(x.sourceLabel || x.source)}</td>`], ['Details', x => `<td>${dash(x.detail)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Page', x => `<td>${dash(x.page)}</td>`]]
   }[tab];
   const sortKey = tab === 'customers' ? 'lastVisit' : 'ts';
   const rows = (data[tab] || []).slice().sort((a, b) => (Number(b[sortKey]) || 0) - (Number(a[sortKey]) || 0));
   $('thead').innerHTML = `<tr>${cols.map(([h]) => `<th>${h}</th>`).join('')}</tr>`;
-  $('tbody').innerHTML = rows.map(r => `<tr>${cols.map(([, f]) => f(r)).join('')}</tr>`).join('') ||
+  $('tbody').innerHTML = rows.map(r => `<tr data-review-row="${tab === 'reviews' ? esc(r.key) : ''}">${cols.map(([, f]) => f(r)).join('')}</tr>`).join('') ||
     `<tr><td colspan="${cols.length}" class="adNote">${errors[tab] ? esc(errors[tab]) : 'No records at this path.'}</td></tr>`;
   $('status').textContent = errors[tab] ? errors[tab] : `${rows.length} record(s) from /${tab}`;
 }
@@ -159,4 +170,56 @@ if (syncBtn) {
   };
 }
 document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+$('tbody').addEventListener('click', async event => {
+  const button = event.target.closest('[data-review-action]');
+  if (!button || tab !== 'reviews') return;
+
+  const reviewId = button.dataset.reviewId;
+  const review = (data.reviews || []).find(item => item.key === reviewId);
+  const user = auth.currentUser;
+  if (!review || !user) return;
+
+  if (button.dataset.reviewAction === 'delete') {
+    const name = review.name || 'this visitor';
+    if (!window.confirm(`Permanently delete this review from ${name}? This cannot be undone.`)) return;
+  }
+
+  const feedback = document.querySelector(`[data-review-feedback="${CSS.escape(reviewId)}"]`);
+  button.disabled = true;
+  if (feedback) feedback.textContent = 'Saving…';
+  try {
+    const token = await user.getIdToken();
+    const path = `reviews/${encodeURIComponent(reviewId)}`;
+    if (button.dataset.reviewAction === 'delete') {
+      await writeReview(path, token, 'DELETE');
+      data.reviews = (data.reviews || []).filter(item => item.key !== reviewId);
+      render();
+      $('status').textContent = 'Review permanently deleted.';
+      return;
+    }
+
+    if (button.dataset.reviewAction === 'remove-reply') {
+      await writeReview(path, token, 'PATCH', { adminReply: null, adminReplyTs: null });
+      delete review.adminReply;
+      delete review.adminReplyTs;
+    } else {
+      const input = document.querySelector(`[data-reply-input="${CSS.escape(reviewId)}"]`);
+      const reply = (input?.value || '').trim();
+      if (!reply) {
+        if (feedback) feedback.textContent = 'Write a reply before saving.';
+        button.disabled = false;
+        return;
+      }
+      const replyTs = Date.now();
+      await writeReview(path, token, 'PATCH', { adminReply: reply, adminReplyTs: replyTs });
+      review.adminReply = reply;
+      review.adminReplyTs = replyTs;
+    }
+    render();
+    $('status').textContent = 'Review reply saved.';
+  } catch (error) {
+    if (feedback) feedback.textContent = error.message || 'Could not update this review.';
+    button.disabled = false;
+  }
+});
 authSdk.onAuthStateChanged(auth, user => { if (user && !user.isAnonymous) { showPanel(user); load(); } else showLogin($('loginErr').textContent); });

@@ -1,54 +1,29 @@
-Passport Room — Vercel static website
+# Welcome to your Lovable project
 
-Extract the ZIP first. Deploy this folder with index.html and vercel.json at the root.
-Use Vercel framework preset Other, leave the build command empty, and set output directory to .
-No installation or build step is required.
+This project was built with [Lovable](https://lovable.dev).
 
-Existing ad scripts and ad popups have been removed. All five placement containers remain in
-index.html, marked data-ad-placement and hidden. No ad units are activated.
-Google AdSense verification and ads.txt use publisher pub-6650727557878424.
+## Build with Lovable
 
-After deployment, request verification in your AdSense account. Google decides approval.
-Deployment to your Vercel account and AdSense approval cannot be guaranteed by this archive.
+Open your project in the [Lovable editor](https://lovable.dev) and keep building.
 
-Visitor profile update — 19 October 2026
-The existing Firebase project passport-48389 is used; no private key is included.
-Accepting cookies starts Firebase Anonymous Authentication. The top-bar profile
-shows the real Firebase UID and a random display name. The Firebase SDK stores
-and renews the browser session; local visitor counts/dates are not sent to a database.
-Rejecting cookies stops authentication and clears the visitor's local session/profile.
-Firebase accounts already created remain in Firebase until the operator deletes them.
-Anonymous accounts can be reviewed in Firebase Console → Authentication → Users.
-Anonymous database writes are currently denied by the project's rules. This update
-therefore does not promise a remotely stored activity log or change database rules.
-The old unauthenticated remote tracker startup has been disabled.
-Do not make the database publicly writable. Reviews retain their existing rules.
-For visitors in the EEA/UK/Switzerland, configure a Google-certified consent
-management platform in AdSense Privacy & messaging. This custom banner alone does
-not establish compliance with Google's certified CMP requirements or guarantee approval.
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
+- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
 
-Admin panel update — 21 October 2026
-Added /admin (read-only; Firebase Email/Password sign-in + /admins/{uid} allowlist).
-See ADMIN-SETUP.md and database.rules.json. No secrets are included.
+## Development
 
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
-Update - 24 October 2026 (tracking fix)
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
+npm run dev
+```
 
-1. IMPORTANT: open Firebase Console -> Realtime Database -> Rules, paste the full
-   contents of database.rules.json from this ZIP and click Publish. The previous
-   rules denied most counter writes, which froze the customer number, visitor,
-   visit, photo and daily totals. The new file grants every path the site uses
-   (public counter increments are +1-only; customers stay admin-readable).
-   Keep Anonymous sign-in enabled in Authentication -> Sign-in method.
-2. Review names: both review forms no longer ask for a name. The name comes from
-   the visitor profile, and profile names are now words only (no numbers).
-   Existing stored profiles are upgraded automatically on next visit.
-3. The "free forever" notice now appears 1.5 seconds after the cookie box.
-4. Admin panel "Sync public stats" now writes each /stats child separately
-   (the rules grant admin writes per child).
+## Built with
 
-Purple liquid glass theme — 2 November 2026
-Added liquid-glass.css, a theme-only override stylesheet now linked last on every page
-(home, about, features, contact, privacy, terms, stats, admin). It recolors the UI to a
-purple liquid glass look (blurred translucent panels, violet aurora background, glass
-buttons and inputs). No content, markup structure, scripts or settings were changed.
+- TanStack Start
+- TypeScript
+- React
+- Tailwind CSS

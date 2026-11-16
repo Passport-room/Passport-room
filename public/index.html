@@ -429,11 +429,9 @@
               <fieldset class="reviewRatingField">
                 <legend>How was your experience?</legend>
                 <div class="reviewStars" data-review-stars role="radiogroup" aria-label="Your rating">
-                  <button type="button" class="reviewStar" data-star="1" role="radio" aria-checked="false" aria-label="Disappointed, 1 star"><span aria-hidden="true">😡</span><small>Disappointed</small></button>
-                  <button type="button" class="reviewStar" data-star="2" role="radio" aria-checked="false" aria-label="Sad, 2 stars"><span aria-hidden="true">😢</span><small>Sad</small></button>
-                  <button type="button" class="reviewStar" data-star="3" role="radio" aria-checked="false" aria-label="Confused, 3 stars"><span aria-hidden="true">🤔</span><small>Confused</small></button>
-                  <button type="button" class="reviewStar" data-star="4" role="radio" aria-checked="false" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
-                  <button type="button" class="reviewStar" data-star="5" role="radio" aria-checked="false" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
+                  <button type="button" class="reviewStar" data-star="3" role="radio" aria-checked="false" aria-label="Low, 3 stars"><span aria-hidden="true">😞</span><small>Low</small></button>
+                  <button type="button" class="reviewStar" data-star="4" role="radio" aria-checked="false" aria-label="Medium, 4 stars"><span aria-hidden="true">🙂</span><small>Medium</small></button>
+                  <button type="button" class="reviewStar" data-star="5" role="radio" aria-checked="false" aria-label="Good, 5 stars"><span aria-hidden="true">😍</span><small>Good</small></button>
                 </div>
               </fieldset>
               <label class="reviewInputLabel" for="reviewText">Tell us more</label>
@@ -2342,7 +2340,7 @@
     <script>try{localStorage.setItem("cubit_save_photos_enabled","false");localStorage.setItem("cubit_save_notice_prompted","true");localStorage.removeItem("cubit_history_v1");Object.keys(localStorage).forEach(function(k){if(k.indexOf("cubit_history")===0)localStorage.removeItem(k)})}catch(e){}</script>
     <script src="download-flow.js?v=20261014"></script>
     <script>window.__prRevName=function(r){var n=String((r&&r.name)||"").trim();if(!n||/^(guest|t|test|test user)$/i.test(n)||/^Passpo/i.test(n))return r&&r.customerId&&/^CUS-\d+$/.test(r.customerId)?"Customer "+r.customerId.slice(4):"Verified customer";return n;};</script>
-    <script type="module" src="assets/app.min.js?v=20261108"></script>
+    <script type="module" src="assets/app.min.js?v=20261113"></script>
     <script src="countries.js?v=20261108" defer></script>
     <script src="country-picker.js?v=20261108" defer></script>
   
@@ -2380,11 +2378,9 @@
           <div class="prSurveyProg">Step 2 of 2</div>
           <h2 class="prFreeTitle">Rate your experience</h2>
           <div class="reviewStars prSurveyStars" role="radiogroup" aria-label="Your rating">
-            <button type="button" class="reviewStar" data-sv="1" aria-label="Disappointed, 1 star"><span aria-hidden="true">😡</span><small>Disappointed</small></button>
-            <button type="button" class="reviewStar" data-sv="2" aria-label="Sad, 2 stars"><span aria-hidden="true">😢</span><small>Sad</small></button>
-            <button type="button" class="reviewStar" data-sv="3" aria-label="Confused, 3 stars"><span aria-hidden="true">🤔</span><small>Confused</small></button>
-            <button type="button" class="reviewStar" data-sv="4" aria-label="Satisfied, 4 stars"><span aria-hidden="true">🙂</span><small>Satisfied</small></button>
-            <button type="button" class="reviewStar" data-sv="5" aria-label="Happy, 5 stars"><span aria-hidden="true">😍</span><small>Happy</small></button>
+            <button type="button" class="reviewStar" data-sv="3" aria-label="Low, 3 stars"><span aria-hidden="true">😞</span><small>Low</small></button>
+            <button type="button" class="reviewStar" data-sv="4" aria-label="Medium, 4 stars"><span aria-hidden="true">🙂</span><small>Medium</small></button>
+            <button type="button" class="reviewStar" data-sv="5" aria-label="Good, 5 stars"><span aria-hidden="true">😍</span><small>Good</small></button>
           </div>
           <textarea id="prSurveyText" class="reviewChatInput prSurveyInput" maxlength="300" rows="3" placeholder="Write your review…"></textarea>
           <div class="prSurveyErr" id="prSurveyErr2"></div>

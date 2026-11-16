@@ -50,7 +50,7 @@
       ".read": true,
       ".indexOn": "ts",
       "$reviewId": {
-        ".write": "auth != null && (!data.exists() && newData.exists())",
+        ".write": "auth != null && (root.child('admins').child(auth.uid).val() === true || (!data.exists() && newData.exists()))",
         ".validate": "newData.hasChildren(['rating','text','ts'])",
         "deviceId": {
           ".validate": "newData.isString() && newData.val().length >= 6 && newData.val().length <= 64"
@@ -77,6 +77,12 @@
           ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 300"
         },
         "ts": {
+          ".validate": "newData.isNumber()"
+        },
+        "adminReply": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 5000"
+        },
+        "adminReplyTs": {
           ".validate": "newData.isNumber()"
         },
         "$other": {

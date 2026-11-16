@@ -31,10 +31,19 @@ The public visitors page (/stats) and the admin dashboard (/admin) now display t
 1. Open Firebase Console -> Realtime Database -> **Rules**.
 2. Copy the updated contents of `database.rules.json` from this ZIP and click **Publish**.
    - Grants `.read: true` to `/stats` and `/reviews` for the public.
+   - Preserves authenticated visitor review insertion while allowing only UIDs listed as `admins/<uid> = true` to update or delete review records.
+   - Allows admins to set or remove `adminReply` and `adminReplyTs`; replies are validated to 1–5,000 characters and a numeric timestamp.
    - Grants admin write permission to each `/stats` child so the admin dashboard can sync totals (written per child).
    - Keeps `/customers` and `/referrals` admin-readable; the app itself writes customer records under a strict `CUS-######` pattern.
 
-## 3. Deploy
+## 3. Review Management and Replies
+- Sign in at `/admin` with an account whose UID is set to `true` under `/admins` in Realtime Database.
+- Open the **Reviews** tab to view the full review records. Each row includes an editable admin reply, a **Post reply**/**Save reply** action, a **Remove reply** action when a reply exists, and a **Delete review** action.
+- Saving or removing a reply updates only `adminReply` and `adminReplyTs` on `/reviews/{reviewId}`. The admin page uses the signed-in Firebase user's ID token; Realtime Database rules enforce admin access.
+- Deleting requires confirmation and issues a Firebase `DELETE` to `/reviews/{reviewId}.json`. This permanently removes that record. It does not create a public deletion label, placeholder, or message; the review simply disappears from the public list.
+- Public replies appear immediately below their review. Longer replies show a small arrow control to expand or collapse the text.
+
+## 4. Deploy
 Vercel deployment remains completely unchanged:
 - Framework: Other
 - Build Command: (empty)
