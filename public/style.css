@@ -1050,7 +1050,7 @@ select:focus {
 }
 .fmt {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 .fmtBtn {
@@ -5245,3 +5245,82 @@ body.is-pro .pr-hta { display:none !important; }
 .prSurveyInput{width:100%;box-sizing:border-box;margin:4px 0 8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font:inherit}
 .prSurveyStars{display:flex;justify-content:center;gap:6px;margin:12px 0}
 .prSurveyErr{min-height:18px;color:#fca5a5;font-size:13px;margin-bottom:6px}
+
+.homeFooterLinks {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+
+
+/* Home footer page links: bigger type, roomier rows, less side gap */
+.homeFooterLinks {
+  gap: 10px 20px;
+  font-size: 15px;
+  padding: 0;
+}
+.homeFooterBottom {
+  font-size: 15px;
+}
+@media (max-width: 639px) {
+  .siteFooter {
+    padding: 0 10px;
+  }
+  .homeFooter {
+    padding: 24px 12px;
+  }
+  .homeFooterLinks {
+    gap: 10px 16px;
+    font-size: 15px;
+  }
+  .homeFooterBottom {
+    font-size: 15px;
+  }
+  .footNote {
+    font-size: 13px;
+    padding: 0 10px;
+  }
+}
+
+/* "A part of OneRoom" line under the home footer copyright */
+.oneRoomLine {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+.oneRoomLine a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+.oneRoomLine img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.oneRoomLine em {
+  font-style: italic;
+  text-decoration: underline;
+  color: #c4b5fd;
+}
+.oneRoomLine a:hover em {
+  color: var(--fg);
+}
+@media (max-width: 639px) {
+  .oneRoomLine a {
+    font-size: 12.5px;
+    gap: 6px;
+  }
+  .oneRoomLine img {
+    height: 16px;
+  }
+  .oneRoomLine em {
+    flex-basis: 100%;
+    text-align: center;
+  }
+}

@@ -223,3 +223,120 @@ table.pgTable th {
 .pgFooter nav a:hover {
   color: var(--pg-text);
 }
+
+/* Compact page links on phones so they fit in two rows */
+@media (max-width: 639px) {
+  .pgNavInner {
+    padding: 7px 8px;
+    gap: 8px;
+  }
+  .pgNavInner img {
+    height: 20px;
+  }
+  .pgNavLinks {
+    gap: 2px 6px;
+    font-size: 11.5px;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* The top bar slides away while scrolling down and drops back in when
+   scrolling up or returning to the top of the page. */
+.pgNav {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pgNav.pgNavHidden {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pgNav {
+    transition: none;
+  }
+}
+
+/* Founder quote and the OneRoom cross-link */
+.founderQuote {
+  margin: 18px 0 10px;
+  padding: 18px 22px;
+  border-left: 3px solid var(--pg-accent-2);
+  border-radius: 0 14px 14px 0;
+  background: oklch(0.2 0.06 305 / 0.35);
+}
+.founderQuoteText {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pgNote {
+  font-size: 13.5px;
+  color: var(--pg-muted);
+  margin: 0 0 26px;
+}
+.oneRoomCard {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 22px 0 6px;
+  padding: 18px 20px;
+  border: 1px solid var(--pg-border);
+  border-radius: 16px;
+  background: oklch(0.2 0.06 305 / 0.3);
+}
+.oneRoomCard img {
+  height: 30px;
+  width: auto;
+}
+.oneRoomCard p {
+  margin: 0;
+  flex: 1;
+  min-width: 220px;
+  color: var(--pg-muted);
+}
+.oneRoomLine {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+.oneRoomLine a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--pg-muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+.oneRoomLine img {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.oneRoomLine em {
+  font-style: italic;
+  text-decoration: underline;
+  color: var(--pg-accent-2);
+}
+.oneRoomLine a:hover em {
+  color: var(--pg-text);
+}
+
+/* OneRoom line on phones: logo and text on one row, link underneath */
+@media (max-width: 639px) {
+  .oneRoomLine a {
+    font-size: 12.5px;
+    gap: 6px;
+  }
+  .oneRoomLine img {
+    height: 16px;
+  }
+  .oneRoomLine em {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  .oneRoomCard img {
+    height: 26px;
+  }
+}

@@ -1,4 +1,9 @@
-/* Passport Room — searchable country size picker for the editor (wraps #specSelect). */
+/* Passport Room — searchable country size picker for the editor (wraps #specSelect).
+ *
+ * The list shows one entry per country from countries.js (no separate built-in
+ * preset list), and picking a country selects that size automatically and sets
+ * the matching background colour — white for the countries that require white.
+ */
 (function () {
   function init() {
     var sel = document.getElementById("specSelect");
@@ -27,6 +32,7 @@
     var btn = wrap.querySelector(".prPickBtn"), panel = wrap.querySelector(".prPickPanel"),
       q = wrap.querySelector(".prPickSearch"), list = wrap.querySelector(".prPickList");
     var label = "";
+    var activeCode = "";
 
     function setLabel(flag, text) { btn.querySelector(".f").textContent = flag; btn.querySelector(".t").textContent = text; }
     function syncFromSelect() {
@@ -41,12 +47,6 @@
     function render() {
       var term = q.value.trim().toLowerCase().replace(/×/g, "x").replace(/\s+/g, " ");
       var h = "", n = 0;
-      var builtin = [].slice.call(sel.options).filter(function (o) { return o.value !== "__custom__"; });
-      var b = builtin.filter(function (o) { return !term || o.textContent.toLowerCase().replace(/×/g, "x").indexOf(term) > -1; });
-      if (b.length) {
-        h += '<div class="prPickHead">Built-in presets</div>';
-        b.forEach(function (o) { n++; h += '<div class="prPickItem" data-v="' + esc(o.value) + '"><span class="f">⭐</span><span>' + esc(o.textContent) + "</span></div>"; });
-      }
       var c = rows.filter(function (r) {
         return !term || (r[0] + " " + r[1] + " " + r[2] + "x" + r[3] + " " + r[2] + "x" + r[3] + "mm").toLowerCase().indexOf(term) > -1;
       });
@@ -54,7 +54,7 @@
         h += '<div class="prPickHead">All countries — passport photo</div>';
         c.forEach(function (r) {
           n++;
-          h += '<div class="prPickItem" data-c="' + esc(r[1]) + '"><span class="f">' + window.PR_FLAG(r[1]) + "</span><span>" + esc(r[0]) +
+          h += '<div class="prPickItem' + (r[1] === activeCode ? " on" : "") + '" data-c="' + esc(r[1]) + '"><span class="f">' + window.PR_FLAG(r[1]) + "</span><span>" + esc(r[0]) +
             '</span><span class="s">' + r[2] + "×" + r[3] + ' mm</span><a href="' + esc(window.PR_LINK(r)) + '" target="_blank" rel="noopener nofollow" title="Official requirements">ⓘ</a></div>';
         });
       }
@@ -70,6 +70,31 @@
       if (e.key === "Enter") { var f = list.querySelector(".prPickItem"); f && f.click(); }
     });
     document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) open(false); });
+
+    // Countries that ask for a light grey background map to the grey swatch;
+    // every other country uses the white swatch.
+    function applyBackground(name) {
+      var want = /gr[ae]y/i.test(String(name || "")) ? "Grey" : "White";
+      var swatches = document.querySelectorAll("#bgSwatches .sw");
+      for (var i = 0; i < swatches.length; i++) {
+        if (swatches[i].title === want) { swatches[i].click(); return; }
+      }
+    }
+
+    // Prefer the app's own preset when it matches the country and its size, so
+    // the size really is "selected" rather than added as a custom size.
+    function matchingPreset(r) {
+      var want = r[2] + "×" + r[3] + "mm";
+      var name = r[0].toLowerCase();
+      for (var i = 0; i < sel.options.length; i++) {
+        var o = sel.options[i];
+        if (o.value === "__custom__") continue;
+        var t = o.textContent.toLowerCase();
+        if (t.indexOf(name) > -1 && t.indexOf(want.toLowerCase()) > -1) return o;
+      }
+      return null;
+    }
+
     list.addEventListener("click", function (e) {
       if (e.target.closest("a")) return;
       var it = e.target.closest(".prPickItem");
@@ -80,12 +105,24 @@
         sel.dispatchEvent(new Event("change"));
       } else {
         var r = rows.find(function (x) { return x[1] === it.dataset.c; });
-        var w = document.getElementById("mainCustomW"), h = document.getElementById("mainCustomH"), ap = document.getElementById("mainCustomApply");
-        if (r && w && h && ap) {
-          w.value = r[2]; h.value = r[3]; ap.click();
-          label = r[0];
-          setLabel(window.PR_FLAG(r[1]), r[0] + " passport · " + r[2] + "×" + r[3] + " mm · " + r[4] + " background");
+        if (!r) { open(false); return; }
+        var preset = matchingPreset(r);
+        if (preset) {
+          label = "";
+          sel.value = preset.value;
+          sel.dispatchEvent(new Event("change"));
+        } else {
+          var w = document.getElementById("mainCustomW"), hh = document.getElementById("mainCustomH"), ap = document.getElementById("mainCustomApply");
+          if (w && hh && ap) {
+            w.value = r[2];
+            hh.value = r[3];
+            ap.click();
+          }
         }
+        applyBackground(r[4]);
+        activeCode = r[1];
+        label = r[0];
+        setLabel(window.PR_FLAG(r[1]), r[0] + " passport · " + r[2] + "×" + r[3] + " mm · " + r[4] + " background");
       }
       open(false);
     });

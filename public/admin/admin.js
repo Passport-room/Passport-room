@@ -21,6 +21,32 @@ let pub = null;
 const errors = {};
 let tab = 'customers';
 
+/* Test-review cleanup. A review is treated as a test when the word "test"
+   appears in its text, the reviewer name, its source or a customer id. */
+const TEST_RE = /test/i;
+const isTestReview = r => TEST_RE.test([r.name, r.text, r.sourceLabel, r.source, r.customerId, r.uid].filter(Boolean).join(' '));
+let showTestOnly = false;
+const testReviews = () => (data.reviews || []).filter(isTestReview);
+
+function updateCleanup() {
+  const find = $('findTestBtn'), del = $('deleteTestBtn'), bar = $('testBar');
+  if (!find) return;
+  const n = testReviews().length;
+  find.textContent = showTestOnly ? 'Show all reviews' : 'Find test reviews';
+  find.setAttribute('aria-pressed', String(showTestOnly));
+  if (del) {
+    del.hidden = !showTestOnly;
+    del.disabled = !n;
+    del.textContent = `Delete all test reviews (${n})`;
+  }
+  if (bar) {
+    bar.hidden = !showTestOnly;
+    bar.textContent = n
+      ? `${n} review(s) mention "test". Use Delete review on a row to remove one, or Delete all test reviews to clear them together.`
+      : 'No reviews mention "test".';
+  }
+}
+
 async function read(path, token) {
   const r = await fetch(`${DB}/${path}.json?auth=${encodeURIComponent(token)}`);
   if (r.status === 401 || r.status === 403) throw new Error('denied');
@@ -137,15 +163,52 @@ function render() {
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
   const cols = {
     customers: [['Customer no.', x => `<td class="mono">${dash(x.id || x.key)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Visits', x => `<td>${dash(x.visitCount)}</td>`], ['Images', x => `<td>${dash(x.photoCount)}</td>`], ['Time spent', x => `<td>${x.totalMs === undefined ? '—' : dur(x.totalMs)}</td>`], ['Country', x => `<td>${dash(x.country)}</td>`], ['Device', x => `<td>${dash([x.deviceType, x.os, x.browser].filter(Boolean).join(' · '))}</td>`], ['First visit', x => `<td>${when(x.firstVisit)}</td>`], ['Last visit', x => `<td>${when(x.lastVisit)}</td>`]],
-    reviews: [['Time', x => `<td>${when(x.ts)}</td>`], ['Rating', x => `<td>${dash(x.rating)}</td>`], ['Review', x => `<td>${dash(x.text)}</td>`], ['Name', x => `<td>${dash(x.name)}</td>`], ['Source', x => `<td>${dash(x.source)}</td>`], ['Customer ID', x => `<td class="mono">${dash(x.customerId)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Device ID', x => `<td class="mono">${dash(x.deviceId)}</td>`], ['Admin reply', x => `<td class="reviewAdminCell"><div class="reviewAdminReply">${x.adminReply ? esc(x.adminReply) : '<span class="adNote">No reply yet</span>'}</div><textarea class="reviewAdminText" maxlength="5000" data-reply-input="${esc(x.key)}" aria-label="Reply to review from ${esc(x.name || 'visitor')}">${esc(x.adminReply || '')}</textarea><div class="reviewAdminActions"><button class="adBtn" type="button" data-review-action="save" data-review-id="${esc(x.key)}">${x.adminReply ? 'Save reply' : 'Post reply'}</button>${x.adminReply ? `<button class="adBtn ghost" type="button" data-review-action="remove-reply" data-review-id="${esc(x.key)}">Remove reply</button>` : ''}<button class="adBtn danger" type="button" data-review-action="delete" data-review-id="${esc(x.key)}">Delete review</button></div><div class="reviewAdminFeedback" data-review-feedback="${esc(x.key)}" aria-live="polite"></div></td>`]],
+    reviews: [['Time', x => `<td>${when(x.ts)}</td>`], ['Rating', x => `<td>${dash(x.rating)}</td>`], ['Review', x => `<td>${dash(x.text)}</td>`], ['Name', x => `<td>${dash(x.name)}${isTestReview(x) ? ' <span class="adTag">test</span>' : ''}</td>`], ['Source', x => `<td>${dash(x.source)}</td>`], ['Customer ID', x => `<td class="mono">${dash(x.customerId)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Device ID', x => `<td class="mono">${dash(x.deviceId)}</td>`], ['Admin reply', x => `<td class="reviewAdminCell"><div class="reviewAdminReply">${x.adminReply ? esc(x.adminReply) : '<span class="adNote">No reply yet</span>'}</div><textarea class="reviewAdminText" maxlength="5000" data-reply-input="${esc(x.key)}" aria-label="Reply to review from ${esc(x.name || 'visitor')}">${esc(x.adminReply || '')}</textarea><div class="reviewAdminActions"><button class="adBtn" type="button" data-review-action="save" data-review-id="${esc(x.key)}">${x.adminReply ? 'Save reply' : 'Post reply'}</button>${x.adminReply ? `<button class="adBtn ghost" type="button" data-review-action="remove-reply" data-review-id="${esc(x.key)}">Remove reply</button>` : ''}<button class="adBtn danger" type="button" data-review-action="delete" data-review-id="${esc(x.key)}">Delete review</button></div><div class="reviewAdminFeedback" data-review-feedback="${esc(x.key)}" aria-live="polite"></div></td>`]],
     referrals: [['Time', x => `<td>${when(x.ts)}</td>`], ['Answer', x => `<td>${dash(x.sourceLabel || x.source)}</td>`], ['Details', x => `<td>${dash(x.detail)}</td>`], ['Visitor UID', x => `<td class="mono">${dash(x.uid)}</td>`], ['Page', x => `<td>${dash(x.page)}</td>`]]
   }[tab];
   const sortKey = tab === 'customers' ? 'lastVisit' : 'ts';
-  const rows = (data[tab] || []).slice().sort((a, b) => (Number(b[sortKey]) || 0) - (Number(a[sortKey]) || 0));
+  const sorted = (data[tab] || []).slice().sort((a, b) => (Number(b[sortKey]) || 0) - (Number(a[sortKey]) || 0));
+  const rows = tab === 'reviews' && showTestOnly ? sorted.filter(isTestReview) : sorted;
   $('thead').innerHTML = `<tr>${cols.map(([h]) => `<th>${h}</th>`).join('')}</tr>`;
   $('tbody').innerHTML = rows.map(r => `<tr data-review-row="${tab === 'reviews' ? esc(r.key) : ''}">${cols.map(([, f]) => f(r)).join('')}</tr>`).join('') ||
-    `<tr><td colspan="${cols.length}" class="adNote">${errors[tab] ? esc(errors[tab]) : 'No records at this path.'}</td></tr>`;
-  $('status').textContent = errors[tab] ? errors[tab] : `${rows.length} record(s) from /${tab}`;
+    `<tr><td colspan="${cols.length}" class="adNote">${errors[tab] ? esc(errors[tab]) : tab === 'reviews' && showTestOnly ? 'No reviews mention "test".' : 'No records at this path.'}</td></tr>`;
+  $('status').textContent = errors[tab]
+    ? errors[tab]
+    : `${rows.length} record(s) from /${tab}${tab === 'reviews' && showTestOnly ? ' (test reviews only)' : ''}`;
+  updateCleanup();
+}
+
+async function deleteAllTestReviews() {
+  const list = testReviews();
+  const user = auth.currentUser;
+  const button = $('deleteTestBtn');
+  if (!list.length || !user) return;
+  const ok = window.confirm(`Permanently delete all ${list.length} test review(s)? This cannot be undone.`);
+  if (!ok) return;
+  if (button) button.disabled = true;
+  let removed = 0;
+  let failed = 0;
+  try {
+    const token = await user.getIdToken();
+    for (const review of list) {
+      try {
+        await writeReview(`reviews/${encodeURIComponent(review.key)}`, token, 'DELETE');
+        data.reviews = (data.reviews || []).filter(item => item.key !== review.key);
+        removed++;
+      } catch {
+        failed++;
+      }
+      render();
+      $('status').textContent = `Deleting test reviews… ${removed + failed}/${list.length}`;
+    }
+  } catch {
+    failed = list.length - removed;
+  }
+  showTestOnly = removed > 0;
+  render();
+  $('status').textContent = failed
+    ? `Removed ${removed} test review(s). ${failed} could not be deleted — check the database rules.`
+    : `All ${removed} test review(s) permanently deleted.`;
 }
 
 function showLogin(msg = '') { $('panel').hidden = true; $('login').hidden = false; $('loginErr').textContent = msg; }
@@ -169,7 +232,9 @@ if (syncBtn) {
     }
   };
 }
-document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; showTestOnly = false; render(); });
+if ($('findTestBtn')) $('findTestBtn').onclick = () => { showTestOnly = !showTestOnly; tab = 'reviews'; render(); };
+if ($('deleteTestBtn')) $('deleteTestBtn').onclick = deleteAllTestReviews;
 $('tbody').addEventListener('click', async event => {
   const button = event.target.closest('[data-review-action]');
   if (!button || tab !== 'reviews') return;

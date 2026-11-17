@@ -553,3 +553,18 @@ select:focus,
 .slotEmptyLabel {
   border-radius: 0;
 }
+
+/* ---------- Top page links: plain text, not button chips ---------- */
+.pgNavLinks a {
+  background: none;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  color: oklch(0.84 0.07 300 / 0.9);
+}
+.pgNavLinks a:hover,
+.pgNavLinks a:focus-visible,
+.pgNavLinks a[aria-current="page"] {
+  color: oklch(0.97 0.02 300);
+  text-shadow: 0 0 14px oklch(0.72 0.2 300 / 0.6);
+}

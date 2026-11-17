@@ -18,8 +18,8 @@
     <meta name="twitter:description" content="Live public totals for Passport Room: how many people have visited and how many passport photos have been created." />
     <link rel="icon" href="/favicon.ico" />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/page.css" />
-<link rel="stylesheet" href="/liquid-glass.css?v=20261105" />
+    <link rel="stylesheet" href="/page.css?v=20261125" />
+<link rel="stylesheet" href="/liquid-glass.css?v=20261122" />
     <style>
       .stGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:32px 0}
       .stCard{background:var(--pg-panel);border:1px solid var(--pg-border);border-radius:16px;padding:24px;text-align:center}
@@ -40,10 +40,12 @@
           <a href="/documents">Documents</a>
           <a href="/features">Features</a>
           <a href="/blog">Blog</a>
+          <a href="/why-to-use">Why to use</a>
+          <a href="/reviews">Reviews</a>
           <a href="/about">About</a>
+          <a href="/founder">About CEO</a>
+          <a href="/parent-company">OneRoom</a>
           <a href="/contact">Contact</a>
-          <a href="https://www.youtube.com/@passport-room" target="_blank" rel="noopener">YouTube</a>
-          <a href="https://www.facebook.com/share/1UGQ9xCT93/" target="_blank" rel="noopener">Facebook</a>
         </div>
       </div>
     </nav>
@@ -71,16 +73,25 @@
       <nav aria-label="Footer">
         <a href="/">Passport photo maker</a>
         <a href="/documents">Documents</a>
-          <a href="/features">Features</a>
+        <a href="/features">Features</a>
         <a href="/blog">Blog</a>
         <a href="/reviews">Reviews</a>
         <a href="/ai-roadmap">AI roadmap</a>
         <a href="/about">About</a>
+        <a href="/founder">About CEO</a>
+        <a href="/parent-company">OneRoom</a>
         <a href="/privacy-policy">Privacy Policy</a>
         <a href="/terms-of-service">Terms of Service</a>
         <a href="/contact">Contact</a>
       </nav>
       <div>© 2026 Passport Room · Private, on-device passport photos.</div>
+      <div class="oneRoomLine">
+        <a href="/parent-company">
+          <img src="/oneroom.png" alt="OneRoom" width="96" height="24" />
+          <span>A part of the mega project OneRoom</span>
+          <em>learn more</em>
+        </a>
+      </div>
     </footer>
     <div class="stSecure" role="note" aria-label="Secured by Firebase Authentication"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Secured by Firebase Authentication</span></div>
     <script>
@@ -141,7 +152,8 @@
       setInterval(load, 30000);
     })();
     </script>
-    <script src="/cookie-consent.js" defer></script>
+    <script src="/nav-scroll.js?v=20261122" defer></script>
+<script src="/cookie-consent.js?v=20261116" defer></script>
     <script type="module" src="/visitor-profile.js?v=20261024"></script>
   </body>
 </html>

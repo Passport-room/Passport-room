@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex, nofollow" />
 <title>Passport Room Admin</title>
 <link rel="icon" href="/favicon.ico" />
-<link rel="stylesheet" href="/page.css" />
-<link rel="stylesheet" href="/liquid-glass.css?v=20261105" />
+<link rel="stylesheet" href="/page.css?v=20261125" />
+<link rel="stylesheet" href="/liquid-glass.css?v=20261122" />
 <style>
 .adWrap{max-width:1200px;margin:0 auto;padding:24px 20px 72px}
 .adCard{background:var(--pg-panel);border:1px solid var(--pg-border);border-radius:14px;padding:20px}
@@ -35,6 +35,8 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
 .reviewAdminReply{margin:0 0 8px;padding:8px 10px;border-left:2px solid var(--pg-accent);background:rgba(110,168,254,.08);border-radius:0 8px 8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
 .reviewAdminFeedback{min-height:1.3em;margin-top:6px;font-size:12px;color:var(--pg-muted)}
 .adTop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.adTag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:rgba(168,85,247,.22);border:1px solid rgba(196,165,255,.45);color:#eddcff}
+.adTestBar{margin:10px 0 0;padding:10px 12px;border:1px dashed rgba(196,165,255,.4);border-radius:10px;background:rgba(124,58,237,.08);color:#eddcff}
 .adTopActions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 [hidden]{display:none!important}
 </style>
@@ -60,6 +62,8 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
       </div>
       <div class="adTopActions">
         <span class="adNote" id="who"></span>
+        <button class="adBtn ghost" id="findTestBtn" aria-pressed="false" title="Show only reviews that mention test">Find test reviews</button>
+        <button class="adBtn danger" id="deleteTestBtn" hidden>Delete all test reviews</button>
         <button class="adBtn ghost" id="syncBtn" title="Sync live stats to public visitors page">Sync public stats</button>
         <button class="adBtn ghost" id="refresh">Refresh</button>
         <button class="adBtn ghost" id="logout">Sign out</button>
@@ -72,10 +76,11 @@ td.mono{font-family:ui-monospace,monospace;font-size:12px;white-space:nowrap}
       <button role="tab" data-tab="referrals" aria-selected="false">Where did you hear about us?</button>
     </div>
     <p class="adNote" id="status"></p>
+    <p class="adNote adTestBar" id="testBar" hidden></p>
     <div class="adTable"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
-    <p class="adNote">Customer and referral records remain read-only. Admins can manage replies and permanently delete reviews.</p>
+    <p class="adNote">Customer and referral records remain read-only. Admins can manage replies and permanently delete reviews. "Find test reviews" filters the review table to entries that mention test, so they can be removed one by one or all at once.</p>
   </section>
 </main>
-<script type="module" src="/admin/admin.js"></script>
+<script type="module" src="/admin/admin.js?v=20261116"></script>
 </body>
 </html>

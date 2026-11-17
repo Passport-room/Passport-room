@@ -52,8 +52,8 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=20261104" />
-    <link rel="stylesheet" href="liquid-glass.css?v=20261105" />
+    <link rel="stylesheet" href="style.css?v=20261125" />
+    <link rel="stylesheet" href="liquid-glass.css?v=20261122" />
     <style>/* Reserved placements stay hidden until explicitly enabled. */
       [data-ad-placement] { display: none !important; }
     </style>
@@ -375,7 +375,12 @@
             </div>
 
           <div id="drop" class="drop">
-            <input id="fileInput" type="file" accept="image/*" hidden />
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.avif,.gif,.bmp"
+              hidden
+            />
             <div class="dropInner">
               <div class="trustedLine">
                 <span class="trustedCheck" aria-hidden="true">
@@ -686,8 +691,15 @@
               </div>
               <div id="specMeta" class="muted small"></div>
               <div class="fmt" style="margin-top: 10px">
-                <button data-fmt="png" class="fmtBtn active">PNG</button>
-                <button data-fmt="jpeg" class="fmtBtn">JPEG</button>
+                <button data-fmt="png" class="fmtBtn active" title="PNG — lossless, largest file">
+                  PNG
+                </button>
+                <button data-fmt="jpeg" class="fmtBtn" title="JPEG — small file, best for uploads">
+                  JPEG
+                </button>
+                <button data-fmt="webp" class="fmtBtn" title="WebP — modern format, small file">
+                  WebP
+                </button>
               </div>
             </div>
             <div class="panel small bgQtyCombinedPanel">
@@ -1403,6 +1415,7 @@
               <select id="settingFormatSelect" class="settingSelect">
                 <option value="png">PNG (Maximum Quality)</option>
                 <option value="jpeg">JPEG (Compressed)</option>
+                <option value="webp">WebP (Modern, Small)</option>
               </select>
             </div>
 
@@ -2305,17 +2318,32 @@
           <div class="homeFooterDivider"></div>
           <div class="homeFooterBottom">
             <div class="homeFooterLinks">
+              <a href="/">Home</a>
               <a href="/documents">Documents</a>
-          <a href="/features">Features</a> | <a href="/about">About</a> |
-              <a href="/privacy-policy">Privacy Policy</a> |
-              <a href="/terms-of-service">Terms of Service</a> | <a href="/contact">Contact</a>
+              <a href="/features">Features</a>
+              <a href="/blog">Blog</a>
+              <a href="/reviews">Reviews</a>
+              <a href="/ai-roadmap">AI roadmap</a>
+              <a href="/about">About</a>
+              <a href="/founder">About CEO</a>
+              <a href="/parent-company">OneRoom</a>
+              <a href="/privacy-policy">Privacy Policy</a>
+              <a href="/terms-of-service">Terms of Service</a>
+              <a href="/contact">Contact</a>
             </div>
           </div>
 
         </div>
 
         <div class="footNote">
-          © <span id="year"></span> Passport Room · Made for private, on-device photo editing.
+          © <span id="year"></span> Passport Room · Private, on-device passport photos.
+        </div>
+        <div class="oneRoomLine">
+          <a href="/parent-company">
+            <img src="/oneroom.png" alt="OneRoom" width="96" height="24" />
+            <span>A part of the mega project OneRoom</span>
+            <em>learn more</em>
+          </a>
         </div>
       </footer>
     </div>
@@ -2340,7 +2368,7 @@
     <script>try{localStorage.setItem("cubit_save_photos_enabled","false");localStorage.setItem("cubit_save_notice_prompted","true");localStorage.removeItem("cubit_history_v1");Object.keys(localStorage).forEach(function(k){if(k.indexOf("cubit_history")===0)localStorage.removeItem(k)})}catch(e){}</script>
     <script src="download-flow.js?v=20261014"></script>
     <script>window.__prRevName=function(r){var n=String((r&&r.name)||"").trim();if(!n||/^(guest|t|test|test user)$/i.test(n)||/^Passpo/i.test(n))return r&&r.customerId&&/^CUS-\d+$/.test(r.customerId)?"Customer "+r.customerId.slice(4):"Verified customer";return n;};</script>
-    <script type="module" src="assets/app.min.js?v=20261113"></script>
+    <script type="module" src="assets/app.min.js?v=20261116"></script>
     <script src="countries.js?v=20261108" defer></script>
     <script src="country-picker.js?v=20261108" defer></script>
   
@@ -2389,7 +2417,7 @@
       </div>
     </div>
 
-<script src="/cookie-consent.js?v=20261021" defer></script>
+<script src="/cookie-consent.js?v=20261116" defer></script>
 <script type="module" src="/visitor-profile.js?v=20261024"></script>
 <script type="module" src="/survey.js?v=20261102"></script>
 </body>
