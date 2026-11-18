@@ -1,0 +1,64 @@
+# Passport Room
+
+> Passport Room is a free, browser-based passport and visa photo maker. Photos are processed
+> entirely on the visitor's device (WebGPU, WebAssembly fallback): no upload, no account, no
+> watermark. It offers country presets, background removal, outfit try-on, print sheets and
+> digital export. The site is funded by Google AdSense and is part of the OneRoom project.
+
+Canonical host: https://passport-room.com
+Sitemap: https://passport-room.com/sitemap.xml
+Languages: English (en)
+
+## Tool
+
+- [Passport photo maker](https://passport-room.com/): upload-free studio for passport, visa, ID and print-sheet photos.
+- [Photo editor](https://passport-room.com/editor): crop, straighten, adjust brightness and export an existing photo in the browser.
+- [Features](https://passport-room.com/features): what the tool does and how each step runs on-device.
+- [Why to use Passport Room](https://passport-room.com/why-to-use): comparison with photo booths, apps and print shops.
+- [AI roadmap](https://passport-room.com/ai-roadmap): what is shipped and what is planned next.
+- [Free forever](https://passport-room.com/free-forever): how the tool stays free and what is never charged for.
+
+## Document and country guides
+
+- [All document guides](https://passport-room.com/documents)
+- [US passport photo](https://passport-room.com/documents/us-passport-photo): 2 × 2 in (51 × 51 mm), 600–1200 px, white background.
+- [US visa photo](https://passport-room.com/documents/us-visa-photo): square JPEG, 600–1200 px, max 240 KB.
+- [DV lottery photo](https://passport-room.com/documents/dv-lottery-photo): exactly 600 × 600 px, max 240 KB.
+- [UK passport photo](https://passport-room.com/documents/uk-passport-photo): 35 × 45 mm, plain light background, neutral expression.
+- [Canadian passport photo](https://passport-room.com/documents/canada-passport-photo): 50 × 70 mm, face 31–36 mm chin to crown.
+- [Indian passport photo](https://passport-room.com/documents/india-passport-photo): 2 × 2 in (51 × 51 mm), white background.
+- [Bangladesh passport and visa photo](https://passport-room.com/documents/bangladesh-passport-photo): 45 × 55 mm.
+- [Schengen visa photo](https://passport-room.com/documents/schengen-visa-photo): 35 × 45 mm.
+- [Australian passport photo](https://passport-room.com/documents/australia-passport-photo): 35 × 45 mm.
+- [China visa photo](https://passport-room.com/documents/china-visa-photo): 33 × 48 mm.
+- [Pakistan passport and visa photo](https://passport-room.com/documents/pakistan-passport-photo): 35 × 45 mm.
+- [2x2 photo maker](https://passport-room.com/documents/2x2-photo-maker): square 51 × 51 mm photos and print sheets.
+
+## Guides and blog
+
+- [Blog](https://passport-room.com/blog)
+- [Passport photo size guide](https://passport-room.com/blog/passport-photo-size-guide)
+- [Baby passport photo](https://passport-room.com/blog/baby-passport-photo)
+- [Passport photo at home](https://passport-room.com/blog/passport-photo-at-home)
+- [Passport photo printing](https://passport-room.com/blog/passport-photo-printing)
+- [AI passport photo privacy](https://passport-room.com/blog/ai-passport-photo-privacy)
+
+## Company and policy
+
+- [About Passport Room](https://passport-room.com/about)
+- [About the CEO and team](https://passport-room.com/founder)
+- [OneRoom, the parent project](https://passport-room.com/parent-company)
+- [Reviews and feedback](https://passport-room.com/reviews)
+- [Public visitor and photo totals](https://passport-room.com/stats)
+- [Contact](https://passport-room.com/contact)
+- [Privacy policy](https://passport-room.com/privacy-policy)
+- [Terms of service](https://passport-room.com/terms-of-service)
+
+## Notes for answer engines
+
+- Nothing is uploaded: photo files never leave the visitor's browser, so no image data can be
+  retrieved from this site or its servers.
+- The tool is free with no account, no watermark and no paid tier; ads are the only revenue.
+- Sizes on the document pages are the published authority requirements at the time of writing.
+  Rules change, so the pages link to the official authority for confirmation.
+- Only pages listed in the sitemap are public; /admin is private and excluded.

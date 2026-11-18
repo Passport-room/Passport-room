@@ -52,11 +52,8 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=20261125" />
-    <link rel="stylesheet" href="liquid-glass.css?v=20261122" />
-    <style>/* Reserved placements stay hidden until explicitly enabled. */
-      [data-ad-placement] { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="style.css?v=20261126" />
+    <link rel="stylesheet" href="liquid-glass.css?v=20261126" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -368,12 +365,6 @@
               </div>
             </div>
           </div>
-          <!-- Reserved hidden ad placement -->
-<div class="pr-ad pr-ad-hero pr-hta" data-ad-placement="upload" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="upload"></div>
-            </div>
-
           <div id="drop" class="drop">
             <input
               id="fileInput"
@@ -388,7 +379,7 @@
                     <path d="m5.2 10.2 3 3.1 6.8-7" />
                   </svg>
                 </span>
-                <span>Trusted by 1,000+</span>
+                <span>Trusted by Thousands</span>
               </div>
               <div class="dropIcon">
                 <svg
@@ -465,12 +456,7 @@
         <div id="procTitle" class="procTitle">Warming up the AI…</div>
         <div id="procSub" class="procSub">Preparing your photo studio.</div>
 
-        <!-- Reserved hidden ad placement -->
-        <div class="pr-ad pr-ad-proc pr-hta" data-ad-placement="processing" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="processing"></div>
-            </div>
-      </section>
+        </section>
 
       <section id="resultView" class="view hidden">
         <div class="resultHead">
@@ -505,12 +491,7 @@
                 <img id="tryOnResult" class="tryOnResult hidden" alt="AI dress try-on result" />
               </div>
             </div>
-            <!-- Reserved hidden ad placement -->
-            <div class="pr-ad pr-ad-preview pr-hta" data-ad-placement="preview" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="preview"></div>
             </div>
-          </div>
 
           <div id="tryOnPanel" class="panel tryOnPanel">
             <div class="tryOnHead">
@@ -1035,10 +1016,6 @@
           <div class="pr-download-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg></div>
           <h2 id="downloadTitle" class="modalTitle">Download Your Picture</h2>
           <p id="downloadDescription" class="pr-download-description">To save your picture, click Download Your Picture. Thank you!</p>
-          <div class="pr-ad pr-download-ad" data-ad-placement="download" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="download"></div>
-            </div>
           <button id="prDownloadConfirm" type="button" class="btn primary pr-download-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v5h14v-5"/></svg><span>Download Your Picture</span></button>
           <p id="prDownloadStatus" class="pr-download-status" role="status" aria-live="polite"></p>
         </div>
@@ -1058,12 +1035,7 @@
           </button>
           <div class="modalTitle">Ready to print</div>
 
-<div class="pr-ad pr-ad-modal pr-hta" data-ad-placement="print" hidden aria-hidden="true">
-              <!-- Reserved ad placement: intentionally inactive. -->
-              <div class="pr-hta-slot" data-ad-slot="print"></div>
-            </div>
-
-          <p class="modalSub muted small">Your print sheet has been sent to the print dialog.</p>
+<p class="modalSub muted small">Your print sheet has been sent to the print dialog.</p>
           <div class="modalBtns">
             <button id="printAdModalHome" class="btn primary">Home</button>
           </div>
@@ -2089,12 +2061,13 @@
 
           <div class="aboutDemoBox">
             <img
-              src="/assets/how-it-works.jpg"
+              src="/assets/comparison.jpg"
               loading="lazy"
               width="720"
-              height="593"
-              alt="Real Passport Room result: the same photo before and after on-device background removal and formal dress try-on"
+              height="720"
+              alt="Passport Room before and after: the same portrait with the background removed and a formal suit added"
               class="aboutDemoImg"
+              onerror="this.closest('.aboutDemoBox').remove()"
             />
             <div class="aboutDemoCaption">
               <strong>Before vs. After:</strong> a real, unretouched screenshot from Passport Room
@@ -2420,5 +2393,6 @@
 <script src="/cookie-consent.js?v=20261116" defer></script>
 <script type="module" src="/visitor-profile.js?v=20261024"></script>
 <script type="module" src="/survey.js?v=20261102"></script>
-</body>
+    <script src="/nav-active.js?v=20261118" defer></script>
+  </body>
 </html>

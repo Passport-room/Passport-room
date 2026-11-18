@@ -1987,13 +1987,12 @@ select:focus {
   box-shadow: 0 4px 20px -5px oklch(0.65 0.25 140 / 0.3);
 }
 
+/* The comparison image sits directly on the page: no white card, no frame. */
 .aboutDemoBox {
   margin: 20px 0;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid oklch(0.62 0.26 305 / 0.3);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
-  background: oklch(0.14 0.04 300);
+  border: 0;
+  background: none;
+  box-shadow: none;
 }
 
 .aboutDemoImg {
@@ -2004,12 +2003,12 @@ select:focus {
 }
 
 .aboutDemoCaption {
-  padding: 10px 16px;
+  padding: 10px 4px 0;
   font-size: 12.5px;
   color: var(--muted);
   text-align: center;
-  background: oklch(0.18 0.05 300 / 0.8);
-  border-top: 1px solid oklch(0.62 0.26 305 / 0.15);
+  background: none;
+  border-top: 0;
 }
 
 /* Home Page Contact Footer */
