@@ -52,5 +52,3 @@ Added liquid-glass.css, a theme-only override stylesheet now linked last on ever
 (home, about, features, contact, privacy, terms, stats, admin). It recolors the UI to a
 purple liquid glass look (blurred translucent panels, violet aurora background, glass
 buttons and inputs). No content, markup structure, scripts or settings were changed.
-
-Offerwall.GG survey rewards are available at `/earn`. See `OFFERWALL-SETUP.md` for the Vercel environment variables, Firebase wallet rules, and placement postback URL. Never commit the placement secret or Firebase service-account JSON.
