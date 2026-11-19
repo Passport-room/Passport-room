@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c0519" />
+    <title>Earn Coins with Surveys | Passport Room</title>
+    <meta name="description" content="Complete surveys and offers to earn Passport Room coins, credited to your visitor account." />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="https://passport-room.com/earn" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Earn Coins with Surveys | Passport Room" />
+    <meta property="og:description" content="Complete surveys and offers to earn Passport Room coins." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/page.css?v=20261118" />
+    <link rel="stylesheet" href="/liquid-glass.css?v=20261126" />
+    <style>
+      .earnBar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:18px 0;padding:14px 18px;border-radius:16px;border:1px solid rgba(196,165,255,.25);background:rgba(167,139,250,.1)}
+      .earnCoins{font:700 28px Sora,sans-serif}
+      .earnUid{font-size:12px;opacity:.75;word-break:break-all}
+      .earnWall{width:100%;height:800px;border:0;border-radius:16px;background:rgba(0,0,0,.15)}
+      .earnGate{padding:24px;border-radius:16px;border:1px solid rgba(196,165,255,.25);text-align:center}
+      .earnGate button{margin-top:12px;border:0;border-radius:12px;padding:11px 18px;font:600 14px Inter,sans-serif;color:#fff;background:linear-gradient(150deg,#7c3aed,#a855f7);cursor:pointer}
+    </style>
+  </head>
+  <body>
+    <nav class="pgNav" aria-label="Primary">
+      <div class="pgNavInner">
+        <a href="/"><img src="/logo.png" alt="Passport Room" width="120" height="28" /></a>
+        <div class="pgNavLinks">
+          <a href="/">Photo maker</a>
+          <a href="/documents">Documents</a>
+          <a href="/features">Features</a>
+          <a href="/blog">Blog</a>
+          <a href="/why-to-use">Why to use</a>
+          <a href="/reviews">Reviews</a>
+          <a href="/earn" aria-current="page">Earn</a>
+          <a href="/about">About</a>
+          <a href="/founder">About CEO</a>
+          <a href="/parent-company">OneRoom</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pgWrap">
+      <p class="pgCrumbs"><a href="/">Home</a> › Earn</p>
+      <h1>Earn coins</h1>
+      <p class="pgLead">Complete surveys and offers below. Coins are added to your account automatically once the offer partner confirms completion, which can take a few minutes.</p>
+
+      <div class="earnBar">
+        <div><div>Your balance</div><div class="earnCoins"><span id="earnCoins">0</span> coins</div></div>
+        <div class="earnUid">User ID: <span id="earnUid">Not assigned</span></div>
+      </div>
+      <p id="earnStatus" role="status"></p>
+
+      <div id="earnGate" class="earnGate">
+        <p>To credit coins to you, Passport Room needs a visitor ID. Use the cookie banner to accept cookies, then this page will load your offers.</p>
+      </div>
+      <iframe id="earnWall" class="earnWall" title="Offerwall surveys and offers" allow="clipboard-write" hidden></iframe>
+    </main>
+
+    <footer class="pgFooter">
+      <nav aria-label="Footer">
+        <a href="/">Home</a>
+        <a href="/earn">Earn</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </nav>
+    </footer>
+    <script src="/nav-scroll.js?v=20261122" defer></script>
+    <script src="/cookie-consent.js?v=20261116" defer></script>
+    <script type="module" src="/visitor-profile.js?v=20261024"></script>
+    <script type="module" src="/earn.js?v=20261119"></script>
+    <script src="/nav-active.js?v=20261118" defer></script>
+  </body>
+</html>

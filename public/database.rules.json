@@ -154,77 +154,17 @@
         }
       }
     },
-    "rewards": {
-      "config": {
-        ".read": true,
-        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
-        "settings": {
-          "enabled": {
-            ".validate": "newData.isBoolean()"
-          },
-          "pointsPerUnit": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
-          },
-          "dailyEarnCapPoints": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000"
-          },
-          "minPayoutPoints": {
-            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000"
-          },
-          "maintenanceMessage": {
-            ".validate": "newData.isString() && newData.val().length <= 400"
-          },
-          "termsUrl": {
-            ".validate": "newData.isString() && newData.val().length <= 200"
-          },
-          "$other": {
-            ".validate": true
-          }
-        },
-        "providers": {
-          "$providerId": {
-            ".validate": "$providerId.length <= 64",
-            "enabled": {
-              ".validate": "newData.isBoolean()"
-            },
-            "category": {
-              ".validate": "newData.isString() && newData.val().matches(/^(survey|offer|video)$/)"
-            },
-            "mode": {
-              ".validate": "newData.isString() && newData.val().matches(/^(iframe|link)$/)"
-            },
-            "launchUrl": {
-              ".validate": "newData.isString() && newData.val().length <= 2000"
-            },
-            "$other": {
-              ".validate": true
-            }
-          }
-        }
-      },
-      "users": {
-        ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
-        "$uid": {
-          ".read": "auth != null && auth.uid === $uid",
-          ".write": false
-        }
-      },
-      "transactions": {
-        ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
-        ".indexOn": "ts",
-        "$uid": {
-          ".read": "auth != null && auth.uid === $uid",
-          ".write": false
-        }
-      },
-      "ledger": {
-        ".read": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
         ".write": false
       }
     },
-    "rewardsSecrets": {
-      ".read": false,
-      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    "wallets": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
     }
   }
 }

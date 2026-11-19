@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Vercel deployment
+
+- Keep static website content, Vercel serverless endpoints, and their helper modules inside `public/`, which is deployed as the Vercel project root; this preserves the existing static-site hosting model.
