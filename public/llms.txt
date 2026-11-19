@@ -17,6 +17,7 @@ Languages: English (en)
 - [Why to use Passport Room](https://passport-room.com/why-to-use): comparison with photo booths, apps and print shops.
 - [AI roadmap](https://passport-room.com/ai-roadmap): what is shipped and what is planned next.
 - [Free forever](https://passport-room.com/free-forever): how the tool stays free and what is never charged for.
+- [Rewards](https://passport-room.com/rewards): points for surveys, offerwalls and rewarded videos; only a verified provider postback can credit an account, and the balance is never editable in the browser.
 
 ## Document and country guides
 

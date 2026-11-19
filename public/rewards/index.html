@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}(function(){var c=null;try{c=localStorage.getItem("pr_cookie_consent");}catch(e){}var g=c==="accepted"?"granted":"denied";gtag("consent","default",{ad_storage:g,ad_user_data:g,ad_personalization:g,analytics_storage:g,wait_for_update:500});})();</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c0519" />
+    <title>Rewards – Surveys, Offers and Videos | Passport Room</title>
+    <meta
+      name="description"
+      content="Earn points on Passport Room with surveys, offers and rewarded videos from our reward partners. Every credit is verified on our server and recorded in your history."
+    />
+    <link rel="canonical" href="https://passport-room.com/rewards" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta property="og:site_name" content="Passport Room" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://passport-room.com/rewards" />
+    <meta property="og:title" content="Rewards – Surveys, Offers and Videos | Passport Room" />
+    <meta
+      property="og:description"
+      content="Earn points on Passport Room from survey walls, offer walls and rewarded videos. Every credit is verified and recorded server-side."
+    />
+    <meta property="og:image" content="https://passport-room.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://passport-room.com/og-image.jpg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/page.css?v=20261126" />
+    <link rel="stylesheet" href="/liquid-glass.css?v=20261126" />
+    <link rel="stylesheet" href="/rewards/rewards.css?v=20261119" />
+  </head>
+  <body>
+    <nav class="pgNav" aria-label="Primary">
+      <div class="pgNavInner">
+        <a href="/"><img src="/logo.png" alt="Passport Room" width="120" height="28" /></a>
+        <div class="pgNavLinks">
+          <a href="/">Photo maker</a>
+          <a href="/documents">Documents</a>
+          <a href="/features">Features</a>
+          <a href="/blog">Blog</a>
+          <a href="/why-to-use">Why to use</a>
+          <a href="/reviews">Reviews</a>
+          <a href="/rewards" aria-current="page">Rewards</a>
+          <a href="/about">About</a>
+          <a href="/founder">About CEO</a>
+          <a href="/parent-company">OneRoom</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pgWrap rwWrap">
+      <p class="pgCrumbs"><a href="/">Home</a> › Rewards</p>
+
+      <section class="rwHero">
+        <div>
+          <span class="rwBadge" id="rwStatus" data-state="off">Checking availability…</span>
+          <h1>Earn rewards for surveys, offers and videos</h1>
+          <p>
+            Partners pay us when you complete a survey, an offer or a rewarded video. They tell our
+            server what it was worth, the server verifies their message, and the points land in your
+            account. You never type, edit or send a balance yourself — the page only ever reads it.
+          </p>
+        </div>
+      </section>
+
+      <p class="rwNotice" id="rwNotice" hidden></p>
+
+      <section class="rwBalance" id="rwBalance" hidden aria-label="Your balance">
+        <div class="rwBalanceMain">
+          <span>Your balance</span>
+          <b id="rwPoints">0</b>
+          <small id="rwValue">points</small>
+        </div>
+        <div class="rwStat">
+          <span>Earned today</span>
+          <b id="rwToday">0</b>
+        </div>
+        <div class="rwStat">
+          <span>Lifetime earned</span>
+          <b id="rwLifetime">0</b>
+        </div>
+        <div class="rwStat">
+          <span>Reversed</span>
+          <b id="rwReversed">0</b>
+        </div>
+      </section>
+
+      <div class="rwTabs" id="rwTabs" role="tablist" hidden>
+        <button role="tab" data-cat="survey" aria-selected="true">Survey walls <span id="cntSurvey">0</span></button>
+        <button role="tab" data-cat="offer" aria-selected="false">Offerwalls <span id="cntOffer">0</span></button>
+        <button role="tab" data-cat="video" aria-selected="false">Rewarded videos <span id="cntVideo">0</span></button>
+      </div>
+
+      <div class="rwGrid" id="rwGrid"></div>
+
+      <section id="rwHistorySec" hidden>
+        <div class="rwSectionTitle">
+          <h2>Reward history</h2>
+          <button class="rwTabs" style="all:unset" hidden></button>
+          <a href="#" id="rwRefresh" role="button">Refresh</a>
+        </div>
+        <p class="rwFootNote">
+          Every row below is a record written by our server when a partner reported a completed
+          activity. Reversals are separate rows; the original entry is never edited or deleted.
+        </p>
+        <div class="rwTableWrap">
+          <table class="rwTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Partner</th>
+                <th>Type</th>
+                <th>Points</th>
+                <th>Reference</th>
+              </tr>
+            </thead>
+            <tbody id="rwTxnBody">
+              <tr><td colspan="5" class="rwEmpty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="rwInfo">
+        <article>
+          <h3>How points are calculated</h3>
+          <p>
+            Each partner reports a payout in money. That payout is multiplied by the rate shown on
+            the partner card, and the result is capped per activity and per day by the limits in our
+            configuration. The rate is applied by the server, never by the browser.
+          </p>
+        </article>
+        <article>
+          <h3>Getting your points</h3>
+          <p>
+            Points are not cash and cannot be transferred between accounts. When you have at least
+            the minimum shown above, <a href="/contact">contact us</a> from the same browser you
+            earned them in and we will arrange the payout manually.
+          </p>
+        </article>
+        <article>
+          <h3>Fraud, reversals and limits</h3>
+          <p>
+            Partners can reverse a completion after the fact — for example when a survey is
+            rejected for straight-lining or a payment is charged back. A reversal takes back the
+            same points and appears in your history with its reason. Accounts that automate walls,
+            use VPNs to fake a country or share a device to farm surveys are removed.
+          </p>
+        </article>
+      </section>
+
+      <p class="rwFootNote">
+        Rewards are operated by Passport Room with third-party partners. Read the
+        <a id="rwTerms" href="/terms-of-service">terms of service</a> and
+        <a href="/privacy-policy">privacy policy</a>. Nothing on this page is a promise of earnings:
+        what you receive depends on which activities you complete and whether the partner confirms
+        them.
+      </p>
+    </main>
+
+    <footer class="pgFooter">
+      <nav aria-label="Footer">
+        <a href="/">Passport photo maker</a>
+        <a href="/documents">Documents</a>
+        <a href="/features">Features</a>
+        <a href="/blog">Blog</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/rewards" aria-current="page">Rewards</a>
+        <a href="/ai-roadmap">AI roadmap</a>
+        <a href="/about">About</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/terms-of-service">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </nav>
+      <div>© 2026 Passport Room · Private, on-device passport photos.</div>
+    </footer>
+
+    <div class="rwModal" id="rwModal" hidden role="dialog" aria-modal="true" aria-labelledby="rwModalTitle">
+      <div class="rwModalBox">
+        <div class="rwModalHead">
+          <h2 id="rwModalTitle">Partner wall</h2>
+          <a id="rwModalOpen" href="#" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+          <button type="button" id="rwModalClose" aria-label="Close">×</button>
+        </div>
+        <iframe class="rwModalFrame" id="rwFrame" title="Reward partner wall" referrerpolicy="no-referrer-when-downgrade" allow="fullscreen"></iframe>
+      </div>
+    </div>
+
+    <script src="/nav-scroll.js?v=20261122" defer></script>
+    <script src="/cookie-consent.js?v=20261126" defer></script>
+    <script src="/nav-active.js?v=20261118" defer></script>
+    <script type="module" src="/rewards/rewards.js?v=20261119"></script>
+  </body>
+</html>
