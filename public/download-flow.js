@@ -43,6 +43,9 @@
     const { blob, filename, onDownloaded } = pending;
     confirm.disabled = true;
     try {
+      // Open the Monetag Direct Link from this genuine user gesture, while the photo
+      // continues downloading locally in the same tab.
+      window.open('https://uplcm.com/4/12374644', '_blank', 'noopener,noreferrer');
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
